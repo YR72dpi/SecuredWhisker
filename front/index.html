@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA Key Generation</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+    <link rel="stylesheet" href="style/style.css">
+    <script src="src/IndexedDB.js"></script>
+    <script src="src/utils.js"></script>
+</head>
+
+<body>
+    <main id="registerFormSection">
+        <form id="registerForm">
+            <label for="ip">Service IP</label>
+            <input id="ip" type="text" name="ip" placeholder="Service IP" required value="localhost">
+
+            <label for="port">Service port</label>
+            <input id="port" type="text" name="port" placeholder="Service port" required value="3000">
+
+            <label for="username">Your user name</label>
+            <input id="username" type="text" name="name" placeholder="Your user name" required>
+
+            <input type="submit" value="Start Communication">
+        </form>
+        <span id="loading">Loading... Check the console to know what's happening</span>
+
+    </main>
+
+    <main id="personnalData">
+        <p>Identifier : <span id="finalUsername"></span></p>
+    </main>
+
+    <main  id="chatSection">
+        <section>
+            <aside id="contact">
+                <h2>Contact</h2>
+            </aside>
+            <aside id="chat">
+                <h2>Chat</h2>
+            </aside>
+        </section>
+    </main>
+
+    <main id="messageForm">
+
+        <label for="message">Your user name</label>
+        <input id="message" type="text" name="name" placeholder="Message">
+
+        <input type="submit" value="send">
+    </main>
+    
+    <main id="stopCommunication">
+        <button>Stop Communication</button>
+    </main>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.1.0/jsencrypt.min.js"></script>
+    <script src="src/register.js"></script>
+</body>
+
+</html>
