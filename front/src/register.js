@@ -32,19 +32,22 @@
       redirect: 'follow'
     };
 
+    window.targetServiceIp = evt.target.ip.value
+    window.targetServicePort = evt.target.port.value
     await fetch(
-      `http://${evt.target.ip.value}:${evt.target.port.value}/register`, 
+      `http://${window.targetServiceIp}:${window.targetServicePort}/register`, 
       requestOptions
       )
       .then(response => response.text())
       .then(async (result) => {
         console.log(result)
+        window.currentUser = result
         document.getElementById("registerFormSection").style.display = "none"
 
         document.getElementById("finalUsername").innerText = result
         document.getElementById("personnalData").style.display      = "block"
         document.getElementById("chatSection").style.display        = "block"
-        document.getElementById("messageForm").style.display        = "block"
+        document.getElementById("messageFormContainer").style.display        = "block"
         document.getElementById("stopCommunication").style.display  = "block"
 
         await IndexedDB.addIpService(evt.target.ip.value)

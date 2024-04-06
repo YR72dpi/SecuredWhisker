@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -14,8 +15,22 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  ip        String  
-  uniqId    String
+  id        Int    @id @default(autoincrement())
+  ip        String 
+  uniqId    String @unique
   publicKey String
+  sendMessage Message[] @relation("MessageFrom")
+  receiveMessage Message[] @relation("MessageTo")
+}
+
+model Message {
+  id   Int      @id @default(autoincrement())
+  at   DateTime @default(now())
+  content String
+
+  from User @relation("MessageFrom", fields: [fromId], references: [id])
+  fromId Int
+
+  to   User @relation("MessageTo", fields: [toId], references: [id])
+  toId Int
 }
