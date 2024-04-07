@@ -1,7 +1,6 @@
 // src/index.js
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client'
 import { uniqid } from "./utils/utils"
