@@ -58,6 +58,7 @@ const send = async (encryptMessageFor, forUser) => {
         
         const encryptedMessage = await encryptMessageFor(message, neededUser)
         await send(encryptedMessage, to)
+        form.message.value = ""
 
     })
 })()

@@ -8,7 +8,4 @@ const generateRSAKeys = () => {
         resolve({ publicKey: publicKey, privateKey: privateKey });
       });
     });
-    // return { publicKey: "publicKey", privateKey: "privateKey" }
   };
-
-  

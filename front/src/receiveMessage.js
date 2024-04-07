@@ -35,6 +35,8 @@ const messageElement = async (msg) => {
     let textNode = document.createTextNode(decryptedMsg)
 
     strong.innerText = msg.from.uniqId + ": "
+    strong.setAttribute("data-user", msg.from.uniqId)
+    strong.classList.add("messageReceive")
 
     p.appendChild(strong);
     p.appendChild(textNode);
@@ -58,6 +60,13 @@ let messagesShown = [];
                     }
                 });
             }
+
+            document.querySelectorAll(".messageReceive").forEach(messageReceive => {
+                messageReceive.addEventListener("click", (el) => {
+                    console.log(el.target)
+                    document.getElementById("to").value = el.target.dataset.user
+                })
+            })
         } else {
             console.log("Wait for register")
         }
