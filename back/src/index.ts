@@ -52,7 +52,11 @@ app.get('/getUser', cors(corsOptions), async (req: Request, res: Response) => {
   const uniqUsername = await prisma.user.findUnique({
     where: {
       uniqId: String(data)
-    }
+    },
+    select: {
+      uniqId: true,
+      publicKey: true,
+    },
   })
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -95,6 +99,45 @@ app.post('/insertMessage', cors(corsOptions), async (req: Request, res: Response
 
   }
 
+
+
+});
+
+app.get('/myMessage', cors(corsOptions), async (req: Request, res: Response) => {
+
+  const data = req.query.name
+  console.log(data)
+
+  const userTo = await prisma.user.findUnique({
+    where: {
+      uniqId: String(data)
+    }
+  })
+
+  if(userTo) {
+    const messages = await prisma.message.findMany({
+      where: {
+        to: userTo
+      },
+      include: {
+        from: {
+          select: {
+            uniqId: true
+          }
+        },
+        to: {
+          select: {
+            uniqId: true
+          }
+        }
+      }
+    })
+
+    res.send(messages)
+  } else {
+    
+    res.send("Error user not found")
+  }
 
 
 });

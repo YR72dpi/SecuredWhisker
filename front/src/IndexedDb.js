@@ -81,6 +81,48 @@ class IndexedDBManager {
     };
   }
 
+  async getPrivateKey() {
+    return new Promise((resolve, reject) => {
+      // Ouvrir une connexion avec la base de données
+      const request = window.indexedDB.open(this.dbName, 1);
+
+      // Gérer les événements liés à l'ouverture de la base de données
+      request.onerror = function (event) {
+        console.error("Error while opening bdd: ", event.target.error);
+        reject(event.target.error);
+      };
+
+      request.onsuccess = function (event) {
+        this.db = event.target.result;
+
+        // Démarre une transaction en lecture seule
+        const transaction = this.db.transaction(['userData'], 'readonly');
+
+        // Récupère l'object store des données utilisateur
+        const objectStore = transaction.objectStore('userData');
+
+        // Récupère la clé privée à partir de l'object store
+        const getRequest = objectStore.getAll();
+
+        getRequest.onsuccess = function (event) {
+          const privateKeys = event.target.result;
+          if (privateKeys && privateKeys.length > 0) {
+            // Récupère la première clé privée (supposant qu'il n'y en a qu'une)
+            const privateKey = atob(privateKeys[0]); // Décodage de la clé privée de Base64
+            resolve(privateKey);
+          } else {
+            resolve(null); // Aucune clé privée trouvée
+          }
+        };
+
+        getRequest.onerror = function (event) {
+          console.error("Error while getting PrivateKey", event.target.error);
+          reject(event.target.error);
+        };
+      };
+    });
+  }
+
   async addIpService(ip) {
     // Ouvrir une connexion avec la base de données
     const request = window.indexedDB.open(this.dbName, 1);
