@@ -6,7 +6,6 @@ import { PrismaClient } from '@prisma/client'
 import { uniqid } from "./utils/utils"
 import { deleteOldUserByIp } from "./utils/prismaUtils";
 
-
 dotenv.config();
 
 const app: Express = express();
@@ -23,7 +22,7 @@ const corsOptions = {
 const prisma = new PrismaClient()
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send("Secured Whisker");
 });
 
 app.post('/register', cors(corsOptions), async (req: Request, res: Response) => {
@@ -34,20 +33,23 @@ app.post('/register', cors(corsOptions), async (req: Request, res: Response) => 
   await deleteOldUserByIp(ip)
 
   const uniqUsername = data.username + uniqid()
-  await prisma.user.create({
-    data: {
-      ip: String(ip),
-      uniqId: uniqUsername,
-      publicKey: data.publicKey
-    }
-  })
+  try {
+    await prisma.user.create({
+      data: {
+        ip: String(ip),
+        uniqId: uniqUsername,
+        publicKey: data.publicKey
+      }
+    })
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.send(uniqUsername)
+    console.log("[/register] \t " + data.username + " => " + uniqUsername)
+    res.send(uniqUsername)
+  } catch (error) {
+    res.status(404).send(error)
+  }
 });
 
 app.get('/getUser', cors(corsOptions), async (req: Request, res: Response) => {
-
   const data = req.query.name
   const uniqUsername = await prisma.user.findUnique({
     where: {
@@ -59,7 +61,7 @@ app.get('/getUser', cors(corsOptions), async (req: Request, res: Response) => {
     },
   })
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  console.log("[/getUser] \t " + data)
   res.send(uniqUsername)
 });
 
@@ -88,11 +90,11 @@ app.post('/insertMessage', cors(corsOptions), async (req: Request, res: Response
       }
     })
 
-    res.send("send")
-
+  console.log("[/insertMessage] " + userFrom.uniqId + " => " + userTo.uniqId)
+  
+    res.send("Send")
   } else {
     res.send("User not find")
-
   }
 
 });
@@ -110,7 +112,7 @@ app.get('/myMessage', cors(corsOptions), async (req: Request, res: Response) => 
   if (userTo) {
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     if (ip !== userTo.ip) {
-      res.send("Wrong user")
+      res.status(401).send("Wrong user")
     }
 
     const messages = await prisma.message.findMany({
@@ -131,9 +133,10 @@ app.get('/myMessage', cors(corsOptions), async (req: Request, res: Response) => 
       }
     })
 
+    console.log("[/myMessage] \t " + data + " getting message")
     res.send(messages)
   } else {
-    res.send("Error user not found")
+    res.status(500).send("Error user not found")
   }
 
 
