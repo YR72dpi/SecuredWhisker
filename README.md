@@ -77,6 +77,14 @@ DATABASE_URL="postgresql://root:securedwhisker@localhost:5432/securedwhisker?sch
 
 Contributions are welcome! Feel free to open issues or submit pull requests to contribute to the development of this application.
 
+## To improve it
+
+- Front
+    - Use [Dexie.js](https://dexie.org/) to manage IndexDB
+    - Make an NextJs front which gonna be export
+  
+  
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
