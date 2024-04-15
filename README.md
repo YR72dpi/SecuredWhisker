@@ -81,9 +81,8 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 
 - Front
     - Use [Dexie.js](https://dexie.org/) to manage IndexDB
+    - Use [FingerprintJS ](https://github.com/fingerprintjs/fingerprintjs) instead of IP adress
     - Make an NextJs front which gonna be export
-  
-  
 
 ## License
 
