@@ -1,6 +1,3 @@
-
-
-
 (async () => {
   document.getElementById("registerForm").addEventListener("submit", async (evt) => {
     evt.preventDefault()
@@ -44,19 +41,16 @@
         window.currentUser = result
         document.getElementById("registerFormSection").style.display = "none"
 
-        document.getElementById("finalUsername").innerText = result
-        document.getElementById("personnalData").style.display      = "block"
-        document.getElementById("chatSection").style.display        = "block"
-        document.getElementById("messageFormContainer").style.display        = "block"
-        document.getElementById("stopCommunication").style.display  = "block"
+        document.getElementById("finalUsername").innerText            = result
+        document.getElementById("personnalData").style.display        = "block"
+        document.getElementById("chatSection").style.display          = "block"
+        document.getElementById("messageFormContainer").style.display = "block"
 
         await IndexedDB.addIpService(evt.target.ip.value)
         await IndexedDB.addPortService(evt.target.port.value)
         
       })
       .catch(error => console.log('error', error));
-
-
 
     console.log("form send")
   })
