@@ -1,7 +1,0 @@
-#personnalData, #loading, #chatSection, #messageFormContainer, #stopCommunication {
-    display: none;
-}
-
-.messageReceive {
-    cursor:pointer;
-}
