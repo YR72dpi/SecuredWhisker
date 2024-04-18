@@ -1,0 +1,12 @@
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    &#registerForm {
+        justify-content: center;
+        width: 25vw;
+        height: calc(100vh - 2 * 15px);
+        margin: 0 auto;
+    }
+}

@@ -1,0 +1,13 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    
+    * {
+        box-sizing: border-box;
+    }
+}
+main {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
