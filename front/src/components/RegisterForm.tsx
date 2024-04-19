@@ -3,8 +3,14 @@ import { Input } from "./ui/input";
 import JSEncrypt from "jsencrypt"
 
 interface Saved {
-  formSubmitted:    () => void
-  chatReady:        () => void
+  formSubmitted:            () => void
+  registrationStateMessage: (state: string) => void
+  chatReady:                () => void
+
+  putUsername:              (state: string) => void
+  putIp:                    (ip: string) => void
+  putPort:                  (port: string) => void
+  putPrivateKey:            (privateKey: string) => void
 }
 
 interface RSAKeys {
@@ -14,7 +20,13 @@ interface RSAKeys {
 
 export const RegisterForm: FC<Saved> = ({
   formSubmitted,
-  chatReady
+  registrationStateMessage,
+  chatReady,
+
+  putUsername,
+  putIp,
+  putPort,
+  putPrivateKey
 }) => {
   const [canSend, setCanSend] = useState(false)
 
@@ -56,7 +68,9 @@ export const RegisterForm: FC<Saved> = ({
           });
         };
 
+        registrationStateMessage("Generate RSA keys")
         const rsaKeys = await generateRSAKeys()
+
         console.table([
           rsaKeys.publicKey,
           rsaKeys.privateKey
@@ -75,12 +89,19 @@ export const RegisterForm: FC<Saved> = ({
           body: JSON.stringify(formdata),
         };
 
+        registrationStateMessage("Send public key and username")
         await fetch(
           'http://' + formData.ip + ':' + formData.port + '/register',
           requestOptions
         ).then(async (res) => {
             if(res.ok) {
-              let username = await res.text()
+              let username: string = await res.text()
+
+              putUsername(username)
+              putIp(formData.ip)
+              putPort(formData.port)
+              putPrivateKey(rsaKeys.privateKey)
+
               chatReady()
               // Enregistrer user, username private Key 
             }

@@ -112,12 +112,15 @@ app.get('/myMessage', cors(corsOptions), async (req: Request, res: Response) => 
   if (userTo) {
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     if (ip !== userTo.ip) {
-      res.status(401).send("Wrong user")
+      res.send("Wrong user")
     }
 
     const messages = await prisma.message.findMany({
       where: {
-        to: userTo
+        OR: [
+          { toId:   { equals : userTo.id } },
+          { fromId: { equals : userTo.id } }
+        ]
       },
       include: {
         from: {
@@ -136,10 +139,10 @@ app.get('/myMessage', cors(corsOptions), async (req: Request, res: Response) => 
     console.log("[/myMessage] \t " + data + " getting message")
     res.send(messages)
   } else {
-    res.status(500).send("Error user not found")
+    res.send("Error user not found")
   }
 
-
+  
 });
 
 app.listen(port, () => {
