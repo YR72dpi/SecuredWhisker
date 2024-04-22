@@ -31,6 +31,9 @@ export const Contact: FC<Data> = ({ messages, userSelected, you }) => {
       el.classList.add("border")
     })
     document.getElementById(userButton.id)!.classList.remove("border")
+
+    let toUserInput = document.getElementById("toUser")! as HTMLInputElement
+    toUserInput.value = userButton.innerText
     userSelected(userButton.innerText)
   }
 
@@ -40,7 +43,7 @@ export const Contact: FC<Data> = ({ messages, userSelected, you }) => {
         <ScrollArea className="h-[100%] w-[100%] rounded-md border p-4">
           <ul className="p-1 flex flex-col gap-2 overflow-auto" >
             {userList.map((user, index) => {
-              return <li onClick={userSelectingHandler} key={index} id={"user+"+user} className="userButton px-2 py-1 rounded-lg border hover:bg-slate-600">{user}</li>
+              return <li onClick={userSelectingHandler} key={user} id={"user+"+user} className="userButton px-2 py-1 rounded-lg border hover:bg-slate-600">{user}</li>
             })}
           </ul>
         </ScrollArea>

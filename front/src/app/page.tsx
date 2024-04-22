@@ -57,7 +57,6 @@ export default function Home() {
       })()
     }
   }, [isChatReady, messages, selectedUser])
-
   return (
     <>
       <main>
@@ -90,6 +89,7 @@ export default function Home() {
               <ResizablePanel defaultSize={75}>
                 
                 { selectedUser !== "" && <ShowMessage from={selectedUser} messages={messages} you={username} />}
+                
               </ResizablePanel>
             </ResizablePanelGroup>
 

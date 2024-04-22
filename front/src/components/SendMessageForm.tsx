@@ -11,12 +11,13 @@ interface Data {
 export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
   const [formData, setFormData] = useState({
     message: "",
-    to: toUser ? toUser : ""
+    to: ""
   });
   const [haveToSend, setSend] = useState(false)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    console.log([name, value])
     setFormData({
       ...formData,
       [name]: value,
@@ -31,10 +32,10 @@ export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
   useEffect(() => {
     (async () => {
       if (haveToSend) {
-        console.log("send Message to " + formData.to)
+        console.log("send Message to " + formData.to === "" ? toUser : formData.to)
         var dataToSend = {
           encryptMessageFor: formData.message,
-          to: formData.to,
+          to: formData.to === "" ? toUser : formData.to,
           from: username
         }
 
@@ -66,8 +67,9 @@ export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
       <Input
         type="text"
         name="to"
+        id="toUser"
         placeholder="To"
-        value={formData.to ? formData.to : toUser}
+        value={formData.to}
         onChange={handleChange}
       />
       <Input

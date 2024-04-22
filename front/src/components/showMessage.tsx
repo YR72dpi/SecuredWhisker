@@ -21,7 +21,6 @@ export const ShowMessage: FC<Data> = ({
   you
 }) => {
   let messageParsed: Message[] = JSON.parse(messages)
-  console.log(messageParsed)
   let messagesFromSelectedUser = messageParsed.filter((message) => message.from.uniqId)
 
   return (
