@@ -61,7 +61,7 @@ export default function Home() {
   return (
     <>
       <main>
-        {!isChatReady ??
+        {!isChatReady &&
           <RegisterForm
             formSubmitted={handleSubmittedForm}
             registrationStateMessage={handleRegistrationState}
@@ -74,11 +74,11 @@ export default function Home() {
           />
         }
 
-        {(formSubmitted && !isChatReady) ?? <p>{registrationState}</p>}
+        {(formSubmitted && !isChatReady) && <p>{registrationState}</p>}
 
-        {isChatReady ??
+        {isChatReady &&
           <>
-            {username !== "" ? (<p><strong>Your username : </strong>{username}</p>) : (<></>)}
+            {username !== "" && <p><strong>Your username : </strong>{username}</p>}
             <ResizablePanelGroup
               direction="horizontal"
               className="min-h-[85vh] max-h-[85vh] max-w-[100vw] rounded-lg border"
@@ -89,7 +89,7 @@ export default function Home() {
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={75}>
                 
-                { selectedUser !== "" ?? <ShowMessage from={selectedUser} messages={messages} you={username} />}
+                { selectedUser !== "" && <ShowMessage from={selectedUser} messages={messages} you={username} />}
               </ResizablePanel>
             </ResizablePanelGroup>
 
