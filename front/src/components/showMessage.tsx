@@ -26,9 +26,9 @@ export const ShowMessage: FC<Data> = ({
   return (
 
 
-    <ScrollArea className="h-[100%] w-[100%] rounded-md border p-4">
-      {messagesFromSelectedUser.map((user) => {
-        return <p><strong>{user.from.uniqId === you ? "You" : user.from.uniqId } : </strong>{user.content}</p>
+    <ScrollArea className="h-[100%] w-[100%] rounded-md border flex flex-col-reverse column p-4">
+      {messagesFromSelectedUser.map((user, index) => {
+        return <p key={user+String(index)}><strong>{user.from.uniqId === you ? "You" : user.from.uniqId } : </strong>{user.content}</p>
 
         // return <li onClick={userSelectingHandler} key={index} id={"user+" + user} className="userButton px-2 py-1 rounded-lg border hover:bg-slate-600">{user}</li>
       })}
