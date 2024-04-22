@@ -1,4 +1,4 @@
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollArea } from "./ui/scroll-area";
 import { FC, MouseEvent } from "react";
 
 interface Data {

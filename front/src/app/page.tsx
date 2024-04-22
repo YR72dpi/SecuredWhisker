@@ -8,8 +8,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@radix-ui/react-separator";
 
 import { useEffect, useState } from "react";
 
@@ -63,7 +61,7 @@ export default function Home() {
   return (
     <>
       <main>
-        {!isChatReady ? (
+        {!isChatReady ??
           <RegisterForm
             formSubmitted={handleSubmittedForm}
             registrationStateMessage={handleRegistrationState}
@@ -74,13 +72,11 @@ export default function Home() {
             putPort={handleGetPort}
             putPrivateKey={handleGetPrivateKey}
           />
-        ) : (<></>)}
+        }
 
-        {(formSubmitted && !isChatReady) ? (
-          <p>{registrationState}</p>
-        ) : (<></>)}
+        {(formSubmitted && !isChatReady) ?? <p>{registrationState}</p>}
 
-        {isChatReady ? (
+        {isChatReady ??
           <>
             {username !== "" ? (<p><strong>Your username : </strong>{username}</p>) : (<></>)}
             <ResizablePanelGroup
@@ -93,15 +89,12 @@ export default function Home() {
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={75}>
                 
-                { selectedUser !== "" ? (
-                  <ShowMessage from={selectedUser} messages={messages} you={username} />
-                ) : (<></>)}
+                { selectedUser !== "" ?? <ShowMessage from={selectedUser} messages={messages} you={username} />}
               </ResizablePanel>
             </ResizablePanelGroup>
 
             <SendMessageForm ip={ip} port={port} username={username} toUser={selectedUser} />
           </>
-        ) : (<></>)
         }
 
       </main>
