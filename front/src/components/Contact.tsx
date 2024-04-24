@@ -9,14 +9,11 @@ interface Data {
 
 interface Message {
   toId: number
-  from: {
-    uniqId: string
-  }
+  from: { uniqId: string }
 }
 
 export const Contact: FC<Data> = ({ messages, userSelected, you }) => {
   let messageParsed: Message[] = JSON.parse(messages)
-  let hasContact = messageParsed.length > 0
 
   let userList: string[] = []
   messageParsed.forEach(message => {
@@ -24,6 +21,8 @@ export const Contact: FC<Data> = ({ messages, userSelected, you }) => {
       userList.push(message.from.uniqId)
     }
   });
+
+  let hasContact = userList.length > 0
 
   const userSelectingHandler = (evt: MouseEvent) => {
     let userButton = evt.target as HTMLElement

@@ -1,23 +1,26 @@
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from "react";
 import { Input } from "./ui/input";
+import JSEncrypt from "jsencrypt";
 
 interface Data {
   ip: string
   port: string
   username: string,
-  toUser: string
+  userSelected: string
 }
 
-export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
+export const SendMessageForm: FC<Data> = ({ ip, port, username, userSelected }) => {
   const [formData, setFormData] = useState({
     message: "",
-    to: ""
+    to: userSelected ?? ""
   });
   const [haveToSend, setSend] = useState(false)
+  const [manuallyChangedTargetUser, setManuallyChangedTargetUser] = useState<string>("")
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log([name, value])
+    if(e.target.name === "to") setManuallyChangedTargetUser(e.target.value)
+
     setFormData({
       ...formData,
       [name]: value,
@@ -29,13 +32,37 @@ export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
     setSend(true)
   };
 
+  const getNeededUser = async (user: string) => {
+    const neededUserData = await fetch("http://"+ip+":"+port+"/getUser?name="+user).then(data => data.json())
+    return neededUserData
+  }
+  
+  const encryptMessage = async (message: string, forUser: string) => {
+      
+    // Créez une instance de JSRSA
+    var rsaEncrypt = new JSEncrypt();
+  
+    let userInformation = await getNeededUser(forUser)
+  
+    // Set public key
+    var publicKey = atob(userInformation.publicKey);
+  
+    rsaEncrypt.setPublicKey(publicKey);
+  
+    // Encrypt the input text
+    var encrypted = rsaEncrypt.encrypt(message);
+  
+    // Afficher le texte chiffré
+    return encrypted;
+  }
+
   useEffect(() => {
     (async () => {
       if (haveToSend) {
-        console.log("send Message to " + formData.to === "" ? toUser : formData.to)
+        
         var dataToSend = {
-          encryptMessageFor: formData.message,
-          to: formData.to === "" ? toUser : formData.to,
+          encryptMessage: await encryptMessage(formData.message, manuallyChangedTargetUser !== "" ? manuallyChangedTargetUser : userSelected),
+          to: formData.to === "" ? userSelected : formData.to,
           from: username
         }
 
@@ -53,7 +80,6 @@ export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
         )
           .then(response => response.text())
           .then(async (result) => {
-            console.log(result)
           })
           .catch(error => console.log('error', error));
       }
@@ -63,7 +89,7 @@ export const SendMessageForm: FC<Data> = ({ ip, port, username, toUser }) => {
   }, [haveToSend])
 
   return (
-    <form id="sendMessageForm" onSubmit={handleSubmit}>
+    <form id="sendMessageForm" method="post" onSubmit={handleSubmit}>
       <Input
         type="text"
         name="to"

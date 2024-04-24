@@ -31,7 +31,7 @@ export const RegisterForm: FC<Saved> = ({
   const [canSend, setCanSend] = useState(false)
 
   const [formData, setFormData] = useState({
-    ip: 'localhost',
+    ip: '127.0.0.1',
     port: '3001',
     username: '',
   });
@@ -53,7 +53,6 @@ export const RegisterForm: FC<Saved> = ({
   };
 
   useEffect(() => {
-    console.log(canSend)
     if (canSend) {
       (async () => {
         const generateRSAKeys = (): Promise<RSAKeys> => {
@@ -68,6 +67,36 @@ export const RegisterForm: FC<Saved> = ({
           });
         };
 
+        const generateBrowserID = () => {
+          const screenWidth     = screen.width;
+          const screenHeight    = screen.height;
+          const appName         = navigator.appName;
+          const platform        = navigator.platform;
+          const language        = navigator.language;
+          const userAgent       = navigator.userAgent;
+          const languages       = navigator.languages.join("")
+          const timezoneOffset  = new Date().getTimezoneOffset();
+          const cookiesEnabled  = navigator.cookieEnabled ? 'CookiesEnabled' : 'CookiesDisabled';
+          const plugins         = Array.from(navigator.plugins, plugin => plugin.name).join(',');
+          
+          // Concatenate all information into a single string
+          const combinedString = 
+          userAgent + platform + appName + 
+          language + plugins + timezoneOffset + 
+          screenWidth + screenHeight + cookiesEnabled 
+          + languages;
+          
+          // Take a simple hash of the combined string
+          let hash = 0;
+          for (let i = 0; i < combinedString.length; i++) {
+            const char = combinedString.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0; // Convert to 32-bit integer
+          }
+          
+          return hash.toString(36); // Convert to base36 to make it more readable
+        }
+
         registrationStateMessage("Generate RSA keys")
         const rsaKeys = await generateRSAKeys()
 
@@ -78,7 +107,8 @@ export const RegisterForm: FC<Saved> = ({
 
         var formdata = {
           "username": formData.username,
-          "publicKey": btoa(rsaKeys.publicKey)
+          "publicKey": btoa(rsaKeys.publicKey),
+          "browserId": generateBrowserID()
         }
 
         var requestOptions = {
@@ -112,7 +142,7 @@ export const RegisterForm: FC<Saved> = ({
   }, [canSend])
 
   return (
-    <form id="registerForm" onSubmit={handleSubmit}>
+    <form id="registerForm" method="post" onSubmit={handleSubmit}>
       <Input
         type="text"
         name="ip"

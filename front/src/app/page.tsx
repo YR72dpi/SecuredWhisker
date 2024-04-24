@@ -1,42 +1,32 @@
 "use client"
-import { Contact } from "@/components/Contact";
-import { RegisterForm } from "@/components/RegisterForm";
-import { SendMessageForm } from "@/components/SendMessageForm";
-import { ShowMessage } from "@/components/showMessage";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable"
-
-import { useEffect, useState } from "react";
+import { useEffect, useState }                                  from "react"
+import { Contact }                                              from "@/components/Contact"
+import { ShowMessage }                                          from "@/components/showMessage"
+import { RegisterForm }                                         from "@/components/RegisterForm"
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import { SendMessageForm }                                      from "@/components/SendMessageForm"
 
 export default function Home() {
 
-  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [ip, setIp]                               = useState("")
+  const [port, setPort]                           = useState("")
+  const [username, setUsername]                   = useState("")
+  const [messages, setMessages]                   = useState(JSON.stringify([]))
+  const [isChatReady, setChatReady]               = useState(false)
+  const [privateKey, setPrivateKey]               = useState("")
+  const [selectedUser, setSelectedUser]           = useState("")
+  const [formSubmitted, setFormSubmitted]         = useState(false)
   const [registrationState, setRegistrationState] = useState("")
-  const [isChatReady, setChatReady] = useState(false)
 
-  const [username, setUsername] = useState("")
-  const [ip, setIp] = useState("")
-  const [port, setPort] = useState("")
-  const [privateKey, setPrivateKey] = useState("")
+  const handleGetIp             = (gotIp: string)         => { setIp(gotIp) }
+  const handleGetPort           = (gotPort: string)       => { setPort(gotPort) }
+  const handleChatReady         = ()                      => { setChatReady(true) }
+  const handleGetUsername       = (gotUsername: string)   => { setUsername(gotUsername) }
+  const handleUserSelected      = (userSelected: string)  => { setSelectedUser(userSelected) }
+  const handleSubmittedForm     = ()                      => { setFormSubmitted(true) }
+  const handleGetPrivateKey     = (gotPrivateKey: string) => { setPrivateKey(gotPrivateKey) }
+  const handleRegistrationState = (state: string)         => { setRegistrationState(state) }
 
-  const handleSubmittedForm = () => { setFormSubmitted(true) }
-  const handleRegistrationState = (state: string) => { setRegistrationState(state) }
-  const handleChatReady = () => { setChatReady(true) }
-
-  const handleGetUsername = (gotUsername: string) => { setUsername(gotUsername) }
-  const handleGetIp = (gotIp: string) => { setIp(gotIp) }
-  const handleGetPort = (gotPort: string) => { setPort(gotPort) }
-  const handleGetPrivateKey = (gotPrivateKey: string) => { setPrivateKey(gotPrivateKey) }
-
-  const [selectedUser, setSelectedUser] = useState("")
-  const handleUserSelected = (userSelected: string) => {
-    setSelectedUser(userSelected)
-  }
-
-  const [messages, setMessages] = useState(JSON.stringify([]))
   useEffect(() => {
     if (isChatReady) {
       (async () => {
@@ -57,6 +47,7 @@ export default function Home() {
       })()
     }
   }, [isChatReady, messages, selectedUser])
+
   return (
     <>
       <main>
@@ -78,25 +69,18 @@ export default function Home() {
         {isChatReady &&
           <>
             {username !== "" && <p><strong>Your username : </strong>{username}</p>}
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="min-h-[85vh] max-h-[85vh] max-w-[100vw] rounded-lg border"
-            >
+            <ResizablePanelGroup direction="horizontal" className="min-h-[85vh] max-h-[85vh] max-w-[100vw] rounded-lg border">
               <ResizablePanel defaultSize={25}>
                 <Contact messages={messages} you={username} userSelected={handleUserSelected} />
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={75}>
-                
-                { selectedUser !== "" && <ShowMessage from={selectedUser} messages={messages} you={username} />}
-                
+                { selectedUser !== "" && <ShowMessage messages={messages} you={username} privateKey={privateKey} selectedUser={selectedUser} />}
               </ResizablePanel>
             </ResizablePanelGroup>
-
-            <SendMessageForm ip={ip} port={port} username={username} toUser={selectedUser} />
+            <SendMessageForm ip={ip} port={port} username={username} userSelected={selectedUser} />
           </>
         }
-
       </main>
     </>
   );
