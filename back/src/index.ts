@@ -28,21 +28,22 @@ app.get("/", (req: Request, res: Response) => {
 app.post('/register', cors(corsOptions), async (req: Request, res: Response) => {
 
   const data = req.body
-  let ip: string | any = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  let ip: string | string[] | undefined = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  let userComputerId = (ip ?? String(ip)+"-")+data.browserId
 
-  await deleteOldUserByIp(ip)
+  await deleteOldUserByIp(userComputerId)
 
-  const uniqUsername = data.username + uniqid()
+  const uniqUsername = data.username === "" ? uniqid() : data.username + "_" + uniqid()
   try {
     await prisma.user.create({
       data: {
-        ip: String(ip),
+        ip: userComputerId,
         uniqId: uniqUsername,
         publicKey: data.publicKey
       }
     })
 
-    console.log("[/register] \t " + data.username + " => " + uniqUsername)
+    console.log("[/register] \t " + (data.username === "" ? "Empty Username" : data.username) + " => " + uniqUsername)
     res.send(uniqUsername)
   } catch (error) {
     res.status(404).send(error)
@@ -68,6 +69,7 @@ app.get('/getUser', cors(corsOptions), async (req: Request, res: Response) => {
 app.post('/insertMessage', cors(corsOptions), async (req: Request, res: Response) => {
 
   const data = req.body
+  console.log(data)
 
   const userFrom = await prisma.user.findUnique({
     where: {
@@ -84,7 +86,7 @@ app.post('/insertMessage', cors(corsOptions), async (req: Request, res: Response
   if (userFrom && userTo) {
     await prisma.message.create({
       data: {
-        content: data.encryptMessageFor,
+        content: data.encryptMessage,
         fromId: userFrom.id,
         toId: userTo.id
       }
@@ -110,7 +112,7 @@ app.get('/myMessage', cors(corsOptions), async (req: Request, res: Response) => 
   })
 
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-  if (userTo || (ip !== userTo!.ip)) {
+  if (userTo) {
 
     const messages = await prisma.message.findMany({
       where: {
