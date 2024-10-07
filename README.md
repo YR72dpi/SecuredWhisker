@@ -82,7 +82,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - Front
     - Use web socket
     - Make an NextJs front which gonna be export
-    - encrypt the private (who is in the local storage) with AES
+    - Encrypt the private (who is in the local storage) with AES
 
 ## License
 
