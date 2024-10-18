@@ -52,7 +52,7 @@ graph RL;
     - Langage: __GO__
     - Framework: __Fiber__
     - WebSocket: __Gorilla WebSocket__
-    - ORM: __GORM__
+    - ORM: __Go Redis__
     - Database: __Redis__
 
 - Frontend
