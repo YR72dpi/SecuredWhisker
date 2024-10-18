@@ -29,13 +29,14 @@ graph RL;
         UserService["User management"] 
         MessageService["Messages management"]
         Frontend["Frontend"]
-        Database["Database"]
+        UserDatabase["User Database"]
+        MessageDatabase["Message Database"]
     end
 
     Frontend -->|API Rest| UserService
     Frontend -->|WebSocket| MessageService
-    UserService -->|Stockage| Database
-    MessageService -->|Stockage| Database
+    UserService -->|Stockage| UserDatabase
+    MessageService -->|Stockage| MessageDatabase
 
 ```
 
@@ -110,3 +111,4 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 
 - create groups
 - exchange files
+- react-native front
