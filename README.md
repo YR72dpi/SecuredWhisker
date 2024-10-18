@@ -1,5 +1,8 @@
-# Secured Whisker 2.0.0
-Secure Messaging Application
+<img src="docs/banner.png">
+
+---
+
+# Secured Whisker 2.0
 
 This is a secure messaging application that allows users to send encrypted messages to each other using RSA encryption. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
 
@@ -10,7 +13,7 @@ This is a secure messaging application that allows users to send encrypted messa
 ## Features
 
 - Login
-- Registration
+- Sign up
 - Add someone
 - Send / receive message
 
@@ -62,11 +65,19 @@ All of that are Docker-_ized_
 
 ## How it works
 
-### Subscription
+### Sign up
 
-Pseudo & password. The password will be used to encrypt the private key in AES.
+On subscription form, enter ip, port, pseudo and password.
 
-A tag will be generate like __pseudo__#__random_number__ like Discord
+The password will be used to encrypt the private key in AES.
+
+A tag will be generate like __pseudo#randomNumber__ like Discord
+
+### Login
+
+On login form, enter ip, port, pseudo, password.
+
+You have to remember all of these information.
 
 ### Sending Message
 
@@ -89,11 +100,16 @@ sequenceDiagram
 
 ## Configuration
 
+// To complete...
+
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests to contribute to the development of this application.
 
 ## To improve it
+
+- create groups
+- exchange files
 
 ## License
 
