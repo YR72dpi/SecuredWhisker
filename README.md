@@ -112,3 +112,4 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - create groups
 - exchange files
 - react-native front
+- having multiple server on same account
