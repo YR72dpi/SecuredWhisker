@@ -68,17 +68,16 @@ All of that are Docker-_ized_
 
 ### Sign up
 
-On subscription form, enter ip, port, pseudo and password.
+On subscription form, enter pseudo, password and 2FA.
 
 The password will be used to encrypt the private key in AES.
 
-A tag will be generate like __pseudo#randomNumber__ like Discord
+A tag will be generate like __pseudo#randomNumber__ like Discord. 
+It gonna be used to add someone.
 
 ### Login
 
-On login form, enter ip, port, pseudo, password.
-
-You have to remember all of these information.
+On login form, enter pseudo, password and 2FA code.
 
 ### Sending Message
 
