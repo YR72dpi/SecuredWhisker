@@ -6,6 +6,9 @@
 
 This is a secure messaging application that allows users to send encrypted messages to each other using RSA encryption. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
 
+<sub>_This is a one year school project but i would like to make it a real full project_
+</sub>
+
 ## ⚠ Warning ⚠
 
 // To complete...
