@@ -1,13 +1,17 @@
 <img src="docs/banner.png">
 
----
+<sub><i>
+AI-Generated and photoshopped logo
+</i></sub>
+
 
 # Secured Whisker 2.0
 
 This is a secure messaging application that allows users to send encrypted messages to each other using RSA encryption. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
 
-<sub>_This is a one year school project but i would like to make it a real full project_ [See the subject](./docs/subject.md)
-</sub>
+<sub><i>
+This is a one year school project but i would like to make it a real full project_ [See the subject](./docs/subject.md)
+</i></sub>
 
 ## ⚠ Warning ⚠
 
