@@ -6,7 +6,7 @@
 
 This is a secure messaging application that allows users to send encrypted messages to each other using RSA encryption. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
 
-<sub>_This is a one year school project but i would like to make it a real full project_
+<sub>_This is a one year school project but i would like to make it a real full project_ [See the subject](./docs/subject.md)
 </sub>
 
 ## ⚠ Warning ⚠
@@ -19,6 +19,7 @@ This is a secure messaging application that allows users to send encrypted messa
 - Sign up
 - Add someone
 - Send / receive message
+- Send file
 
 ## How to Run
 
@@ -71,7 +72,7 @@ All of that are Docker-_ized_
 
 ### Sign up
 
-On subscription form, enter pseudo, password and 2FA.
+On subscription form, enter pseudo, password.
 
 The password will be used to encrypt the private key in AES.
 
@@ -112,6 +113,5 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 ## To improve it
 
 - create groups
-- exchange files
+- 2FA
 - react-native front
-- having multiple server on same account
