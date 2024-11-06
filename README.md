@@ -14,8 +14,10 @@ This is a one year school project but i would like to make it a real full projec
 </i></sub>
 
 ## ⚠ Warning ⚠
+ 
+The RSA private key is stored in your browser. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, gonna be lost.
 
-// To complete...
+_// To complete_
 
 ## Features
 
