@@ -32,13 +32,17 @@ graph RL;
     subgraph "Microservices Architecture"
         UserService["User management"] 
         MessageService["Messages management"]
-        Frontend["Frontend"]
-        UserDatabase["User Database"]
-        MessageDatabase["Message Database"]
+        UserDatabase[("User Database")]
+        MessageDatabase[("Message Database")]
+        FileManager["File manager"]
     end
+        DropBox{{Dropbox}}
+        Frontend["Frontend"]
 
     Frontend -->|API Rest| UserService
     Frontend -->|WebSocket| MessageService
+    Frontend -->|API REST| FileManager
+    FileManager -->| API REST| DropBox
     UserService -->|Stockage| UserDatabase
     MessageService -->|Stockage| MessageDatabase
 
@@ -47,20 +51,24 @@ graph RL;
 ## Stack
 
 - User management
-    - Langage: __PHP__
+    - Language: __PHP__
     - Framework: __Symfony__
     - ORM: __Doctrine__
     - Database: __PostgreSQL__
 
 - Messages management
-    - Langage: __GO__
+    - Language: __GO__
     - Framework: __Fiber__
     - WebSocket: __Gorilla WebSocket__
     - ORM: __Go Redis__
     - Database: __Redis__
 
+- File manager
+    - Language: __GO__
+    - _// To Complete_
+
 - Frontend
-    - Langage: __TypeScript__
+    - Language: __TypeScript__
     - Framework: __NextJs__
     - WebSockets : __socket.io__
     - Encryption: __JSEncrypt__ 🚨
@@ -102,6 +110,40 @@ sequenceDiagram
     Client->>Client: Decrypt message 
 ```
 
+### Sending Files
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Microservice
+    participant Dropbox
+
+    User->>Browser: Submits the form (file to upload)
+    Browser->>Browser: Generates a random AES key
+    Browser->>Browser: Encrypts the file with the AES key
+    Browser->>Microservice: Sends the encrypted file and the AES key
+    Microservice->>Dropbox: Uploads the encrypted file
+    Dropbox-->>Microservice: Upload confirmation
+    Microservice-->>Browser: Upload confirmation
+    Browser-->>User: Upload complete
+```
+
+### Download File
+
+```Mermaid
+sequenceDiagram
+    participant Client
+    participant Microservice
+    participant Dropbox
+
+    Client->>Microservice: Request to download file
+    Microservice->>Dropbox: Retrieves the encrypted file
+    Dropbox-->>Microservice: Sends the encrypted file
+    Microservice-->>Client: Sends the encrypted file
+    Client->>Client: Decrypts the file with the AES key
+    Client->>Client: Uses the decrypted file
+```
 ## Configuration
 
 // To complete...
@@ -112,6 +154,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 
 ## To improve it
 
-- create groups
+- Create groups
 - 2FA
-- react-native front
+- React-native front
+- Gateway if necessary
