@@ -35,9 +35,43 @@ __Message database__: this is a redis database without persistence, it's mean th
 - Send / receive message
 - Send file
 
-## How to Run
+## How to use
+### Configuration
 
-// To complete...
+```env
+# SecuredWhisker
+VERSION=2.0.0
+
+# User manager (Symfony, PHP) 
+APP_ENV="dev"
+
+# Messages manager (Fiber, GO) 
+SHOW_ONLY_ERROR=false
+
+# File manager (Fiber, GO)
+# To complete
+
+# Frontend
+# To complete
+
+# REDIS (docker container)
+REDIS_PASSWORD=SecuredPassword123
+
+# POSTGRES (docker container)
+POSTGRES_DB=securedwhisker
+POSTGRES_PASSWORD=securedwhisker
+POSTGRES_USER=root
+POSTGRES_PORT=5432
+```
+
+<!-- 
+
+_// TODO: To details_
+
+### Start
+_// TODO: To complete_
+
+-->
 
 ## Architecture
 
