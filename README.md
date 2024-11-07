@@ -13,6 +13,14 @@ This is a secure messaging application that allows users to send encrypted messa
 This is a one year school project but i would like to make it a real full project_ [See the subject](./docs/subject.md)
 </i></sub>
 
+## Security
+
+The will of this project is to allow user to exchange messages and files securely even if there is no https.
+
+All messages are encrypted with the recipient's public rsa key before being sent and stored on the server. And the recipient decrypts it with his private key stored in his browser. Which is AES encrypted with his password.
+
+About files, they will be encrypted in the browser in AES with a randomly generated or user-generated key.
+
 ## ⚠ Warning ⚠
  
 The RSA private key is stored in your browser. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, gonna be lost.
