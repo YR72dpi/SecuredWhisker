@@ -7,7 +7,7 @@ AI-Generated and photoshopped logo
 
 # Secured Whisker 2.0
 
-This is a secure messaging application that allows users to send encrypted messages to each other using RSA encryption. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
+This is a secure messaging application that allows users to send encrypted messages and files to each other, using RSA encryption on message and AES on file. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https.
 
 <sub><i>
 This is a one year school project but i would like to make it a real full project_ [See the subject](./docs/subject.md)
