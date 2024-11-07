@@ -206,7 +206,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 
 ## To improve it
 
-- Create groups
 - 2FA
+- Create groups
 - React-native front
 - Gateway if necessary
