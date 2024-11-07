@@ -133,6 +133,7 @@ sequenceDiagram
     Dropbox-->>Microservice: Upload confirmation
     Microservice-->>Browser: Upload confirmation
     Browser-->>User: Upload complete
+    Browser-->>User: Give random generated AES key
 ```
 
 ### Download File
