@@ -193,13 +193,10 @@ sequenceDiagram
     Client->>Client: Decrypts the file with the AES key
     Client->>Client: Uses the decrypted file
 ```
-## Configuration
-
-_// To complete_
 
 ## ChangeLog
 
-_// not yet_
+_This changelog will make sense after that version 2.0.0 will be released_
 
 [Full changelog](./docs/changelog.md)
 
