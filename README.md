@@ -138,7 +138,7 @@ sequenceDiagram
 
 ### Download File
 
-```Mermaid
+```mermaid
 sequenceDiagram
     participant Client
     participant Microservice
