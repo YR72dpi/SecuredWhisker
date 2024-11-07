@@ -152,7 +152,13 @@ sequenceDiagram
 ```
 ## Configuration
 
-// To complete...
+_// To complete_
+
+## ChangeLog
+
+_// not yet_
+
+[Full changelog](./docs/changelog.md)
 
 ## Contributing
 
