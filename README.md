@@ -91,10 +91,15 @@ graph LR;
     Frontend -->|WebSocket| MessageService
     Frontend -->|API REST| FileManager
     FileManager -->| API REST| DropBox
-    UserService -->|Stockage| UserDatabase
-    MessageService -->|Stockage| MessageDatabase
+    UserService -->|Storage| UserDatabase
+    MessageService -->|Storage| MessageDatabase
 
 ```
+
+[User Management](./docs/UserManagement.md) __-__
+[Messages Management](./docs/MessagesManagement.md) __-__
+[File Management](./docs/FileManagement.md) __-__
+[Frontend](./docs/Frontend.md)
 
 ## Stack
 
@@ -135,11 +140,23 @@ The password will be used to encrypt the private key in AES.
 A tag will be generate like __pseudo#randomNumber__ like Discord. 
 It gonna be used to add someone.
 
+<!-- TODO 
+how it secured password when clien -> server
+ -->
+
 ### Login
 
 On login form, enter pseudo, password and 2FA code.
 
+<!-- TODO 
+how it secured
+ -->
+
 ### Sending Message
+
+<!-- TODO 
+how it secured
+ -->
 
 ```mermaid
 sequenceDiagram
