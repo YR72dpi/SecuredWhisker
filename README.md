@@ -76,13 +76,13 @@ _// TODO: To complete_
 ## Architecture
 
 ```mermaid
-graph RL;
+graph LR;
     subgraph "Microservices Architecture"
         UserService["User management"] 
         MessageService["Messages management"]
         UserDatabase[("User Database")]
         MessageDatabase[("Message Database")]
-        FileManager["File manager"]
+        FileManager["File management"]
     end
         DropBox{{Dropbox}}
         Frontend["Frontend"]
