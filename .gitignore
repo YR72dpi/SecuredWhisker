@@ -2,3 +2,4 @@ fileIntegrityVerifier.js
 /do_not_upload/
 .env
 package.json
+redis.conf
