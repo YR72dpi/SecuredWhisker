@@ -22,10 +22,10 @@ All messages are encrypted with the recipient's public rsa key before being sent
 About files, they will be encrypted in the browser in AES with a randomly generated or user-generated key.
 
 ## ⚠ Warning ⚠
- 
-The RSA private key is stored in your browser. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, gonna be lost.
 
-_// To complete_
+__RSA private key__: The RSA private key is stored in your browser. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, will be lost.
+
+__Message database__: this is a redis database without persistence, it's mean that if you stop the server or docker container, all messages will be lost.
 
 ## Features
 
