@@ -158,7 +158,7 @@ sequenceDiagram
     Client->>Client: Decrypt message 
 ```
 
-### Sending Files
+### Upload Files
 
 ```mermaid
 sequenceDiagram
