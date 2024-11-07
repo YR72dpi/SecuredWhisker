@@ -69,9 +69,9 @@ graph RL;
     - ORM: __Go Redis__
     - Database: __Redis__
 
-- File manager
+- File management
     - Language: __GO__
-    - _// To Complete_
+    - Upload : __github.com/chyroc/dropbox__
 
 - Frontend
     - Language: __TypeScript__
