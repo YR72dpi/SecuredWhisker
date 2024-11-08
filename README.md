@@ -211,6 +211,56 @@ sequenceDiagram
     Client->>Client: Uses the decrypted file
 ```
 
+## Git flow
+
+When I release version 2.0.0, Git Flow should look like this. 
+
+```mermaid
+gitGraph
+   commit id: "Initial Commit" tag: "v2.0.0"
+   branch dev
+   checkout dev
+   commit id: "Set up dev environment"
+
+   branch feature1
+   checkout feature1
+   commit id: "Develop Feature 1 part 1"
+   commit id: "Develop Feature 1 part 2"
+   checkout dev
+   merge feature1 id: "Merge feature1 into dev"
+
+   branch feature2
+   checkout feature2
+   commit id: "Develop Feature 2 part 1"
+   commit id: "Develop Feature 2 part 2"
+   checkout dev
+   merge feature2 id: "Merge feature2 into dev"
+
+   branch feature3
+   checkout feature3
+   commit id: "Develop Feature 3 part 1"
+   commit id: "Develop Feature 3 part 2"
+   checkout dev
+   merge feature3 id: "Merge feature3 into dev" tag: "2.1.0"
+
+   checkout main
+   merge dev id: "Merge dev into main" tag: "v2.1.0"
+   commit id: "Release v2.1.0"
+
+```
+
+## Versioning
+
+The versionning convention follow the [Semantic Versioning 2.0.0](https://semver.org/)
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+- __MAJOR__ version when you make incompatible API changes
+- __MINOR__ version when you add functionality in a backward compatible manner
+- __PATCH__ version when you make backward compatible bug fixes
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
 ## ChangeLog
 
 _This changelog will make sense after that version 2.0.0 will be released_
