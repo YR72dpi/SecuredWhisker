@@ -84,8 +84,9 @@ graph LR;
         MessageDatabase[("Message Database")]
         FileManager["File management"]
     end
-        DropBox{{Dropbox}}
-        Frontend["Frontend"]
+
+    DropBox{{Dropbox}}
+    Frontend["Frontend"]
 
     Frontend -->|API Rest| UserService
     Frontend -->|WebSocket| MessageService
