@@ -97,10 +97,13 @@ graph LR;
 
 ```
 
-[User Management](./docs/UserManagement.md) __-__
-[Messages Management](./docs/MessagesManagement.md) __-__
-[File Management](./docs/FileManagement.md) __-__
-[Frontend](./docs/Frontend.md)
+<!-- - [User Management](./docs/UserManagement.md) 
+
+- [Messages Management](./docs/MessagesManagement.md) 
+
+- [File Management](./docs/FileManagement.md) 
+
+- [Frontend](./docs/Frontend.md) -->
 
 ## Stack
 
