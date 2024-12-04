@@ -5,7 +5,7 @@ AI-Generated and photoshopped logo
 </i></sub>
 
 
-# Secured Whisker 2.0
+# Secured Whisker
 
 This is a secure messaging application that allows users to send encrypted messages and files to each other, using RSA encryption on message and AES on file. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https.
 
@@ -40,7 +40,7 @@ __Message database__: this is a redis database without persistence, it's mean th
 
 ```env
 # SecuredWhisker
-VERSION=2.0.0
+VERSION=0.0.0
 
 # User manager (Symfony, PHP) 
 APP_ENV="dev"
@@ -218,11 +218,11 @@ sequenceDiagram
 
 ## Git flow
 
-When I release version 2.0.0, Git Flow should look like this. 
+When I release version 1.0.0, Git Flow should look like this. 
 
 ```mermaid
 gitGraph
-   commit id: "Initial Commit" tag: "v2.0.0"
+   commit id: "Initial Commit" tag: "v1.0.0"
    branch dev
    checkout dev
    commit id: "Set up dev environment"
@@ -268,7 +268,7 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-_This changelog will make sense after that version 2.0.0 will be released_
+_This changelog will make sense after that version 1.0.0 will be released_
 
 [Full changelog](./docs/changelog.md)
 
