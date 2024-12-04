@@ -15,7 +15,7 @@ This is a one year school project but i would like to make it a real full projec
 
 ## Support me 😘
 
-<a href="buymeacoffee.com/yr72dpi">
+<a href="http://buymeacoffee.com/yr72dpi">
 <img src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fcdn.buymeacoffee.com%2Fbuttons%2Fv2%2Farial-yellow.png&sp=1733355689T635e4e29486bc99e1e083c4e9862fc90a0763bf930be5a3fb428be4bed6213df" style="width: 50%;">
 </a>
 
