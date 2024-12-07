@@ -10,6 +10,12 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  .tw-input { @apply p-2 border border-neutral-400 rounded-md outline-none }
+
+  .tw-button { @apply m-4 border border-neutral-300 rounded-md p-1 outline-none }
+
+  .tw-nav { @apply flex items-start flex-row gap-3 }
 }
 
 @layer base {
