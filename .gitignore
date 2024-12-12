@@ -3,3 +3,4 @@ fileIntegrityVerifier.js
 .env
 package.json
 redis.conf
+/docker

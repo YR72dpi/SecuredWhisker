@@ -22,43 +22,50 @@ services:
   #     POSTGRES_DB: ${POSTGRES_DB}
   #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   #     POSTGRES_USER: ${POSTGRES_USER}
-  redis:
-    image: redis:latest
-    container_name: redis_server
-    restart: always
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis_server
+  #   restart: always
+  #   command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #     - ./redis.conf:/usr/local/etc/redis/redis.conf:ro  # Monte le fichier de configuration en lecture seule
+  #   environment:
+  #     - REDIS_PORT=6379
+
+  user:
+    build:
+      context: .
+      dockerfile: Dockerfile-user
     ports:
-      - "6379:6379"
+      - '8000:8000'
     volumes:
-      - redis_data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro  # Monte le fichier de configuration en lecture seule
+      - './user/:/app'
+      - './env:/.env'
     environment:
-      - REDIS_PORT=6379
+      - SYMFONY_PROJECT_NAME=securedWhisker
+      - SYMFONY_DATABASE_PASSWORD=securedwhisker
+      - DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8"
+    depends_on:
+      - postgres_database
 
-  # user:
-  #   image: 'bitnami/symfony:6.2.6-debian-11-r2'
-  #   ports:
-  #     - '8000:8000'
-  #   volumes:
-  #     - './:/app'
-  #   environment:
-  #     - SYMFONY_PROJECT_NAME=securedWhisker
-
-  #     - DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8"
-  #   depends_on:
-  #     - postgres_database
-
-  # postgres_database:
-  #   image: postgres:15-alpine
-  #   restart: unless-stopped
-  #   ports:
-  #     - ${POSTGRES_PORT}
-  #   environment:
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #   volumes:
-  #     - database_data:/var/lib/postgresql/data:rw
+  postgres_database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+      - ./docker/db/data:/var/lib/postgresql/data:rw
       
 volumes:
   database_data:
