@@ -63,6 +63,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+    ports: 
+      - 5432:5432
     volumes:
       - database_data:/var/lib/postgresql/data:rw
       - ./docker/db/data:/var/lib/postgresql/data:rw
