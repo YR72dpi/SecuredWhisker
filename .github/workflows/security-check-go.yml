@@ -1,36 +1,20 @@
-name: Go Dependency Security Check
-
+name: Run Gosec
 on:
-  workflow_dispatch: # Permet d'exécuter le workflow manuellement
-  schedule:
-    - cron: "0 2 * * 0" # Planification hebdomadaire, chaque dimanche à 2h du matin
   push:
     branches:
       - main
   pull_request:
-
+    branches:
+      - main
 jobs:
-  dependency-check:
-    name: Check Go Dependencies for Security Issues
+  tests:
     runs-on: ubuntu-latest
-
+    env:
+      GO111MODULE: on
     steps:
-      - name: Checkout Code
+      - name: Checkout Source
         uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
         with:
-          go-version: "1.21" # Remplacez par la version de Go utilisée dans votre projet
-
-      - name: Install Dependencies
-        working-directory: ./message
-        run: |
-          go mod tidy
-          go mod download
-
-      - name: Run Govulncheck on Dependencies
-        working-directory: ./message
-        run: |
-          go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck ./...
+          args: ./...
