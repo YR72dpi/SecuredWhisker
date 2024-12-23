@@ -13,18 +13,30 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
+
     steps:
       - name: Checkout Source
         uses: actions/checkout@v3
-      
-      - name: Download dependency
-        working-directory: ./message
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21' # Utilisez la version Go de votre choix
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/go-build
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-mod-
+
+      - name: Download dependencies
         run: |
-          go mod init
           go mod tidy
           go mod download
 
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: ./... 
+          args: ./...
