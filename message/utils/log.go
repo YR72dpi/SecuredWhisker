@@ -11,7 +11,7 @@ import (
 
 func CheckAndCreateDir(dirPath string) {
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		err := os.Mkdir(dirPath, os.ModePerm)
+		err := os.Mkdir(dirPath, 0750)
 		if err != nil {
 			fmt.Println("Erreur de création du dossier:", err)
 		}
@@ -57,7 +57,7 @@ func writeLogToFile(level, message string, data []interface{}) {
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
 	// Configurer la sortie du logger vers le fichier
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 	if err != nil {
 		fmt.Println("Erreur d'ouverture du fichier :", err)
 		return
