@@ -1,4 +1,4 @@
-name: Security Check for Symfony API
+name: Symfony Dependency Security Check
 
 on:
   push:
