@@ -41,6 +41,19 @@ func Logger(level, message string, writeInFile bool, data ...interface{}) {
 // Fonction utilitaire pour écrire le log dans un fichier
 func writeLogToFile(level, message string, data []interface{}) {
 	CheckAndCreateDir("./log")
+
+	validLevels := map[string]bool{
+		"info":  true,
+		"error": true,
+		"warn":  true,
+		"debug": true,
+	}
+
+	if !validLevels[level] {
+		fmt.Println("Log Lever Invalid :", level)
+		return
+	}
+
 	fileName := fmt.Sprintf("./log/%s.log", level)
 
 	// Formatage des données supplémentaires en chaîne
