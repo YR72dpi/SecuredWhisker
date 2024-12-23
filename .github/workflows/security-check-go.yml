@@ -27,6 +27,7 @@ jobs:
         working-directory: ./message
         run: |
           go mod tidy
+          go mod download
 
       - name: Run Govulncheck on Dependencies
         working-directory: ./message
