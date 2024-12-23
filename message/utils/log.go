@@ -11,9 +11,9 @@ import (
 
 func CheckAndCreateDir(dirPath string) {
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		err := os.Mkdir(dirPath, 0750)
-		if err != nil {
-			fmt.Println("Erreur de création du dossier:", err)
+		if err := os.MkdirAll(dirPath, 0750); err != nil {
+			fmt.Println("Erreur de création du répertoire de logs :", err)
+			return
 		}
 	}
 }
@@ -54,7 +54,8 @@ func writeLogToFile(level, message string, data []interface{}) {
 		return
 	}
 
-	fileName := fmt.Sprintf("./log/%s.log", level)
+	baseLogDir := "./log"
+	fileName := fmt.Sprintf("%s/%s.log", baseLogDir, level)
 
 	// Formatage des données supplémentaires en chaîne
 	dataStr := fmt.Sprintf("%v", data)
