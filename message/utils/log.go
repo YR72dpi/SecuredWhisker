@@ -42,6 +42,13 @@ func Logger(level, message string, writeInFile bool, data ...interface{}) {
 func writeLogToFile(level, message string, data []interface{}) {
 	CheckAndCreateDir("./log")
 
+	levelsList := map[string]string{
+		"info":  "info",
+		"error": "error",
+		"warn":  "warn",
+		"debug": "debug",
+	}
+
 	validLevels := map[string]bool{
 		"info":  true,
 		"error": true,
@@ -55,7 +62,7 @@ func writeLogToFile(level, message string, data []interface{}) {
 	}
 
 	baseLogDir := "./log"
-	fileName := fmt.Sprintf("%s/%s.log", baseLogDir, level)
+	fileName := fmt.Sprintf("%s/%s.log", baseLogDir, levelsList[level])
 
 	// Formatage des données supplémentaires en chaîne
 	dataStr := fmt.Sprintf("%v", data)
@@ -76,6 +83,7 @@ func writeLogToFile(level, message string, data []interface{}) {
 		fmt.Println("Erreur d'ouverture du fichier :", err)
 		return
 	}
+
 	defer file.Close()
 	logger.SetOutput(file)
 
