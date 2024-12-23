@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -11,9 +12,9 @@ import (
 
 func CheckAndCreateDir(dirPath string) {
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirPath, 0750); err != nil {
-			fmt.Println("Erreur de création du répertoire de logs :", err)
-			return
+		err := os.Mkdir(dirPath, 0750)
+		if err != nil {
+			fmt.Println("Erreur de création du dossier:", err)
 		}
 	}
 }
@@ -42,27 +43,27 @@ func Logger(level, message string, writeInFile bool, data ...interface{}) {
 func writeLogToFile(level, message string, data []interface{}) {
 	CheckAndCreateDir("./log")
 
-	levelsList := map[string]string{
-		"info":  "info",
-		"error": "error",
-		"warn":  "warn",
-		"debug": "debug",
-	}
-
 	validLevels := map[string]bool{
 		"info":  true,
 		"error": true,
 		"warn":  true,
-		"debug": true,
 	}
 
 	if !validLevels[level] {
-		fmt.Println("Log Lever Invalid :", level)
+		fmt.Println("Niveau de log invalide :", level)
 		return
 	}
 
 	baseLogDir := "./log"
-	fileName := fmt.Sprintf("%s/%s.log", baseLogDir, levelsList[level])
+	fileName := fmt.Sprintf("%s/%s.log", baseLogDir, level)
+
+	cleanFileName := filepath.Clean(fileName)
+
+	// Vérifier si le chemin nettoyé commence bien avec le répertoire de base
+	if !strings.HasPrefix(cleanFileName, baseLogDir) {
+		fmt.Println("Path outside authorized directory:", cleanFileName)
+		return
+	}
 
 	// Formatage des données supplémentaires en chaîne
 	dataStr := fmt.Sprintf("%v", data)
@@ -83,7 +84,6 @@ func writeLogToFile(level, message string, data []interface{}) {
 		fmt.Println("Erreur d'ouverture du fichier :", err)
 		return
 	}
-
 	defer file.Close()
 	logger.SetOutput(file)
 
