@@ -34,4 +34,4 @@ jobs:
       # 4. Vérification de sécurité avec Composer Audit
       - name: Check for vulnerabilities
         working-directory: ./user
-        run: cd user && composer audit --locked
+        run: composer audit --locked
