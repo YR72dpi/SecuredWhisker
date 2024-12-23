@@ -1,0 +1,45 @@
+name: Go Dependency Security Check
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 2 * * 0"
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check-dependencies:
+    name: Check Dependencies for Security Issues
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21" # Remplacez par la version Go utilisée dans votre projet
+
+      - name: Install Dependencies
+        working-directory: ./message
+        run: |
+          go mod tidy
+
+      - name: Run GoSec
+        working-directory: ./message
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          gosec ./...
+
+  dependabot:
+    name: Dependabot Security Updates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dependabot Metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          package-manager: "gomod"
