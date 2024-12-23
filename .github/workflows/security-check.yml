@@ -1,0 +1,37 @@
+name: Security Check for Symfony API
+
+on:
+  push:
+    branches:
+      - main # Vérifie la sécurité lors d'un push sur la branche principale
+  pull_request:
+    branches:
+      - main # Vérifie la sécurité lors des pull requests vers la branche principale
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout du code source
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Installer PHP et Composer
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1 # Changez la version PHP selon vos besoins
+          extensions: mbstring, intl, pdo, curl, dom
+          tools: composer
+          coverage: none
+
+      # 3. Installer les dépendances Composer
+      - name: Install dependencies
+        working-directory: ./user
+        run: composer install --no-scripts --no-progress --prefer-dist
+
+      # 4. Vérification de sécurité avec Composer Audit
+      - name: Check for vulnerabilities
+        working-directory: ./user
+        run: cd user && composer audit --locked
