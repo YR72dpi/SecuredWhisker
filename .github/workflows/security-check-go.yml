@@ -37,12 +37,3 @@ jobs:
         working-directory: ./message
         run: |
           govulncheck ./...
-
-      - name: Upload govulncheck results as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: vulncheck-results
-          path: govulncheck-report.txt
-
-      - name: Display govulncheck results
-        run: cat govulncheck-report.txt
