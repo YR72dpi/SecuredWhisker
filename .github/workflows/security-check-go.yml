@@ -35,7 +35,7 @@ jobs:
 
       - name: Analyze dependencies with govulncheck
         run: |
-          govulncheck -db=latest ./message/...
+          govulncheck ./message/...
 
       - name: Upload govulncheck results as artifact
         uses: actions/upload-artifact@v3
