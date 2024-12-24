@@ -34,8 +34,9 @@ jobs:
           go mod download
 
       - name: Analyze dependencies with govulncheck
+        working-directory: ./message
         run: |
-          govulncheck ./message/...
+          govulncheck ./...
 
       - name: Upload govulncheck results as artifact
         uses: actions/upload-artifact@v3
