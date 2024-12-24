@@ -6,7 +6,8 @@ AI-Generated and photoshopped logo
 
 # Secured Whisker 👨
 
-[![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/security-check.yml/badge.svg?branch=main&event=push "CI Status")](https://github.com/phpseclib/phpseclib/actions/workflows/ci.yml?query=branch%3Amaster)
+[![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/security-check-symfony.yml/badge.svg?branch=main&event=push "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/security-check-symfony.yml?query=branch%3Amain)
+[![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/security-check-go.yml/badge.svg?branch=main&event=push "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/security-check-go.yml?query=branch%3Amain)
 
 This is a secure messaging application that allows users to send encrypted messages and files to each other, using RSA encryption on message and AES on file. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https.
 

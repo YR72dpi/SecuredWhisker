@@ -1,4 +1,4 @@
-name: Symfony Dependency Security Check
+name: Dependency Security Check - PHP
 
 on:
   push:

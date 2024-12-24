@@ -1,4 +1,4 @@
-name: Go Dependency Security Check
+name: Dependency Security Check - Go
 
 on:
   push:
