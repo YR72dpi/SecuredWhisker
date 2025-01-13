@@ -1,4 +1,6 @@
 {
+    "name": "yr72dpi/secured-whisker", 
+    "description": "Secured RSA chat",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
