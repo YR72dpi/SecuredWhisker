@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:generate-rsa-keys',
-    description: 'Add a short description for your command',
+    description: 'Generate public and private keys files',
 )]
 class GenerateRsaKeysCommand extends Command
 {
@@ -51,8 +51,8 @@ class GenerateRsaKeysCommand extends Command
         try {
             $io->info("Generating RSA keys");
             $keyPair = RSA::createKey(2048);
-            $privateKey = $keyPair->toString('PKCS1'); // Format PKCS#8
-            $publicKey = $keyPair->getPublicKey()->toString('PKCS1'); // Format PKCS#8
+            $privateKey = $keyPair;
+            $publicKey = $keyPair->getPublicKey();
             $io->success("RSA keys generated");
         } catch (\Throwable $th) {
             throw $th;
