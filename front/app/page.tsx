@@ -6,9 +6,9 @@ export default function Home() {
       <h1 className="mb-4 text-4xl font-extrabold">Secured Whisker</h1>
       <nav>
         <ul className="tw-nav">
-          <li><a href="/logIn">Login</a></li> 
+          <li><a href="/login">Login</a></li> 
           <span>|</span>
-          <li><a href="/signIn">Sign in</a></li>
+          <li><a href="/signin">Sign in</a></li>
         </ul>
       </nav>
       <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
