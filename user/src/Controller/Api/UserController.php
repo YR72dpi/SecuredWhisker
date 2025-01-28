@@ -30,11 +30,11 @@ class UserController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (empty($data["username"]))
-            return new JsonResponse(['error' => 'Username is missing'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(["ok" => false, 'message' => 'Username is missing'], Response::HTTP_BAD_REQUEST);
         if (empty($data["password"]))
-            return new JsonResponse(['error' => 'Password is missing'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(["ok" => false, 'message' => 'Password is missing'], Response::HTTP_BAD_REQUEST);
         if (empty($data["publicKey"]))
-            return new JsonResponse(['error' => 'Public key is missing'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(["ok" => false, 'message' => 'Public key is missing'], Response::HTTP_BAD_REQUEST);
 
         $username = htmlentities($data["username"]);
         $password = htmlentities($data["password"]);
@@ -43,9 +43,7 @@ class UserController extends AbstractController
         $decryptedPassword = (new Crypt($kernel))->decrypt($password);
 
         if ($userRepository->findOneBy(["username" => $username]))
-            return new JsonResponse([
-                'message' => 'User already exists'
-            ], Response::HTTP_CONFLICT);
+            return new JsonResponse(["ok" => false, 'message' => 'Something went wrong'], Response::HTTP_INTERNAL_SERVER_ERROR);
 
         try {
             $user = new User();
@@ -59,10 +57,10 @@ class UserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            return new JsonResponse(['message' => 'User registered successfully'], Response::HTTP_CREATED);
+            return new JsonResponse(["ok" => true, 'message' => 'User registered successfully'], Response::HTTP_CREATED);
         } catch(\Throwable $err) {
             $logger->error("Error while saving subscribe user", ["exception" => $err->getMessage()]);
-            return new JsonResponse(['message' => 'Something went wrong'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(["ok" => false, 'message' => 'Something went wrong'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
