@@ -10,6 +10,7 @@ import { SubscribeResponse, UserApi } from "@/lib/UserApi";
 import { Crypto } from "@/lib/Crypto";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react"
+import { SwDb } from '../../lib/SwDatabase'
 
 import {
   Alert,
@@ -48,11 +49,13 @@ export default function Home() {
     const serverPublicKey = await UserApi.getApiPublicKey();
     const passwordCrypted = await Crypto.textToCrypted(values.password, serverPublicKey)
 
-    const userPublicKey = (await Crypto.generateRSAKeyPair()).publicKey
-
-    // TODO : register private key
-
+    const generateRSAKeypair = await Crypto.generateRSAKeyPair()
+    const userPublicKey = generateRSAKeypair.publicKey
+    const userPrivateKey = generateRSAKeypair.privateKey
     console.log(userPublicKey)
+    console.log(userPrivateKey)
+
+    await SwDb.addPrivateKey(btoa(userPrivateKey))
 
     const subscribe: SubscribeResponse = await UserApi.subscribe({
       username: values.username,
@@ -66,7 +69,7 @@ export default function Home() {
       setSubscribeError(subscribe.message)
     } else {
       setSubscribeError("")
-      router.push("/login")
+      // router.push("/login")
     }
 
   }
