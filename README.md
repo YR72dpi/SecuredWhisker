@@ -136,8 +136,7 @@ graph LR;
     - Language: __TypeScript__
     - Framework: __NextJs__
     - WebSockets : __socket.io__
-    - Encryption: __JSEncrypt__ 🚨
-        - or maybe window.crypto.subtle.generateKey, not choosen yet. JSEncrypt not seem secure for me. Only 1024bit and not 2048bit
+    - Encryption: __node-forge__
     - Saving on client : __Dexie.js__ (library for indexedDB )
 
 All of that are Docker-_ized_
