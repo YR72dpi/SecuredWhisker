@@ -17,71 +17,61 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
-import { redirect, useRouter } from "next/navigation";
 
 const formSchema = z.object({
   username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+    message: "Username must be at least 5 characters.",
   }),
-  password: z.string().min(10, {
-    message: "Password must be at least 10 characters.",
-  }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match.",
-  path: ["confirmPassword"],
-});
+  password: z.string()
+    .min(10, {
+      message: "Password must be at least 10 characters.",
+    })
+})
 
 export default function Home() {
 
-  const [subscribeError, setSubscribeError] = useState<string>("")
-  const router = useRouter()
+  const [loginError, setLoginError] = useState<string>("")
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       password: "",
-      confirmPassword: "",
     },
-  });
+  })
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
     console.log(values)
+
     const serverPublicKey = await UserApi.getApiPublicKey();
     const passwordCrypted = await Crypto.textToCrypted(values.password, serverPublicKey)
 
-    const generateRSAKeypair = await Crypto.generateRSAKeyPair()
-    const userPublicKey = generateRSAKeypair.publicKey
-    const userPrivateKey = generateRSAKeypair.privateKey
-    console.log(userPublicKey)
-    console.log(userPrivateKey)
-
-    await SwDb.addPrivateKey(btoa(userPrivateKey))
-
-    const subscribe: SubscribeResponse = await UserApi.subscribe({
+    const login = await UserApi.login({
       username: values.username,
-      password: passwordCrypted,
-      publicKey: btoa(userPublicKey)
+      password: passwordCrypted
     })
 
-    if (subscribe === undefined) {
-      setSubscribeError("Server error")
-    } else if (!subscribe.ok) {
-      setSubscribeError(subscribe.message)
+    
+
+    if (login === undefined) {
+      setLoginError("Server error")
+    } else if (!login.ok) {
+      setLoginError(login.message)
     } else {
-      setSubscribeError("")
-      router.push("/login")
+      await SwDb.saveJwtToken(login.token)
+      setLoginError("ok")
     }
+    
 
   }
 
   return (
-    <div className="flex flex-col p-4 items-center h-screen font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col justify-center items-center h-screen font-[family-name:var(--font-geist-sans)]">
       <h1 className="mb-4 text-4xl font-extrabold">Secured Whisker</h1>
-      <h2 className="mb-4 text-3xl">Signin</h2>
+      <h2 className="mb-4 text-3xl">Log in</h2>
       <nav>
         <ul className="tw-nav">
           <li><a href="/">Home</a></li>
@@ -89,7 +79,7 @@ export default function Home() {
       </nav>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="username"
@@ -122,29 +112,16 @@ export default function Home() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Confirm password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <Button type="submit">Submit</Button>
         </form>
       </Form>
 
-      {subscribeError !== "" && (
+      {loginError !== "" && (
         <Alert variant="destructive" className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            {subscribeError}
+            {loginError}
           </AlertDescription>
         </Alert>
       )}

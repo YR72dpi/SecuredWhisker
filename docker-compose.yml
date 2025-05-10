@@ -1,58 +1,41 @@
-# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: '3.8'
 
-version: '3'
-
-# Define services
 services:
-  # message:
-  #   image: golang:1.20-alpine
-  #   container_name: go_app
-  #   working_dir: /app
-  #   volumes:
-  #     - ./message/:/app
+  # user:
+  #   container_name: user-microservice
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-user
   #   ports:
-  #     - "8080:8080"
-  #   command: sh -c "go run app.go"
+  #     - '${SYMFONY_PORT}:8000'
+  #   volumes:
+  #     - './user/:/app'
+  #     - './env:/.env'
+  #   environment:
+  #     - SYMFONY_PROJECT_NAME=securedWhisker
+  #     - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
   #   depends_on:
-  #     - postgres
-  #   environment:
-  #     DB_PORT: ${POSTGRES_PORT}
-  #     DB_HOST: postgres_database
+  #     postgres_database:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
 
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-
-  # redis:
-  #   image: redis:latest
-  #   container_name: redis_server
-  #   restart: always
-  #   command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #     - ./redis.conf:/usr/local/etc/redis/redis.conf:ro  # Monte le fichier de configuration en lecture seule
-  #   environment:
-  #     - REDIS_PORT=6379
-
-  user:
-    build:
-      context: .
-      dockerfile: Dockerfile-user
+  redis:
+    image: redis:latest
+    container_name: redis_server
+    restart: always
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
     ports:
-      - '8000:8000'
+      - "6379:6379"
     volumes:
-      - './user/:/app'
-      - './env:/.env'
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro  # Monte le fichier de configuration en lecture seule
     environment:
-      - SYMFONY_PROJECT_NAME=securedWhisker
-      - SYMFONY_DATABASE_PASSWORD=securedwhisker
-      - DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8"
-    depends_on:
-      - postgres_database
+      - REDIS_PORT=6379
 
   postgres_database:
+    container_name: user-database
+    restart: always
     image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -60,15 +43,22 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+      interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 30s
     ports: 
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - database_data:/var/lib/postgresql/data:rw
       - ./docker/db/data:/var/lib/postgresql/data:rw
-      
+    networks:
+      - app-network
+
 volumes:
   database_data:
   redis_data:
+
+networks:
+  app-network:
+    driver: bridge

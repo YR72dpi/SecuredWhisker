@@ -11,7 +11,28 @@ security:
                 property: username
         # used to reload user from session & other features (e.g. switch_user)
         # used to reload user from session & other features (e.g. switch_user)
+
     firewalls:
+        api_login:
+            pattern: ^/api/user/login
+            stateless: true
+            custom_authenticators:
+                - App\Security\CustomAuthenticator
+        # api:
+        #     pattern: ^/api/user/login
+        #     stateless: true
+        #     custom_authenticators:
+        #         - App\Security\CustomAuthenticator
+        # login:
+        #     pattern: ^/api/user/login
+        #     stateless: true
+        #     json_login:
+        #         check_path: api_user_login
+        #         username_path: username
+        #         password_path: password
+        #         success_handler: lexik_jwt_authentication.handler.authentication_success
+        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        #     custom_authenticator: App\Security\CustomAuthenticator
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false

@@ -35,6 +35,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "text")]
     private ?string $publicKey = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $uniqid = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,5 +123,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->publicKey = $publicKey;
 
         return $this;
+    }
+
+    public function getUniqid(): ?string
+    {
+        return $this->uniqid;
+    }
+
+    public function setUniqid(string $uniqid): static
+    {
+        $this->uniqid = $uniqid;
+
+        return $this;
+    }
+
+    public function getFullIdentifier(): string
+    {
+        return $this->username . '_' . $this->uniqid;
     }
 }

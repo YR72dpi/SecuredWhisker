@@ -13,7 +13,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use App\Service\Crypt;
+use App\Service\CryptService;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 
 #[Route('/api/user', name: 'api_user_')]
 class UserController extends AbstractController
@@ -40,7 +42,7 @@ class UserController extends AbstractController
         $password = htmlentities($data["password"]);
         $publicKey = htmlentities($data["publicKey"]);
 
-        $decryptedPassword = (new Crypt($kernel))->decrypt($password);
+        $decryptedPassword = (new CryptService($kernel))->decrypt($password);
 
         if ($userRepository->findOneBy(["username" => $username]))
             return new JsonResponse(["ok" => false, 'message' => 'Something went wrong'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -48,22 +50,25 @@ class UserController extends AbstractController
         try {
             $user = new User();
             $user->setUsername($username);
-    
+            $user->setUniqid(uniqid());
+
             $hashedPassword = $userPasswordHasherInterface->hashPassword($user, $decryptedPassword);
-    
+
             $user->setPassword($hashedPassword);
             $user->setPublicKey($publicKey);
-    
+
             $entityManager->persist($user);
             $entityManager->flush();
 
             return new JsonResponse(["ok" => true, 'message' => 'User registered successfully'], Response::HTTP_CREATED);
-        } catch(\Throwable $err) {
+        } catch (\Throwable $err) {
             $logger->error("Error while saving subscribe user", ["exception" => $err->getMessage()]);
             return new JsonResponse(["ok" => false, 'message' => 'Something went wrong'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
+
+    #[Route('/login', name: 'login', methods: ["POST"])]
+    public function login() {}
 
     #[Route('/publicKey/{userId}', name: 'publicKey')]
     public function getPublicKey(

@@ -4,11 +4,13 @@ namespace App\Service;
 
 use App\Kernel;
 use phpseclib3\Crypt\Common\AsymmetricKey;
+use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Crypt\RSA;
 
-class Crypt
+class CryptService
 {
-    private string $privateKey;
+    // private string $privateKey;
+    private RSA\PrivateKey $privateKey;
 
 
     public function __construct(Private Kernel $kernel)
@@ -22,7 +24,7 @@ class Crypt
             . DIRECTORY_SEPARATOR
             . "privateKey.key";
         
-        $this->privateKey = file_get_contents($privateKeyFile);
+        $this->privateKey = PublicKeyLoader::loadPrivateKey(file_get_contents($privateKeyFile));
     }
 
     public function decrypt(string $encryptedText): string

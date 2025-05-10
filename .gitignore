@@ -3,3 +3,4 @@ fileIntegrityVerifier.js
 .env
 redis.conf
 /docker
+*.bat
