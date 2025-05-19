@@ -41,7 +41,7 @@ __Message database__: this is a redis database without persistence, it's mean th
 - Sign up
 - Add someone
 - Send / receive message
-- Send file
+- Translate messages (with chatGPT)
 
 ## How to use 🤔
 ### Configuration
