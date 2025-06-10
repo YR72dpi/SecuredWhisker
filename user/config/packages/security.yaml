@@ -18,21 +18,13 @@ security:
             stateless: true
             custom_authenticators:
                 - App\Security\CustomAuthenticator
-        # api:
-        #     pattern: ^/api/user/login
-        #     stateless: true
-        #     custom_authenticators:
-        #         - App\Security\CustomAuthenticator
-        # login:
-        #     pattern: ^/api/user/login
-        #     stateless: true
-        #     json_login:
-        #         check_path: api_user_login
-        #         username_path: username
-        #         password_path: password
-        #         success_handler: lexik_jwt_authentication.handler.authentication_success
-        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
-        #     custom_authenticator: App\Security\CustomAuthenticator
+        
+        api:
+            pattern: ^/api/protected
+            stateless: true
+            provider: app_user_provider
+            jwt: ~
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -49,6 +41,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/api/protected, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
