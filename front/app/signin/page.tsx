@@ -17,7 +17,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   username: z.string().min(2, {
