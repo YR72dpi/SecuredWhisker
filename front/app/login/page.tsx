@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -6,11 +6,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
-import { SubscribeResponse, UserApi } from "@/lib/UserApi";
+import { UserApi } from "@/lib/UserApi";
 import { Crypto } from "@/lib/Crypto";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
+import { useRouter } from "next/navigation";
 
 import {
   Alert,
@@ -29,9 +30,9 @@ const formSchema = z.object({
 })
 
 export default function Home() {
-
+  
   const [loginError, setLoginError] = useState<string>("")
-
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,7 +44,6 @@ export default function Home() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-
     console.log(values)
 
     const serverPublicKey = await UserApi.getApiPublicKey();
@@ -62,7 +62,8 @@ export default function Home() {
       setLoginError(login.message)
     } else {
       await SwDb.saveJwtToken(login.token)
-      setLoginError("ok")
+      setLoginError("")
+      router.push("/chat")
     }
     
 
