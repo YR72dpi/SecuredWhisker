@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { SwDb } from "@/lib/SwDatabase";
@@ -60,9 +60,16 @@ export function AddFriend() {
         };
 
         fetch("http://localhost:4000/api/protected/addFriend", requestOptions)
-            .then((response) => response.json())
+            .then(async (response) => {
+                const jsonResponse = await response.json()
+                 if (!response.ok) {
+                    throw new Error(jsonResponse.message || "Erreur inconnue");
+                }
+                return jsonResponse
+            })
             .then((result) => {
                 console.log(result)
+                setAlert("Request send")
                 setAlertType(true)
             })
             .catch((error) => {
@@ -72,6 +79,12 @@ export function AddFriend() {
             });
 
     }
+
+    useEffect(() => {
+        setTimeout(() => {
+            setAlert("")
+        }, 5000)
+    }, [alert])
 
     return (
         <>
