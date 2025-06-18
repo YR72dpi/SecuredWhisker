@@ -26,33 +26,6 @@ import { SuiteContext } from "node:test";
 export function ContactList() {
     const [contacts, setContacts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const acceptContactRequest = async (uniqid: string) => {
-        try {
-            const jwtToken = await SwDb.getJwtToken();
-
-            const myHeaders = new Headers();
-            myHeaders.append("Authorization", "Bearer " + jwtToken);
-
-
-            const requestOptions: RequestInit = {
-                method: "GET",
-                headers: myHeaders,
-                redirect: "follow"
-            };
-
-            fetch("http://localhost:4000/api/protected/contacts", requestOptions)
-                .then((response) => response.json())
-                .then((result) => {
-                    setContacts(result)
-                })
-                .catch((error) => console.error(error));
-        } catch (error) {
-            console.error(error);
-            setError("Failed to accept contact");
-        }
-    };
 
     useEffect(() => {
         const getContacts = async () => {
@@ -70,7 +43,6 @@ export function ContactList() {
             fetch("http://localhost:4000/api/protected/contacts", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
-                    console.log(result)
                     setContacts(result.data)
                     setIsLoading(false)
                 }
@@ -90,7 +62,6 @@ export function ContactList() {
             ) : (
                 <ul className="mt-2 space-y-2">
                     {contacts.map((contact, index) => (
-
                         <li key={index} className="border-b p-2 break-all">
                             {contact.username ?? "Unnamed contact"} 
                             <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
