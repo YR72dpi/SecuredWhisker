@@ -2,94 +2,139 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"securedWhisker/db"
-	"securedWhisker/utils"
-	"time"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
-	socketio "github.com/googollee/go-socket.io"
-	"github.com/valyala/fasthttp/fasthttpadaptor"
+	"github.com/gorilla/websocket"
 )
 
-func main() {
-	envData := utils.LoadEnv()
-	env := envData["APP_ENV"]
-	version := envData["VERSION"]
+type Client struct {
+	conn *websocket.Conn
+	send chan []byte
+	room string
+}
 
-	app := fiber.New(fiber.Config{
-		Prefork:       env != "dev" || env == "",
-		CaseSensitive: true,
-		StrictRouting: true,
-		ServerHeader:  "Secured Whisker " + version,
-		AppName:       "Secured Whisker " + version,
-	})
+type Hub struct {
+	clients    map[*Client]bool
+	rooms      map[string]map[*Client]bool
+	register   chan *Client
+	unregister chan *Client
+	broadcast  chan Message
+}
 
-	if !fiber.IsChild() {
-		utils.Logger("info", "Secured Whisker "+version+" launched !", false)
-		utils.Logger("info", "Env: "+env, false)
-		utils.Logger("info", "Try to hit the port 8081 to see what happens", false)
-	} else {
-		utils.Logger("info", "Child process", false)
+type Message struct {
+	room string
+	data []byte
+}
+
+func newHub() *Hub {
+	return &Hub{
+		clients:    make(map[*Client]bool),
+		rooms:      make(map[string]map[*Client]bool),
+		register:   make(chan *Client),
+		unregister: make(chan *Client),
+		broadcast:  make(chan Message),
+	}
+}
+
+func (h *Hub) run() {
+	for {
+		select {
+		case client := <-h.register:
+			h.clients[client] = true
+			if _, ok := h.rooms[client.room]; !ok {
+				h.rooms[client.room] = make(map[*Client]bool)
+			}
+			h.rooms[client.room][client] = true
+
+		case client := <-h.unregister:
+			if _, ok := h.clients[client]; ok {
+				delete(h.clients, client)
+				close(client.send)
+				if roomClients, ok := h.rooms[client.room]; ok {
+					delete(roomClients, client)
+					if len(roomClients) == 0 {
+						delete(h.rooms, client.room)
+					}
+				}
+			}
+
+		case msg := <-h.broadcast:
+			if clients, ok := h.rooms[msg.room]; ok {
+				for client := range clients {
+					select {
+					case client.send <- msg.data:
+					default:
+						close(client.send)
+						delete(h.clients, client)
+						delete(h.rooms[msg.room], client)
+					}
+				}
+			}
+		}
+	}
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool { return true }, // autorise toutes les origines
+}
+
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	room := r.URL.Query().Get("room")
+	if room == "" {
+		http.Error(w, "room is required", http.StatusBadRequest)
+		return
 	}
 
-	// ➤ Setup Socket.IO
-	io := socketio.NewServer(nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
 
-	io.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		log.Println("🔌 Socket.IO connected:", s.ID())
-		return nil
-	})
+	client := &Client{
+		conn: conn,
+		send: make(chan []byte),
+		room: room,
+	}
+	hub.register <- client
 
-	io.OnEvent("/", "message", func(s socketio.Conn, msg string) {
-		log.Println("📨 Message received:", msg)
-		s.Emit("reply", "Echo: "+msg)
-	})
+	go client.writePump()
+	client.readPump(hub)
+}
 
-	io.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		log.Println("❌ Socket.IO disconnected:", reason)
-	})
-
-	go func() {
-		if err := io.Serve(); err != nil {
-			log.Fatalf("Socket.IO listen error: %s\n", err)
-		}
+func (c *Client) readPump(hub *Hub) {
+	defer func() {
+		hub.unregister <- c
+		c.conn.Close()
 	}()
-	defer io.Close()
+	for {
+		_, message, err := c.conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		hub.broadcast <- Message{
+			room: c.room,
+			data: message,
+		}
+	}
+}
 
-	// ➤ Proxy /socket.io/ vers Socket.IO
-	app.Use("/socket.io/", func(c *fiber.Ctx) error {
-		handler := fasthttpadaptor.NewFastHTTPHandlerFunc(io.ServeHTTP)
-		handler(c.Context())
-		return nil
+func (c *Client) writePump() {
+	for msg := range c.send {
+		err := c.conn.WriteMessage(websocket.TextMessage, msg)
+		if err != nil {
+			break
+		}
+	}
+}
+
+func main() {
+	hub := newHub()
+	go hub.run()
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r)
 	})
 
-	// ➤ Route HTTP standard
-	app.Get("/", func(c *fiber.Ctx) error {
-		fmt.Print("\n")
-		utils.Logger("info", "Access to route", false, "/")
-
-		status := 200
-		message := "Ok"
-
-		if !db.ConnectionTest() {
-			status = 500
-			message = "Database connection error"
-		}
-
-		response := utils.IndexResponse{
-			Message:  message,
-			Status:   status,
-			DateTime: time.Now(),
-		}
-
-		if status == 500 {
-			c.Status(500)
-		}
-
-		return c.JSON(response)
-	})
-
-	log.Fatal(app.Listen(":8081"))
+	fmt.Println("Serveur WebSocket démarré sur :8080")
+	http.ListenAndServe(":8080", nil)
 }
