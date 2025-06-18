@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"securedWhisker/db"
 	"securedWhisker/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	socketio "github.com/googollee/go-socket.io"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
 func main() {
@@ -30,6 +33,39 @@ func main() {
 		utils.Logger("info", "Child process", false)
 	}
 
+	// ➤ Setup Socket.IO
+	io := socketio.NewServer(nil)
+
+	io.OnConnect("/", func(s socketio.Conn) error {
+		s.SetContext("")
+		log.Println("🔌 Socket.IO connected:", s.ID())
+		return nil
+	})
+
+	io.OnEvent("/", "message", func(s socketio.Conn, msg string) {
+		log.Println("📨 Message received:", msg)
+		s.Emit("reply", "Echo: "+msg)
+	})
+
+	io.OnDisconnect("/", func(s socketio.Conn, reason string) {
+		log.Println("❌ Socket.IO disconnected:", reason)
+	})
+
+	go func() {
+		if err := io.Serve(); err != nil {
+			log.Fatalf("Socket.IO listen error: %s\n", err)
+		}
+	}()
+	defer io.Close()
+
+	// ➤ Proxy /socket.io/ vers Socket.IO
+	app.Use("/socket.io/", func(c *fiber.Ctx) error {
+		handler := fasthttpadaptor.NewFastHTTPHandlerFunc(io.ServeHTTP)
+		handler(c.Context())
+		return nil
+	})
+
+	// ➤ Route HTTP standard
 	app.Get("/", func(c *fiber.Ctx) error {
 		fmt.Print("\n")
 		utils.Logger("info", "Access to route", false, "/")
@@ -37,9 +73,7 @@ func main() {
 		status := 200
 		message := "Ok"
 
-		// verifier la co à l'autre microservices
-		connectDb := db.ConnectionTest()
-		if !connectDb {
+		if !db.ConnectionTest() {
 			status = 500
 			message = "Database connection error"
 		}
@@ -51,11 +85,11 @@ func main() {
 		}
 
 		if status == 500 {
-			c.Context().SetStatusCode(500)
+			c.Status(500)
 		}
 
 		return c.JSON(response)
 	})
 
-	app.Listen(":8081")
+	log.Fatal(app.Listen(":8081"))
 }
