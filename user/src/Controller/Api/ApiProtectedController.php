@@ -46,12 +46,13 @@ class ApiProtectedController extends AbstractController
     #[Route('/addFriend', name: '_addFriend', methods: ["POST"])]
     public function addFriend(
         UserRepository $userRepository,
+        FriendshipRepository $friendshipRepository,
         Request $request,
         Security $security,
         EntityManagerInterface $em
     ): JsonResponse
     {   
-
+        $user = $security->getUser();
         $data = json_decode($request->getContent(), true);
         $splitedIdentifier = explode("_", $data["userIdentifier"]);
 
@@ -64,14 +65,19 @@ class ApiProtectedController extends AbstractController
             'message' => 'User not find',
         ], 404);
 
-        if($wantedUser === $security->getUser()) return $this->json([
+        if($wantedUser === $user) return $this->json([
             'message' => 'Why the fuck did u want to add yourself ? Wanna talk \'bout it ? Need friends ?',
         ], 400);
 
-        // TODO: check if friendship doesn't not already exist
         
+        $isFriendShipAlreadyExist = $friendshipRepository->findUserContacts($user);
+        if(count($isFriendShipAlreadyExist) > 0) return $this->json([
+            'message' => 'Already friend !',
+        ], 400);
+
+
         $friendShip = (new Friendship())
-            ->setRequestFrom($security->getuser())
+            ->setRequestFrom($user)
             ->setRequestTo($wantedUser)
             ->setIsAccepted(false)
             ->setCreatedTime(new \DateTimeImmutable("now"));
