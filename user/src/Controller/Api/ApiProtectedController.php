@@ -67,6 +67,8 @@ class ApiProtectedController extends AbstractController
         if($wantedUser === $security->getUser()) return $this->json([
             'message' => 'Why the fuck did u want to add yourself ? Wanna talk \'bout it ? Need friends ?',
         ], 400);
+
+        // TODO: check if friendship doesn't not already exist
         
         $friendShip = (new Friendship())
             ->setRequestFrom($security->getuser())
@@ -76,8 +78,6 @@ class ApiProtectedController extends AbstractController
 
         $em->persist($friendShip);
         $em->flush();
-
-
 
         return $this->json([
             'message' => 'ok',
