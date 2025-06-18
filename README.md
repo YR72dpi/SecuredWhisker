@@ -31,9 +31,8 @@ About files, they will be encrypted in the browser in AES with a randomly genera
 
 ## ⚠ Warning ⚠
 
-__RSA private key__: The RSA private key is stored in your browser. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, will be lost.
+The __RSA private key is stored in your browser__. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, will be lost.
 
-__Message database__: this is a redis database without persistence, it's mean that if you stop the server or docker container, all messages will be lost.
 
 ## Features 📜
 
@@ -89,29 +88,21 @@ graph LR;
         UserService["User management"] 
         MessageService["Messages management"]
         UserDatabase[("User Database")]
-        MessageDatabase[("Message Database")]
-        FileManager["File management"]
+        Translator["Translator"]
     end
 
-    DropBox{{Dropbox}}
     Frontend["Frontend"]
 
     Frontend -->|API Rest| UserService
     Frontend -->|WebSocket| MessageService
-    Frontend -->|API REST| FileManager
-    FileManager -->| API REST| DropBox
     UserService -->|Storage| UserDatabase
-    MessageService -->|Storage| MessageDatabase
+
+    MessageService -->|API REST| Translator
+    Translator -->|API REST| MessageService
+    Translator -->| API REST| ChatGPT
+
 
 ```
-
-<!-- - [User Management](./docs/UserManagement.md) 
-
-- [Messages Management](./docs/MessagesManagement.md) 
-
-- [File Management](./docs/FileManagement.md) 
-
-- [Frontend](./docs/Frontend.md) -->
 
 ## Stack 👁‍🗨
 
@@ -128,9 +119,7 @@ graph LR;
     - ORM: __Go Redis__
     - Database: __Redis__
 
-- File management
-    - Language: __GO__
-    - Upload : __github.com/chyroc/dropbox__
+- Translator : [YR72dpi/TextManagerGPT](https://github.com/YR72dpi/TextManagerGPT)
 
 - Frontend
     - Language: __TypeScript__
@@ -153,7 +142,7 @@ A tag will be generate like __pseudo#randomNumber__ like Discord.
 It gonna be used to add someone.
 
 <!-- TODO 
-how it secured password when clien -> server
+how it secured password when client -> server
  -->
 
 ### Login
