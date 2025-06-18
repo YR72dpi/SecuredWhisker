@@ -38,7 +38,8 @@ class ApiProtectedController extends AbstractController
 
         return $this->json([
             'message' => 'ok',
-            "identifier" => $user->getFullIdentifier()
+            "identifier" => $user->getFullIdentifier(),
+            "username" => $user->getUsername()
         ]);
     }
 
