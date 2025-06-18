@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Friendship;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,17 @@ class FriendshipRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+     /**
+     * @return Friendship[]
+     */
+    public function findUserContacts(User $user): array
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.requestFrom = :user OR f.requestTo = :user')
+            ->andWhere('f.isAccepted = true')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

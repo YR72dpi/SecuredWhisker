@@ -1,0 +1,104 @@
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { SwDb } from "@/lib/SwDatabase";
+
+export function ContactRequest() {
+    const [contactsRequest, setContactsRequest] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const acceptContactRequest = async (uniqid: string) => {
+        try {
+            const jwtToken = await SwDb.getJwtToken();
+
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "text/plain");
+            myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+            const requestOptions: RequestInit = {
+                method: "POST",
+                headers: myHeaders,
+                body: uniqid,
+                redirect: "follow"
+            };
+
+            const response = await fetch("http://localhost:4000/api/protected/acceptContact", requestOptions);
+
+            if (!response.ok) {
+                throw new Error("Failed to accept contact");
+            }
+
+            // Retirer le contact accepté de la liste
+            setContactsRequest((prev) => prev.filter((contact) => contact.uniqid !== uniqid));
+        } catch (error) {
+            console.error(error);
+            setError("Failed to accept contact");
+        }
+    };
+
+    useEffect(() => {
+        const getContactRequest = async () => {
+            const jwtToken = await SwDb.getJwtToken()
+
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", "Bearer " + jwtToken);
+            const requestOptions: RequestInit = {
+                method: "GET",
+                headers: myHeaders,
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:4000/api/protected/contactRequest", requestOptions)
+                .then((response) => response.json())
+                .then((result) => {
+                    setContactsRequest(result.data)
+                    setIsLoading(false)
+                }
+                )
+                .catch((error) => console.error(error));
+        }
+
+        getContactRequest()
+    }, [])
+
+    return (
+        <>
+            <Dialog>
+                <DialogTrigger className="border p-2 rounded">Contacts Request</DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Contacts Request</DialogTitle>
+                        { isLoading ? (<p>"Loading...."</p>) : "" }
+                        { !isLoading && contactsRequest.length === 0 ? (
+                            <p>No contact requests</p>
+                        ) : (
+                            <ul className="mt-2 space-y-2">
+                                {contactsRequest.map((contact, index) => (
+
+                                    <li key={index} className="border-b p-2 flex place-content-between items-center">
+                                        {contact.username ?? "Unnamed contact"}
+                                        {contact.uniqid ? " (" + contact.uniqid + ")" : ""}
+
+                                        <Button
+                                            onClick={() => acceptContactRequest(contact.uniqid)}
+                                            variant="default"
+                                        >Accept</Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+}

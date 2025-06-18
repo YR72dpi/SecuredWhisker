@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Friendship;
+use App\Repository\FriendshipRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -79,6 +80,112 @@ class ApiProtectedController extends AbstractController
 
         return $this->json([
             'message' => 'ok',
+        ]);
+    }
+
+    #[Route('/contactRequest', name: '_contactRequest')]
+    public function contactRequest(
+        Security $security,
+        FriendshipRepository $friendshipRepository
+    ): JsonResponse
+    {   
+        $user = $security->getUser();
+        
+        $requestList = $friendshipRepository->findby([
+            "isAccepted" => false,
+            "requestTo" => $user->getId()
+        ]);
+
+        $requestData = [];
+        foreach ($requestList as $request) {
+            $requestData[] = [
+                "id" => $request->getRequestFrom()->getId(), 
+                "username" => $request->getRequestFrom()->getUsername(), 
+                "uniqid" => $request->getRequestFrom()->getUniqid()
+            ];
+        }
+
+        return $this->json([
+            'message' => 'ok',
+            "data" => $requestData
+        ]);
+    }
+
+        #[Route('/acceptContact', name: '_acceptContact', methods: ["POST"])]
+    public function acceptContact(
+        Security $security,
+        Request $request,
+        FriendshipRepository $friendshipRepository,
+        UserRepository $userRepository,
+        EntityManagerInterface $em
+    ): JsonResponse
+    {   
+        $user = $security->getUser();
+        $data = $request->getContent();
+
+        $whoRequest = $userRepository->findOneBy([
+            "uniqid" => $data
+        ]);
+
+        if(!$whoRequest) return $this->json([
+            'message' => 'User not found',
+        ], 404);
+
+        $contactrequest = $friendshipRepository->findOneBy([
+            "requestFrom" => $whoRequest,
+            "requestTo" => $user
+        ]);
+
+        if(!$contactrequest) return $this->json([
+            'message' => 'Request not found',
+        ], 404);
+
+        $contactrequest->setIsAccepted(true);
+        $em->persist($contactrequest);
+        $em->flush();
+
+        return $this->json([
+            'message' => 'ok',
+        ]);
+    }
+
+     #[Route('/contacts', name: '_contacts')]
+    public function contacts(
+        Security $security,
+        FriendshipRepository $friendshipRepository
+    ): JsonResponse
+    {   
+        $user = $security->getUser();
+        
+        $contacts = $friendshipRepository->findUserContacts($user);
+
+        $contactList = [];
+        foreach ($contacts as $contact) {
+            $contactToAdd = [];
+
+            if($contact->getRequestTo() === $user) {
+                $contactToAdd = [
+                    "id" => $contact->getRequestFrom()->getId(), 
+                    "username" => $contact->getRequestFrom()->getUsername(), 
+                    "uniqid" => $contact->getRequestFrom()->getUniqid()
+                ];
+            }
+
+            if($contact->getRequestFrom() === $user) {
+                $contactToAdd = [
+                    "id" => $contact->getRequestTo()->getId(), 
+                    "username" => $contact->getRequestTo()->getUsername(), 
+                    "uniqid" => $contact->getRequestTo()->getUniqid()
+                ];
+            }
+
+            if(!empty($contactToAdd)) $contactList[] = $contactToAdd;
+
+        }
+
+        return $this->json([
+            'message' => 'ok',
+            "data" => $contactList
         ]);
     }
 }

@@ -1,5 +1,7 @@
 "use client"
 import { AddFriend } from "@/components/addFriend";
+import { ContactList } from "@/components/contactList";
+import { ContactRequest } from "@/components/contactRequest";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -10,15 +12,13 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
     const [identifier, setIdentifier] = useState<string | null>(null)
-
-    async function getAllFriend() {
-
-    }
-
+       
     useEffect(() => {
-        const identifier = async () => {
-
-            const jwtToken = await SwDb.getJwtToken()
+         
+         const identifier = async () => {
+             
+             const jwtToken = await SwDb.getJwtToken()
+             console.log(jwtToken)
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);
@@ -49,6 +49,8 @@ export default function Home() {
                     <ResizablePanel defaultSize={25}>
                         <div className="flex flex-col p-6">
                             <AddFriend />
+                            <ContactRequest />
+                            <ContactList />
                         </div>
                     </ResizablePanel>
                     <ResizableHandle withHandle />
