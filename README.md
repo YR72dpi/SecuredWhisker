@@ -18,7 +18,7 @@ This is a one year school project but i would like to make it a real full projec
 ## Support me 😘
 
 <a href="http://buymeacoffee.com/yr72dpi">
-<img style="border-radius: 15px; max-width: 300px;" src="./docs/bmac.jpg" style="width: 50%;">
+<img style="border-radius: 15px; max-width: 300px;" src="./docs/bmac.png" style="width: 50%;">
 </a>
 
 ## Security 🔐
