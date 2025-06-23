@@ -94,13 +94,28 @@ graph LR;
     Frontend["Frontend"]
 
     Frontend -->|API Rest| UserService
-    Frontend -->|WebSocket| MessageService
     UserService -->|Storage| UserDatabase
 
-    MessageService -->|API REST| Translator
-    Translator -->|API REST| MessageService
-    Translator -->| API REST| ChatGPT
+    Frontend -->|WebSocket| MessageService
+```
 
+### When messages are translate
+
+```mermaid
+graph LR;
+    subgraph "Microservices Architecture"
+        UserService["User management"] 
+        MessageService["Messages management"]
+        Translator["Translator"]
+    end
+
+    Frontend["Frontend"]
+
+    Frontend -- 1 --> UserService
+    UserService -- 2 --> Translator
+    Translator -- 3 --> UserService
+    UserService -- 4 --> Frontend
+    Frontend -- 5 --> MessageService
 
 ```
 
@@ -114,10 +129,10 @@ graph LR;
 
 - Messages management
     - Language: __GO__
-    - Framework: __Fiber__
+    <!-- - Framework: __Fiber__ -->
     - WebSocket: __Gorilla WebSocket__
-    - ORM: __Go Redis__
-    - Database: __Redis__
+    <!-- - ORM: __Go Redis__ -->
+    <!-- - Database: __Redis__ -->
 
 - Translator : [YR72dpi/TextManagerGPT](https://github.com/YR72dpi/TextManagerGPT)
 
@@ -135,29 +150,17 @@ All of that are Docker-_ized_
 ### Sign up
 
 On subscription form, enter pseudo, password.
-
-The password will be used to encrypt the private key in AES.
+These data will be encrypted with the public key of the User Service.
 
 A tag will be generate like __pseudo#randomNumber__ like Discord. 
 It gonna be used to add someone.
 
-<!-- TODO 
-how it secured password when client -> server
- -->
-
 ### Login
 
-On login form, enter pseudo, password and 2FA code.
-
-<!-- TODO 
-how it secured
- -->
+On login form, enter pseudo, password.
+These data will be encrypted with the public key of the User Service and it will return a jwtToken.
 
 ### Sending Message
-
-<!-- TODO 
-how it secured
- -->
 
 ```mermaid
 sequenceDiagram
@@ -172,44 +175,8 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Server->>Client: Receive crypted messages
-    Client->>Client: Decrypt his own AES crypted private key
+    Client->>Client: Get his own private key
     Client->>Client: Decrypt message 
-```
-
-### Upload Files
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Browser
-    participant Microservice
-    participant Dropbox
-
-    User->>Browser: Submits the form (file to upload)
-    Browser->>Browser: Generates a random AES key
-    Browser->>Browser: Encrypts the file with the AES key
-    Browser->>Microservice: Sends the encrypted file and the AES key
-    Microservice->>Dropbox: Uploads the encrypted file
-    Dropbox-->>Microservice: Upload confirmation
-    Microservice-->>Browser: Upload confirmation
-    Browser-->>User: Upload complete
-    Browser-->>User: Give random generated AES key
-```
-
-### Download File
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Microservice
-    participant Dropbox
-
-    Client->>Microservice: Request to download file
-    Microservice->>Dropbox: Retrieves the encrypted file
-    Dropbox-->>Microservice: Sends the encrypted file
-    Microservice-->>Client: Sends the encrypted file
-    Client->>Client: Decrypts the file with the AES key
-    Client->>Client: Uses the decrypted file
 ```
 
 ## Git flow
@@ -278,3 +245,4 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - Create groups
 - React-native front
 - Gateway if necessary
+- Crypt private key on local storage in AES with the user password
