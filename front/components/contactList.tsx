@@ -23,7 +23,11 @@ import {
 import { AlertCircle } from "lucide-react"
 import { SuiteContext } from "node:test";
 
-export function ContactList() {
+type ContactListProps = {
+    onSelectContact: (contactId: string) => void;
+};
+
+export function ContactList({ onSelectContact }: ContactListProps) {
     const [contacts, setContacts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -62,7 +66,11 @@ export function ContactList() {
             ) : (
                 <ul className="mt-2 space-y-2">
                     {contacts.map((contact, index) => (
-                        <li key={index} className="border-b p-2 break-all">
+                        <li 
+                        key={index} 
+                        className="border-b p-2 break-all"
+                        onClick={() => onSelectContact(contact.id)}
+                        >
                             {contact.username ?? "Unnamed contact"} 
                             <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
                         </li>

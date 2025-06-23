@@ -2,14 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { ChatFormater } from "@/lib/ChatFormater";
+import { ChatLib } from "@/lib/ChatLib";
 
 type ChatProps = {
     username: string;
+    room: string;
 };
 
-
-export function Chat({ username }: ChatProps) {
+export function Chat({ username, room }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -17,8 +17,9 @@ export function Chat({ username }: ChatProps) {
     const [connectionState, setConnectionState] = useState<number>(0)
     
     useEffect(() => {
-        const roomName = "12";
-        const socket = new WebSocket(`ws://localhost:8080/ws?room=${roomName}`);
+        console.log("Connecting to room:", room);
+         if (!room) return;
+        const socket = new WebSocket(`ws://localhost:8080/ws?room=${room}`);
         ws.current = socket;
 
         socket.onopen = () => {
@@ -28,6 +29,11 @@ export function Chat({ username }: ChatProps) {
 
         socket.onmessage = (event) => {
             console.log("Received message:", event.data);
+
+            // déchiffrer celui de l'autre
+            // ajout a Messages
+            // afficher les miens
+
             setMessages(prev => [...prev, JSON.parse(event.data)]);
         };
 
@@ -44,16 +50,18 @@ export function Chat({ username }: ChatProps) {
         return () => {
             socket.close();
         };
-        
-    }, []);
+
+    }, [room]);
 
     const sendMessage = () => {
         if (input.trim() !== "") {
 
-            const formatedMessage = ChatFormater.format(username, input)
 
-            ws.current?.send(formatedMessage);
+            // ajouter le mien
             // setMessages(prev => [...prev, "Moi : " + input]);
+
+            const formatedMessage = ChatFormater.format(username, input)
+            ws.current?.send(formatedMessage);
             setInput("");
         }
     };
@@ -65,7 +73,6 @@ export function Chat({ username }: ChatProps) {
                 {connectionState === 0 && " 🟠"}
                 {connectionState === 1 && " 🟢"}
                 {connectionState === -1 && " 🔴"}
-
             </h2>
 
             <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 bg-gray-100">

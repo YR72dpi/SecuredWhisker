@@ -8,16 +8,20 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { ChatLib } from "@/lib/ChatLib";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useState } from "react";
 
 export default function Home() {
     const [identifier, setIdentifier] = useState<string | null>(null)
+    const [userId, setUserId] = useState<string | null>(null)
     const [username, setUsername] = useState<string | null>(null)
+    
+    const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
 
     useEffect(() => {
 
-        const identifier = async () => {
+        (async () => {
 
             const jwtToken = await SwDb.getJwtToken()
             console.log(jwtToken)
@@ -36,11 +40,11 @@ export default function Home() {
                 .then((result) => {
                     setIdentifier(result.identifier)
                     setUsername(result.username)
+                    setUserId(result.id)
                 })
                 .catch((error) => console.error(error));
-        }
+        })()
 
-        identifier()
     }, [])
 
     return (
@@ -55,9 +59,9 @@ export default function Home() {
                         <div className="flex flex-col gap-1 p-6">
                             {identifier && (
                                 <>
-                                <AddFriend />
-                                <ContactRequest />
-                                <ContactList />
+                                    <AddFriend />
+                                    <ContactRequest />
+                                    <ContactList onSelectContact={setSelectedContactId} />
                                 </>
                             )}
                         </div>
@@ -78,10 +82,11 @@ export default function Home() {
                                         >
                                             <ResizablePanel defaultSize={100}>
                                                 <div className="h-full">
-                                                    {username && (
-                                                        <>
-                                                        <Chat username={username} />
-                                                        </>
+                                                    {username && selectedContactId && userId && (
+                                                        <Chat
+                                                            username={username}
+                                                            room={ChatLib.getRoomName(userId, selectedContactId)}
+                                                        />
                                                     )}
                                                 </div>
                                             </ResizablePanel>
