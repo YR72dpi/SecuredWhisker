@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  message:
+    container_name: message-microservice
+    build:
+      context: ./message
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
   # user:
   #   container_name: user-microservice
   #   build:
