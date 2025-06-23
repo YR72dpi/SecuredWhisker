@@ -9,37 +9,24 @@ services:
     ports:
       - "8080:8080"
 
-  # user:
-  #   container_name: user-microservice
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-user
-  #   ports:
-  #     - '${SYMFONY_PORT}:8000'
-  #   volumes:
-  #     - './user/:/app'
-  #     - './env:/.env'
-  #   environment:
-  #     - SYMFONY_PROJECT_NAME=securedWhisker
-  #     - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
-  #   depends_on:
-  #     postgres_database:
-  #       condition: service_healthy
-  #   networks:
-  #     - app-network
-
-  redis:
-    image: redis:latest
-    container_name: redis_server
-    restart: always
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+  user:
+    container_name: user-microservice
+    build:
+      context: ./user
+      dockerfile: Dockerfile
     ports:
-      - "6379:6379"
+      - '${SYMFONY_PORT}:8000'
     volumes:
-      - redis_data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro  # Monte le fichier de configuration en lecture seule
+      - './user/:/app'
+      - './env:/.env'
     environment:
-      - REDIS_PORT=6379
+      - SYMFONY_PROJECT_NAME=securedWhisker
+      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
+    depends_on:
+      postgres_database:
+        condition: service_healthy
+    networks:
+      - app-network
 
   postgres_database:
     container_name: user-database
@@ -58,13 +45,11 @@ services:
     ports: 
       - "5432:5432"
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
       - ./docker/db/data:/var/lib/postgresql/data:rw
     networks:
       - app-network
 
 volumes:
-  database_data:
   redis_data:
 
 networks:
