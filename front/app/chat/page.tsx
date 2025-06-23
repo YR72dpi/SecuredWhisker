@@ -65,6 +65,7 @@ export default function Home() {
                                     <ContactList
                                         onSelectContact={setSelectedContactId}
                                         contactPublicKey={setContactPublicKey}
+                                        username={setUsername}
                                     />
                                 </>
                             )}

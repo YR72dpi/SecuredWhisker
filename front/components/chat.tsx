@@ -24,6 +24,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
          if (!room) return;
         const socket = new WebSocket(`ws://localhost:8080/ws?room=${room}`);
         ws.current = socket;
+        setMessages([]);
 
         socket.onopen = () => {
             setConnectionState(1)
@@ -84,7 +85,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
     return (
         <div className="flex flex-col h-full p-4">
             <h2 className="text-xl font-semibold mb-2">
-                Chat 
+                Chat to {username}
                 {connectionState === 0 && " 🟠"}
                 {connectionState === 1 && " 🟢"}
                 {connectionState === -1 && " 🔴"}

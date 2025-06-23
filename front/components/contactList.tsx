@@ -3,10 +3,11 @@ import { SwDb } from "@/lib/SwDatabase";
 
 type ContactListProps = {
     onSelectContact: (contactId: string) => void;
+    username: (username: string) => void;
     contactPublicKey: (publicKey: string) => void;
 };
 
-export function ContactList({ onSelectContact, contactPublicKey }: ContactListProps) {
+export function ContactList({ onSelectContact, username, contactPublicKey }: ContactListProps) {
     const [contacts, setContacts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -50,6 +51,7 @@ export function ContactList({ onSelectContact, contactPublicKey }: ContactListPr
                         className="border-b p-2 break-all"
                         onClick={() => {
                             onSelectContact(contact.id);
+                            username(contact.username);
                             contactPublicKey(contact.publicKey);
                         }}
                         >
