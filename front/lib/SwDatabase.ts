@@ -5,36 +5,40 @@ interface PrivateKey {
 }
 
 interface JwtToken {
-  id: string; // clé primaire fixe
+  id: string;
   token: string;
 }
 
 class SwDatabase extends Dexie {
-  public keys!: EntityTable<PrivateKey, 'privateKey'>;
+  public keys!: EntityTable<PrivateKey & { id: string }, 'id'>;
   public jwt!: EntityTable<JwtToken, 'id'>;
 
   constructor() {
     super('SecuredWhisker');
 
-    this.version(1).stores({
-      keys: 'privateKey',
+    this.version(2).stores({
+      keys: 'id',
       jwt: 'id',
     });
 
     this.keys = this.table('keys');
-    this.jwt = this.table('jwt'); // <- assignation
+    this.jwt = this.table('jwt');
   }
 
   async addPrivateKey(privateKey: string): Promise<void> {
-    await this.keys.add({ privateKey });
+    await this.keys.put({ id: 'main_private_key', privateKey });
   }
 
   async getPrivateKey(): Promise<PrivateKey | undefined> {
-    return await this.keys.get('privateKey');
+    const result = await this.keys.get('main_private_key');
+    if (result) {
+      return { privateKey: result.privateKey };
+    }
+    return undefined;
   }
 
   async saveJwtToken(token: string): Promise<void> {
-    await this.jwt.put({ id: 'auth_token', token }); // id fixe
+    await this.jwt.put({ id: 'auth_token', token });
   }
 
   async getJwtToken(): Promise<string | null> {
