@@ -60,7 +60,7 @@ export function Chat({ username, room }: ChatProps) {
             // ajouter le mien
             // setMessages(prev => [...prev, "Moi : " + input]);
 
-            const formatedMessage = ChatFormater.format(username, input)
+            const formatedMessage = ChatLib.format(username, input)
             ws.current?.send(formatedMessage);
             setInput("");
         }
