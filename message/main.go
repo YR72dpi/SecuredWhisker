@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"securedWhisker/utils"
 
 	"github.com/gorilla/websocket"
 )
@@ -109,8 +110,12 @@ func (c *Client) readPump(hub *Hub) {
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
+			utils.Logger("error", "WebSocket read error", true, err.Error())
 			break
 		}
+
+		utils.Logger("info", "WebSocket message received", false, string(message))
+
 		hub.broadcast <- Message{
 			room: c.room,
 			data: message,
@@ -122,6 +127,7 @@ func (c *Client) writePump() {
 	for msg := range c.send {
 		err := c.conn.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
+			utils.Logger("error", "WebSocket write error", true, err.Error())
 			break
 		}
 	}

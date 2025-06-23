@@ -16,7 +16,6 @@ func LoadEnv() map[string]string {
 
 	return map[string]string{
 		"APP_ENV":         os.Getenv("APP_ENV"),
-		"REDIS_PASSWORD":  os.Getenv("REDIS_PASSWORD"),
 		"VERSION":         os.Getenv("VERSION"),
 		"SHOW_ONLY_ERROR": os.Getenv("SHOW_ONLY_ERROR"),
 	}
