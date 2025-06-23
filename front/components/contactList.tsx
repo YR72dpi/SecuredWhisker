@@ -3,9 +3,10 @@ import { SwDb } from "@/lib/SwDatabase";
 
 type ContactListProps = {
     onSelectContact: (contactId: string) => void;
+    contactPublicKey: (publicKey: string) => void;
 };
 
-export function ContactList({ onSelectContact }: ContactListProps) {
+export function ContactList({ onSelectContact, contactPublicKey }: ContactListProps) {
     const [contacts, setContacts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -47,7 +48,10 @@ export function ContactList({ onSelectContact }: ContactListProps) {
                         <li 
                         key={index} 
                         className="border-b p-2 break-all"
-                        onClick={() => onSelectContact(contact.id)}
+                        onClick={() => {
+                            onSelectContact(contact.id);
+                            contactPublicKey(contact.publicKey);
+                        }}
                         >
                             {contact.username ?? "Unnamed contact"} 
                             <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>

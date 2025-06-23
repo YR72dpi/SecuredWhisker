@@ -3,13 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ChatLib } from "@/lib/ChatLib";
+import { Crypto } from "@/lib/Crypto";
+import { SwDb } from "@/lib/SwDatabase";
 
 type ChatProps = {
     username: string;
     room: string;
+    contactPublicKey?: string;
 };
 
-export function Chat({ username, room }: ChatProps) {
+export function Chat({ username, room, contactPublicKey }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -27,14 +30,22 @@ export function Chat({ username, room }: ChatProps) {
             console.log("Connected");
         };
 
-        socket.onmessage = (event) => {
-            console.log("Received message:", event.data);
+        socket.onmessage = async (event) => {
 
-            // déchiffrer celui de l'autre
+            const parsedMessage = JSON.parse(event.data)
+
+            const privateKey = await SwDb.getPrivateKey();
+            // console.log(atob(privateKey?.privateKey || ""));
+            const decryptedMessage = await Crypto.cryptedToText(
+                parsedMessage.message, 
+                atob(privateKey?.privateKey || "")
+            );
+            
+
             // ajout a Messages
             // afficher les miens
 
-            setMessages(prev => [...prev, JSON.parse(event.data)]);
+            setMessages(prev => [...prev, { from: parsedMessage.from, message: decryptedMessage }]);
         };
 
         socket.onclose = () => {
@@ -51,20 +62,24 @@ export function Chat({ username, room }: ChatProps) {
             socket.close();
         };
 
-    }, [room]);
+    }, [room, contactPublicKey]);
 
-    const sendMessage = () => {
-        if (input.trim() !== "") {
+    const sendMessage = async () => {
+        if (input.trim() !== "" && contactPublicKey) {
+            try {
+                const publicKeyPem = atob(contactPublicKey);
+                console.log(publicKeyPem);
+                const cryptedMessage = await Crypto.textToCrypted(input, publicKeyPem);
+                const formatedMessage = ChatLib.format(username, cryptedMessage);
+                ws.current?.send(formatedMessage);
 
-
-            // ajouter le mien
-            // setMessages(prev => [...prev, "Moi : " + input]);
-
-            const formatedMessage = ChatLib.format(username, input)
-            ws.current?.send(formatedMessage);
-            setInput("");
+                setMessages(prev => [...prev, { from: username, message: input }]);
+                setInput("");
+            } catch (e) {
+                console.error("Erreur de chiffrement :", e);
+            }
         }
-    };
+    }
 
     return (
         <div className="flex flex-col h-full p-4">

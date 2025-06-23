@@ -175,7 +175,8 @@ class ApiProtectedController extends AbstractController
                 $contactToAdd = [
                     "id" => $contact->getRequestFrom()->getId(), 
                     "username" => $contact->getRequestFrom()->getUsername(), 
-                    "uniqid" => $contact->getRequestFrom()->getUniqid()
+                    "uniqid" => $contact->getRequestFrom()->getUniqid(),
+                    "publicKey" => $contact->getRequestFrom()->getPublicKey()
                 ];
             }
 
@@ -183,7 +184,8 @@ class ApiProtectedController extends AbstractController
                 $contactToAdd = [
                     "id" => $contact->getRequestTo()->getId(), 
                     "username" => $contact->getRequestTo()->getUsername(), 
-                    "uniqid" => $contact->getRequestTo()->getUniqid()
+                    "uniqid" => $contact->getRequestTo()->getUniqid(),
+                    "publicKey" => $contact->getRequestTo()->getPublicKey()
                 ];
             }
 

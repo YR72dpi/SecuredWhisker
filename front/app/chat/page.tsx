@@ -18,6 +18,7 @@ export default function Home() {
     const [username, setUsername] = useState<string | null>(null)
     
     const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+    const [contactPublicKey, setContactPublicKey] = useState<string | null>(null);
 
     useEffect(() => {
 
@@ -61,7 +62,10 @@ export default function Home() {
                                 <>
                                     <AddFriend />
                                     <ContactRequest />
-                                    <ContactList onSelectContact={setSelectedContactId} />
+                                    <ContactList
+                                        onSelectContact={setSelectedContactId}
+                                        contactPublicKey={setContactPublicKey}
+                                    />
                                 </>
                             )}
                         </div>
@@ -82,10 +86,11 @@ export default function Home() {
                                         >
                                             <ResizablePanel defaultSize={100}>
                                                 <div className="h-full">
-                                                    {username && selectedContactId && userId && (
+                                                    {username && selectedContactId && userId && contactPublicKey && (
                                                         <Chat
                                                             username={username}
                                                             room={ChatLib.getRoomName(userId, selectedContactId)}
+                                                            contactPublicKey={contactPublicKey}
                                                         />
                                                     )}
                                                 </div>
