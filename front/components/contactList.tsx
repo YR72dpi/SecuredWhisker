@@ -1,27 +1,5 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod"
 import { SwDb } from "@/lib/SwDatabase";
-
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle
-} from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
-import { SuiteContext } from "node:test";
 
 type ContactListProps = {
     onSelectContact: (contactId: string) => void;
