@@ -14,7 +14,7 @@ export type LoginResponse = {
 
 export class UserApi {
     static async getApiPublicKey () {
-        const data = await fetch("http://localhost:4000/api/publicKey")
+        const data = await fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/publicKey")
         .then((response) => response.json())
         .then((result) => result)
         .catch((error) => console.error(error));
@@ -29,7 +29,7 @@ export class UserApi {
 
         try {
             const request = await fetch(
-                "http://localhost:4000/api/user/subscribe", 
+                process.env.NEXT_PUBLIC_USER_HOST + "/api/user/subscribe", 
                 {
                     method: "POST",
                     headers: myHeaders,
@@ -55,7 +55,7 @@ export class UserApi {
 
         try {
             const request = await fetch(
-                "http://localhost:4000/api/user/login", 
+                process.env.NEXT_PUBLIC_USER_HOST + "/api/user/login", 
                 {
                     method: "POST",
                     headers: myHeaders,

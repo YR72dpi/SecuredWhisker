@@ -26,7 +26,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
     useEffect(() => {
         console.log("Connecting to room:", room);
         if (!room) return;
-        const socket = new WebSocket(`ws://localhost:8080/ws?room=${room}`);
+        const socket = new WebSocket(process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
         setMessages([]);
 
@@ -86,7 +86,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                         "language": selectedLanguage
                     });
 
-                    const response = await fetch("http://localhost:4000/api/protected/translate", {
+                    const response = await fetch(process.env.NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST + "/api/protected/translate", {
                         method: "POST",
                         headers: myHeaders,
                         body: raw,

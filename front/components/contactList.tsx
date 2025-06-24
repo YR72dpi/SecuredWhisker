@@ -31,7 +31,7 @@ export function ContactList({ onSelectContact, username, contactPublicKey }: Con
                 redirect: "follow"
             };
 
-            fetch("http://localhost:4000/api/protected/contacts", requestOptions)
+            fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contacts", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setContacts(result.data)

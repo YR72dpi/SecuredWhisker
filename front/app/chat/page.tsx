@@ -36,7 +36,7 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch("http://localhost:4000/api/protected/selfUserData", requestOptions)
+            return fetch( process.env.NEXT_PUBLIC_USER_HOST +"/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setIdentifier(result.identifier)

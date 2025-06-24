@@ -59,7 +59,7 @@ export function AddFriend() {
             redirect: "follow"
         };
 
-        fetch("http://localhost:4000/api/protected/addFriend", requestOptions)
+        fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
             .then(async (response) => {
                 const jsonResponse = await response.json()
                  if (!response.ok) {

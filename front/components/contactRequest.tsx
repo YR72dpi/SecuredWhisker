@@ -33,7 +33,7 @@ export function ContactRequest() {
                 redirect: "follow"
             };
 
-            const response = await fetch("http://localhost:4000/api/protected/acceptContact", requestOptions);
+            const response = await fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/acceptContact", requestOptions);
 
             if (!response.ok) {
                 throw new Error("Failed to accept contact");
@@ -62,7 +62,7 @@ export function ContactRequest() {
                 redirect: "follow"
             };
 
-            fetch("http://localhost:4000/api/protected/contactRequest", requestOptions)
+            fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     if (!cancelled) {
