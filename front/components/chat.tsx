@@ -21,6 +21,8 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
 
     const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
+    const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
+
     useEffect(() => {
         console.log("Connecting to room:", room);
         if (!room) return;
@@ -110,7 +112,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
 
     return (
         <div className="flex flex-col h-full p-4">
-            <div className="mb-2 text-lg font-semibold">
+            <div className="mb-2 flex items-center justify-between">
                 <h2 className="text-xl font-semibold mb-2">
                     Chat to {username}
                     {connectionState === 0 && " 🟠"}
@@ -118,7 +120,8 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                     {connectionState === -1 && " 🔴"}
                 </h2>
 
-                <select
+                {showLanguageSelector && (
+                     <select
                     value={selectedLanguage}
                     onChange={e => setSelectedLanguage(e.target.value)}
                     className="mb-2 p-2 border rounded"
@@ -140,6 +143,8 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                     <option value="Reunionese Creole">Réunion Creole</option>
                     {/* Ajoute d'autres langues ici */}
                 </select>
+                )}
+               
             </div>
 
             <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 bg-gray-100">
