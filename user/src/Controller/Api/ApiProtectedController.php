@@ -28,11 +28,10 @@ class ApiProtectedController extends AbstractController
     #[Route('/selfUserData', name: '_selfUserData',)]
     public function selfUserData(
         Security $security
-    ): JsonResponse
-    {   
+    ): JsonResponse {
         $user = $security->getUser();
 
-        if(!$user) return $this->json([
+        if (!$user) return $this->json([
             'message' => 'ok',
         ], 404);
 
@@ -51,8 +50,7 @@ class ApiProtectedController extends AbstractController
         Request $request,
         Security $security,
         EntityManagerInterface $em
-    ): JsonResponse
-    {   
+    ): JsonResponse {
         $user = $security->getUser();
         $data = json_decode($request->getContent(), true);
         $splitedIdentifier = explode("_", $data["userIdentifier"]);
@@ -62,17 +60,17 @@ class ApiProtectedController extends AbstractController
             "uniqid" => $splitedIdentifier[1],
         ]);
 
-        if(!$wantedUser) return $this->json([
+        if (!$wantedUser) return $this->json([
             'message' => 'User not find',
         ], 404);
 
-        if($wantedUser === $user) return $this->json([
+        if ($wantedUser === $user) return $this->json([
             'message' => 'Why the fuck did u want to add yourself ? Wanna talk \'bout it ? Need friends ?',
         ], 400);
 
         // TODO : créer une erreur quand on veux plusiurs amie car oneToOne
         $isFriendShipAlreadyExist = $friendshipRepository->findRelation($user, $wantedUser);
-        if($isFriendShipAlreadyExist !== []) return $this->json([
+        if ($isFriendShipAlreadyExist !== []) return $this->json([
             'message' => 'Already friend !',
         ], 400);
 
@@ -94,10 +92,9 @@ class ApiProtectedController extends AbstractController
     public function contactRequest(
         Security $security,
         FriendshipRepository $friendshipRepository
-    ): JsonResponse
-    {   
+    ): JsonResponse {
         $user = $security->getUser();
-        
+
         $requestList = $friendshipRepository->findby([
             "isAccepted" => false,
             "requestTo" => $user->getId()
@@ -106,8 +103,8 @@ class ApiProtectedController extends AbstractController
         $requestData = [];
         foreach ($requestList as $request) {
             $requestData[] = [
-                "id" => $request->getRequestFrom()->getId(), 
-                "username" => $request->getRequestFrom()->getUsername(), 
+                "id" => $request->getRequestFrom()->getId(),
+                "username" => $request->getRequestFrom()->getUsername(),
                 "uniqid" => $request->getRequestFrom()->getUniqid()
             ];
         }
@@ -118,15 +115,14 @@ class ApiProtectedController extends AbstractController
         ]);
     }
 
-        #[Route('/acceptContact', name: '_acceptContact', methods: ["POST"])]
+    #[Route('/acceptContact', name: '_acceptContact', methods: ["POST"])]
     public function acceptContact(
         Security $security,
         Request $request,
         FriendshipRepository $friendshipRepository,
         UserRepository $userRepository,
         EntityManagerInterface $em
-    ): JsonResponse
-    {   
+    ): JsonResponse {
         $user = $security->getUser();
         $data = $request->getContent();
 
@@ -134,7 +130,7 @@ class ApiProtectedController extends AbstractController
             "uniqid" => $data
         ]);
 
-        if(!$whoRequest) return $this->json([
+        if (!$whoRequest) return $this->json([
             'message' => 'User not found',
         ], 404);
 
@@ -143,7 +139,7 @@ class ApiProtectedController extends AbstractController
             "requestTo" => $user
         ]);
 
-        if(!$contactrequest) return $this->json([
+        if (!$contactrequest) return $this->json([
             'message' => 'Request not found',
         ], 404);
 
@@ -156,45 +152,79 @@ class ApiProtectedController extends AbstractController
         ]);
     }
 
-     #[Route('/contacts', name: '_contacts')]
+    #[Route('/contacts', name: '_contacts')]
     public function contacts(
         Security $security,
         FriendshipRepository $friendshipRepository
-    ): JsonResponse
-    {   
+    ): JsonResponse {
         $user = $security->getUser();
-        
+
         $contacts = $friendshipRepository->findUserContacts($user);
 
         $contactList = [];
         foreach ($contacts as $contact) {
             $contactToAdd = [];
 
-            if($contact->getRequestTo() === $user) {
+            if ($contact->getRequestTo() === $user) {
                 $contactToAdd = [
-                    "id" => $contact->getRequestFrom()->getId(), 
-                    "username" => $contact->getRequestFrom()->getUsername(), 
+                    "id" => $contact->getRequestFrom()->getId(),
+                    "username" => $contact->getRequestFrom()->getUsername(),
                     "uniqid" => $contact->getRequestFrom()->getUniqid(),
                     "publicKey" => $contact->getRequestFrom()->getPublicKey()
                 ];
             }
 
-            if($contact->getRequestFrom() === $user) {
+            if ($contact->getRequestFrom() === $user) {
                 $contactToAdd = [
-                    "id" => $contact->getRequestTo()->getId(), 
-                    "username" => $contact->getRequestTo()->getUsername(), 
+                    "id" => $contact->getRequestTo()->getId(),
+                    "username" => $contact->getRequestTo()->getUsername(),
                     "uniqid" => $contact->getRequestTo()->getUniqid(),
                     "publicKey" => $contact->getRequestTo()->getPublicKey()
                 ];
             }
 
-            if(!empty($contactToAdd)) $contactList[] = $contactToAdd;
-
+            if (!empty($contactToAdd)) $contactList[] = $contactToAdd;
         }
 
         return $this->json([
             'message' => 'ok',
             "data" => $contactList
+        ]);
+    }
+
+    #[Route('/translate', name: '_translate', methods: ["POST"])]
+    public function translate(
+        Request $request
+    ): JsonResponse
+    {
+        $data = $request->getContent();
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://localhost:5000/translate',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $translatedMessage = json_decode($response, true)['translated'];
+
+
+        return $this->json([
+            'message' => 'ok',
+            'translated' => $translatedMessage
         ]);
     }
 }

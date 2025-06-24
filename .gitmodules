@@ -1,0 +1,3 @@
+[submodule "TextManagerGPT"]
+	path = TextManagerGPT
+	url = https://github.com/YR72dpi/TextManagerGPT

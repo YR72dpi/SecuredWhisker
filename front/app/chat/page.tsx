@@ -16,7 +16,7 @@ export default function Home() {
     const [identifier, setIdentifier] = useState<string | null>(null)
     const [userId, setUserId] = useState<string | null>(null)
     const [username, setUsername] = useState<string | null>(null)
-    
+
     const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
     const [contactPublicKey, setContactPublicKey] = useState<string | null>(null);
 
@@ -88,11 +88,13 @@ export default function Home() {
                                             <ResizablePanel defaultSize={100}>
                                                 <div className="h-full">
                                                     {username && selectedContactId && userId && contactPublicKey && (
-                                                        <Chat
-                                                            username={username}
-                                                            room={ChatLib.getRoomName(userId, selectedContactId)}
-                                                            contactPublicKey={contactPublicKey}
-                                                        />
+                                                        
+                                                            
+                                                            <Chat
+                                                                username={username}
+                                                                room={ChatLib.getRoomName(userId, selectedContactId)}
+                                                                contactPublicKey={contactPublicKey} />
+                                                        
                                                     )}
                                                 </div>
                                             </ResizablePanel>
