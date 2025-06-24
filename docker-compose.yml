@@ -7,7 +7,7 @@ services:
       context: ./message
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "${SOCKET_PORT}:8080"
 
   user:
     container_name: user-microservice
@@ -21,14 +21,14 @@ services:
       - './env:/.env'
     environment:
       - SYMFONY_PROJECT_NAME=securedWhisker
-      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
+      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
     depends_on:
-      postgres_database:
+      database:
         condition: service_healthy
     networks:
       - app-network
 
-  postgres_database:
+  database:
     container_name: user-database
     restart: always
     image: postgres:${POSTGRES_VERSION:-16}-alpine
@@ -49,8 +49,35 @@ services:
     networks:
       - app-network
 
-volumes:
-  redis_data:
+  next-app:
+    container_name: next-app
+    build:
+      context: ./front/
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_GPT_API_KEY: ${NEXT_PUBLIC_GPT_API_KEY}
+        NEXT_PUBLIC_USER_HOST: http://${SERVER_HOST}:${SYMFONY_PORT}
+        NEXT_PUBLIC_MESSAGE_HOST: ws://${SERVER_HOST}:${SOCKET_PORT}
+        NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST: http://text-manager-gpt:${TextManagerGPT_PORT}
+    restart: always
+    ports:
+      - ${NEXTJS_PORT}:3000
+    networks:
+      - app-network
+    depends_on:
+      - user
+      - message
+
+  text-manager-gpt:
+    build:
+      context: ./TextManagerGPT
+      dockerfile: Dockerfile
+    container_name: TextManagerGPT
+    ports:
+      - "${TextManagerGPT_PORT}:3000"
+    environment:
+      - NODE_ENV=production
+    command: node dist/index.js
 
 networks:
   app-network:
