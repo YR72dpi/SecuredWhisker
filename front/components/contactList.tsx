@@ -7,8 +7,15 @@ type ContactListProps = {
     contactPublicKey: (publicKey: string) => void;
 };
 
+type Contact = {
+    id: string;
+    username: string;
+    uniqid: string;
+    publicKey: string;
+};
+
 export function ContactList({ onSelectContact, username, contactPublicKey }: ContactListProps) {
-    const [contacts, setContacts] = useState<any[]>([]);
+    const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {

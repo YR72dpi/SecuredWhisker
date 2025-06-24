@@ -1,7 +1,6 @@
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -10,10 +9,14 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 
+type contactsRequestType = {
+    uniqid: string;
+    username?: string;
+}
+
 export function ContactRequest() {
-    const [contactsRequest, setContactsRequest] = useState<any[]>([]);
+    const [contactsRequest, setContactsRequest] = useState<contactsRequestType[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
 
     const acceptContactRequest = async (uniqid: string) => {
         try {
@@ -40,7 +43,6 @@ export function ContactRequest() {
             setContactsRequest((prev) => prev.filter((contact) => contact.uniqid !== uniqid));
         } catch (error) {
             console.error(error);
-            setError("Failed to accept contact");
         }
     };
 
@@ -95,7 +97,7 @@ export function ContactRequest() {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Contacts Request</DialogTitle>
-                        {isLoading ? (<p>"Loading...."</p>) : ""}
+                        {isLoading ? (<p>Loading....</p>) : ""}
                         {!isLoading && contactsRequest.length === 0 ? (
                             <p>No contact requests</p>
                         ) : (
