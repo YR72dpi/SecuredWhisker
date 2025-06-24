@@ -44,36 +44,41 @@ export function ContactRequest() {
         }
     };
 
-    const getContactRequest = async () => {
-        const jwtToken = await SwDb.getJwtToken()
-
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("Authorization", "Bearer " + jwtToken);
-        const requestOptions: RequestInit = {
-            method: "GET",
-            headers: myHeaders,
-            redirect: "follow"
-        };
-
-        fetch("http://localhost:4000/api/protected/contactRequest", requestOptions)
-            .then((response) => response.json())
-            .then((result) => {
-                setContactsRequest(result.data)
-                setIsLoading(false)
-            }
-            )
-            .catch((error) => console.error(error));
-    }
-
     useEffect(() => {
+        let cancelled = false;
+
+        const getContactRequest = async () => {
+            const jwtToken = await SwDb.getJwtToken()
+
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+            const requestOptions: RequestInit = {
+                method: "GET",
+                headers: myHeaders,
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:4000/api/protected/contactRequest", requestOptions)
+                .then((response) => response.json())
+                .then((result) => {
+                    if (!cancelled) {
+                        setContactsRequest(result.data)
+                        setIsLoading(false)
+                        setTimeout(() => {
+                            getContactRequest();
+                        }, 5000); // 5 secondes d'attente avant le prochain appel
+                    }
+                })
+                .catch((error) => console.error(error));
+        }
+
         getContactRequest()
 
-        const interval = setInterval(() => {
-            getContactRequest();
-        }, 5000); // refresh every 3 seconds
-
-        return () => clearInterval(interval);
+        return () => {
+            cancelled = true;
+        };
     }, [])
 
     return (
@@ -83,7 +88,7 @@ export function ContactRequest() {
                     Contacts Request
                     {contactsRequest.length > 0 && (
                         <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs">
-                             {contactsRequest.length}
+                            {contactsRequest.length}
                         </span>
                     )}
                 </DialogTrigger>
