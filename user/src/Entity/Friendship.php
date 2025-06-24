@@ -2,13 +2,10 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\FriendshipRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FriendshipRepository::class)]
-#[ApiResource]
 class Friendship
 {
     #[ORM\Id]
@@ -16,17 +13,16 @@ class Friendship
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'friendships')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $requestFrom = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'friendships')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $requestTo = null;
 
-    #[ORM\Column(options: ["default" => false])]
+    #[ORM\Column]
     private ?bool $isAccepted = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdTime = null;
 
     public function getId(): ?int
     {
@@ -62,21 +58,9 @@ class Friendship
         return $this->isAccepted;
     }
 
-    public function setIsAccepted(bool $isAccepted): static
+    public function setAccepted(bool $isAccepted): static
     {
         $this->isAccepted = $isAccepted;
-
-        return $this;
-    }
-
-    public function getCreatedTime(): ?\DateTimeInterface
-    {
-        return $this->createdTime;
-    }
-
-    public function setCreatedTime(\DateTimeInterface $createdTime): static
-    {
-        $this->createdTime = $createdTime;
 
         return $this;
     }

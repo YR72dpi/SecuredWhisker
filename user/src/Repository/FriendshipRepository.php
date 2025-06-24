@@ -54,4 +54,21 @@ class FriendshipRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Trouve les relations d'amitié entre deux utilisateurs (dans les deux sens).
+     * @return Friendship[]
+     */
+    public function findRelation(User $user1, User $user2): array
+    {
+        return $this->createQueryBuilder('f')
+            ->where('
+                (f.requestFrom = :user1 AND f.requestTo = :user2) 
+                OR (f.requestFrom = :user2 AND f.requestTo = :user1)
+            ')
+            ->setParameter('user1', $user1)
+            ->setParameter('user2', $user2)
+            ->getQuery()
+            ->getResult();
+    }
 }

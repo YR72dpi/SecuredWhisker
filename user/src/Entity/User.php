@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -37,6 +39,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $uniqid = null;
+
+    /**
+     * @var Collection<int, Friendship>
+     */
+    #[ORM\OneToMany(targetEntity: Friendship::class, mappedBy: 'requestFrom', orphanRemoval: true)]
+    private Collection $friendships;
+
+    public function __construct()
+    {
+        $this->friendships = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -140,5 +153,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getFullIdentifier(): string
     {
         return $this->username . '_' . $this->uniqid;
+    }
+
+    /**
+     * @return Collection<int, Friendship>
+     */
+    public function getFriendships(): Collection
+    {
+        return $this->friendships;
+    }
+
+    public function addFriendship(Friendship $friendship): static
+    {
+        if (!$this->friendships->contains($friendship)) {
+            $this->friendships->add($friendship);
+            $friendship->setRequestFrom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFriendship(Friendship $friendship): static
+    {
+        if ($this->friendships->removeElement($friendship)) {
+            // set the owning side to null (unless already changed)
+            if ($friendship->getRequestFrom() === $this) {
+                $friendship->setRequestFrom(null);
+            }
+        }
+
+        return $this;
     }
 }

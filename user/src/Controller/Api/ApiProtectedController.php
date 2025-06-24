@@ -70,9 +70,9 @@ class ApiProtectedController extends AbstractController
             'message' => 'Why the fuck did u want to add yourself ? Wanna talk \'bout it ? Need friends ?',
         ], 400);
 
-        
-        $isFriendShipAlreadyExist = $friendshipRepository->findUserContacts($user);
-        if(count($isFriendShipAlreadyExist) > 0) return $this->json([
+        // TODO : créer une erreur quand on veux plusiurs amie car oneToOne
+        $isFriendShipAlreadyExist = $friendshipRepository->findRelation($user, $wantedUser);
+        if($isFriendShipAlreadyExist !== []) return $this->json([
             'message' => 'Already friend !',
         ], 400);
 
@@ -80,8 +80,7 @@ class ApiProtectedController extends AbstractController
         $friendShip = (new Friendship())
             ->setRequestFrom($user)
             ->setRequestTo($wantedUser)
-            ->setIsAccepted(false)
-            ->setCreatedTime(new \DateTimeImmutable("now"));
+            ->setAccepted(false);
 
         $em->persist($friendShip);
         $em->flush();
@@ -148,7 +147,7 @@ class ApiProtectedController extends AbstractController
             'message' => 'Request not found',
         ], 404);
 
-        $contactrequest->setIsAccepted(true);
+        $contactrequest->setAccepted(true);
         $em->persist($contactrequest);
         $em->flush();
 
