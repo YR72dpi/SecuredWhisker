@@ -1,3 +1,4 @@
+
 <img src="docs/banner.png">
 
 <sub><i>
@@ -15,11 +16,14 @@ This is a secure messaging application that allows users to send encrypted messa
 This is a one year school project but i would like to make it a real full project [See the subject](./docs/subject.md)
 </i></sub>
 
-## Support me 😘
 
-<a href="http://buymeacoffee.com/yr72dpi">
-<img style="border-radius: 15px; max-width: 300px;" src="./docs/bmac.png" style="width: 50%;">
-</a>
+## 📚 Documentation
+
+- [🧭 Q&A Policy](./docs/Q&A_POLICY.md)
+- [📜 RGPD Policy](./docs/RGPD.md)
+<!-- - [🤝 Contributing Guidelines](./CONTRIBUTING.md) -->
+<!-- - [🔐 Security Policy](./SECURITY.md) -->
+<!-- - [🏗️ Technical Architecture](./ARCHITECTURE.md) -->
 
 ## Security 🔐
 
@@ -55,14 +59,11 @@ APP_ENV="dev"
 # Messages manager (Fiber, GO) 
 SHOW_ONLY_ERROR=false
 
-# File manager (Fiber, GO)
+# File manager (GO)
 # To complete
 
 # Frontend
 # To complete
-
-# REDIS (docker container)
-REDIS_PASSWORD=SecuredPassword123
 
 # POSTGRES (docker container)
 POSTGRES_DB=securedwhisker
@@ -246,3 +247,10 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - React-native front
 - Gateway if necessary
 - Crypt private key on local storage in AES with the user password
+
+
+## Support me 😘
+
+<a href="http://buymeacoffee.com/yr72dpi">
+<img style="border-radius: 15px; max-width: 300px;" src="./docs/bmac.png" style="width: 50%;">
+</a>
