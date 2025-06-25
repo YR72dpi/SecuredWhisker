@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { SubscribeResponse, UserApi } from "@/lib/UserApi";
 import { Crypto } from "@/lib/Crypto";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
 
@@ -35,6 +35,7 @@ const formSchema = z.object({
 export default function Home() {
 
   const [subscribeError, setSubscribeError] = useState<string>("")
+  const [pendingValues, setPendingValues] = useState<z.infer<typeof formSchema> | null>(null)
   const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,36 +47,45 @@ export default function Home() {
     },
   });
 
+  useEffect(() => {
+    if (!pendingValues) return;
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const doSubmit = async () => {
+      console.log(pendingValues)
+      const serverPublicKey = await UserApi.getApiPublicKey();
+      const passwordCrypted = await Crypto.textToCrypted(pendingValues.password, serverPublicKey)
 
-    console.log(values)
-    const serverPublicKey = await UserApi.getApiPublicKey();
-    const passwordCrypted = await Crypto.textToCrypted(values.password, serverPublicKey)
+      const generateRSAKeypair = await Crypto.generateRSAKeyPair()
+      const userPublicKey = generateRSAKeypair.publicKey
+      const userPrivateKey = generateRSAKeypair.privateKey
+      console.log(userPublicKey)
+      console.log(userPrivateKey)
 
-    const generateRSAKeypair = await Crypto.generateRSAKeyPair()
-    const userPublicKey = generateRSAKeypair.publicKey
-    const userPrivateKey = generateRSAKeypair.privateKey
-    console.log(userPublicKey)
-    console.log(userPrivateKey)
+      await SwDb.addPrivateKey(btoa(userPrivateKey))
 
-    await SwDb.addPrivateKey(btoa(userPrivateKey))
+      const subscribe: SubscribeResponse = await UserApi.subscribe({
+        username: pendingValues.username,
+        password: passwordCrypted,
+        publicKey: btoa(userPublicKey)
+      })
 
-    const subscribe: SubscribeResponse = await UserApi.subscribe({
-      username: values.username,
-      password: passwordCrypted,
-      publicKey: btoa(userPublicKey)
-    })
-
-    if (subscribe === undefined) {
-      setSubscribeError("Server error")
-    } else if (!subscribe.ok) {
-      setSubscribeError(subscribe.message)
-    } else {
-      setSubscribeError("")
-      router.push("/login")
+      if (subscribe === undefined) {
+        setSubscribeError("Server error")
+      } else if (!subscribe.ok) {
+        setSubscribeError(subscribe.message)
+      } else {
+        setSubscribeError("")
+        router.push("/login")
+      }
+      setPendingValues(null)
     }
 
+    doSubmit()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingValues])
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setPendingValues(values)
   }
 
   return (
