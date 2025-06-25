@@ -1,4 +1,3 @@
-import * as forge from 'node-forge';
 
 export type KeyPair = {
   publicKey: string
@@ -34,15 +33,15 @@ export class Crypto {
 
   static generateRSAKeyPair = async (
     keySize: number = 2048,
-    exponent: number = 0x10001
+    exponent: Uint8Array = new Uint8Array([1, 0, 1])
   ): Promise<KeyPair> => {
     const keyPair = await window.crypto.subtle.generateKey(
       {
         name: 'RSA-OAEP',
-        modulusLength: 2048,
-        publicExponent: new Uint8Array([1, 0, 1]),
+        modulusLength: keySize,
+        publicExponent: exponent,
         hash: 'SHA-256'
-      },
+      } as RsaHashedKeyGenParams,
       true, // extractable
       ['encrypt', 'decrypt']
     );
