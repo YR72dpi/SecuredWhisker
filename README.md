@@ -47,6 +47,11 @@ The __RSA private key is stored in your browser__. If you clean up “Cookies an
 - Translate messages (with chatGPT)
 
 ## How to use 🤔
+
+``` bash 
+git clone --recurse-submodules https://github.com/YR72dpi/SecuredWhisker.git
+```
+
 ### Configuration
 
 ```env

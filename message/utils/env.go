@@ -9,6 +9,7 @@ import (
 
 func LoadEnv() map[string]string {
 
+	// TODO : 2025/06/24 20:13:06 Error loading ../.env file on docker
 	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("Error loading ../.env file")
