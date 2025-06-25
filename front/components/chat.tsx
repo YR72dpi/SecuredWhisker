@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ChatLib } from "@/lib/ChatLib";
-import { Crypto } from "@/lib/Crypto";
+import { RsaLib } from "@/lib/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
 
 type ChatProps = {
@@ -41,7 +41,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
 
             const privateKey = await SwDb.getPrivateKey();
             // console.log(atob(privateKey?.privateKey || ""));
-            const decryptedMessage = await Crypto.cryptedToText(
+            const decryptedMessage = await RsaLib.cryptedToText(
                 parsedMessage.message,
                 atob(privateKey?.privateKey || "")
             );
@@ -97,7 +97,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                 }
 
                 const publicKeyPem = atob(contactPublicKey);
-                const cryptedMessage = await Crypto.textToCrypted(messageToSend, publicKeyPem);
+                const cryptedMessage = await RsaLib.textToCrypted(messageToSend, publicKeyPem);
                 const formatedMessage = ChatLib.format(username, cryptedMessage);
                 ws.current?.send(formatedMessage);
 

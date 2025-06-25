@@ -4,25 +4,25 @@ export type KeyPair = {
   privateKey: string
 }
 
-export class Crypto {
+export class RsaLib {
 
 
   static async textToCrypted(text: string, publicKeyPem: string): Promise<string> {
     // Convertir PEM en ArrayBuffer
-    const publicKey = await Crypto.importPublicKey(publicKeyPem);
+    const publicKey = await RsaLib.importPublicKey(publicKeyPem);
     const encoded = new TextEncoder().encode(text);
     const encrypted = await window.crypto.subtle.encrypt(
       { name: "RSA-OAEP" },
       publicKey,
       encoded
     );
-    return Crypto.arrayBufferToBase64(encrypted);
+    return RsaLib.arrayBufferToBase64(encrypted);
   }
 
   static async cryptedToText(encryptedText: string, privateKeyPem: string): Promise<string> {
     // Convertir PEM en ArrayBuffer
-    const privateKey = await Crypto.importPrivateKey(privateKeyPem);
-    const encryptedBuffer = Crypto.base64ToArrayBuffer(encryptedText);
+    const privateKey = await RsaLib.importPrivateKey(privateKeyPem);
+    const encryptedBuffer = RsaLib.base64ToArrayBuffer(encryptedText);
     const decrypted = await window.crypto.subtle.decrypt(
       { name: "RSA-OAEP" },
       privateKey,
@@ -83,7 +83,7 @@ export class Crypto {
   private static async importPublicKey(pem: string): Promise<CryptoKey> {
     // Nettoyer le PEM
     const b64 = pem.replace(/-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\n/g, '');
-    const binaryDer = Crypto.base64ToArrayBuffer(b64);
+    const binaryDer = RsaLib.base64ToArrayBuffer(b64);
     return window.crypto.subtle.importKey(
       'spki',
       binaryDer,
@@ -95,7 +95,7 @@ export class Crypto {
 
   private static async importPrivateKey(pem: string): Promise<CryptoKey> {
     const b64 = pem.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, '');
-    const binaryDer = Crypto.base64ToArrayBuffer(b64);
+    const binaryDer = RsaLib.base64ToArrayBuffer(b64);
     return window.crypto.subtle.importKey(
       'pkcs8',
       binaryDer,

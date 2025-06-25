@@ -7,7 +7,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { SubscribeResponse, UserApi } from "@/lib/UserApi";
-import { Crypto } from "@/lib/Crypto";
+import { RsaLib } from "@/lib/RsaLib";
 import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
@@ -53,9 +53,9 @@ export default function Home() {
     const doSubmit = async () => {
       console.log(pendingValues)
       const serverPublicKey = await UserApi.getApiPublicKey();
-      const passwordCrypted = await Crypto.textToCrypted(pendingValues.password, serverPublicKey)
+      const passwordCrypted = await RsaLib.textToCrypted(pendingValues.password, serverPublicKey)
 
-      const generateRSAKeypair = await Crypto.generateRSAKeyPair()
+      const generateRSAKeypair = await RsaLib.generateRSAKeyPair()
       const userPublicKey = generateRSAKeypair.publicKey
       const userPrivateKey = generateRSAKeypair.privateKey
       console.log(userPublicKey)

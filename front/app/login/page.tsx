@@ -7,7 +7,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { UserApi } from "@/lib/UserApi";
-import { Crypto } from "@/lib/Crypto";
+import { RsaLib } from "@/lib/RsaLib";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
@@ -47,7 +47,7 @@ export default function Home() {
     console.log(values)
 
     const serverPublicKey = await UserApi.getApiPublicKey();
-    const passwordCrypted = await Crypto.textToCrypted(values.password, serverPublicKey)
+    const passwordCrypted = await RsaLib.textToCrypted(values.password, serverPublicKey)
 
     const login = await UserApi.login({
       username: values.username,
