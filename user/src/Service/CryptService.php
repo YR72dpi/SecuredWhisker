@@ -13,31 +13,24 @@ class CryptService
     private RSA\PrivateKey $privateKey;
 
 
-    public function __construct(Private Kernel $kernel)
+    public function __construct(private Kernel $kernel)
     {
         $configPath = $this->kernel->getProjectDir() . DIRECTORY_SEPARATOR . "config";
 
-        $privateKeyFile = 
-            $configPath 
+        $privateKeyFile =
+            $configPath
             .  DIRECTORY_SEPARATOR
             . "keys"
             . DIRECTORY_SEPARATOR
             . "privateKey.key";
-        
+
         $this->privateKey = PublicKeyLoader::loadPrivateKey(file_get_contents($privateKeyFile));
     }
 
     public function decrypt(string $encryptedText): string
     {
-        // Charger la clé privée
         $privateKey = $this->privateKey;
-        openssl_private_decrypt(
-            base64_decode($encryptedText),
-            $decryptedMessage,
-            $privateKey,
-            OPENSSL_PKCS1_OAEP_PADDING
-        );
-    
+        $decryptedMessage = $privateKey->decrypt(base64_decode($encryptedText)); 
         return $decryptedMessage;
     }
 }

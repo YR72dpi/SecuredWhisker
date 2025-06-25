@@ -46,7 +46,6 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                 atob(privateKey?.privateKey || "")
             );
 
-
             // ajout a Messages
             // afficher les miens
 
