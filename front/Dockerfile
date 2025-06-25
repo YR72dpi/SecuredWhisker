@@ -23,6 +23,10 @@ ENV NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST=$NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST
 
 RUN npm run build
 
+RUN mkdir -p public/forge \
+  && cp node_modules/node-forge/lib/prime.worker.js public/forge/
+
+
 # Note: It is not necessary to add an intermediate step that does a full copy of `node_modules` here
 
 # Step 2. Production image, copy all the files and run next
