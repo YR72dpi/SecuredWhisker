@@ -14,9 +14,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - '${SYMFONY_PORT}:8000'
+    
     volumes:
-      - './user/:/app'
-      - './env:/.env'
+      - ./docker/jwt:/app/config/jwt
+      - ./docker/keys:/app/config/keys
+    # Uncomment the following lines if you want to use volumes for local development
+    #   - './user/:/app'
+    #   # - './env:/.env'
     environment:
       - SYMFONY_PROJECT_NAME=securedWhisker
       - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
