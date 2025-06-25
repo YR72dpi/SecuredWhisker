@@ -19,6 +19,7 @@ COPY . .
 
 # Ajout : créer .env si absent
 RUN mv .env.example .env || true
+
 # Install PHP dependencies
 RUN composer install
 
