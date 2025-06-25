@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   message:
     container_name: message-microservice
