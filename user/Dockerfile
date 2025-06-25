@@ -17,11 +17,7 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
-# Copy .env.example from root if not present
-COPY .env.example .env.example
-
-# Ajout : créer .env si absent
-RUN cp .env.example .env
+RUN mv .env.example .env
 
 # Install PHP dependencies
 RUN composer install
