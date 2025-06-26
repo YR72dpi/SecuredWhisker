@@ -29,6 +29,16 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user.rule=Host(`${NEXTJS_DOMAIN}`)"
+      - "traefik.http.routers.user.entrypoints=websecure"
+      - "traefik.http.routers.user.tls.certresolver=myresolver"
+      - "traefik.http.services.user.loadbalancer.server.port=3000"
+
+      - "traefik.http.routers.user.entrypoints=web"
+      - "traefik.http.routers.user.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   database:
     container_name: user-database
@@ -59,7 +69,7 @@ services:
       args:
         NEXT_PUBLIC_GPT_API_KEY: ${NEXT_PUBLIC_GPT_API_KEY}
         NEXT_PUBLIC_USER_HOST: http://${SERVER_HOST}:${SYMFONY_PORT}
-        NEXT_PUBLIC_MESSAGE_HOST: ws://${SERVER_HOST}:${SOCKET_PORT}
+        NEXT_PUBLIC_MESSAGE_HOST: ws://${SOCKET_HOST}:${SOCKET_PORT}
         NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST: http://text-manager-gpt:${TextManagerGPT_PORT}
     restart: always
     ports:
@@ -69,6 +79,16 @@ services:
     depends_on:
       - user
       - message
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-app.rule=Host(`${NEXTJS_DOMAIN}`)"
+      - "traefik.http.routers.next-app.entrypoints=websecure"
+      - "traefik.http.routers.next-app.tls.certresolver=myresolver"
+      - "traefik.http.services.next-app.loadbalancer.server.port=3000"
+
+      - "traefik.http.routers.next-app.entrypoints=web"
+      - "traefik.http.routers.next-app.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   text-manager-gpt:
     build:
