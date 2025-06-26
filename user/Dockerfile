@@ -22,10 +22,13 @@ RUN mv .env.example .env
 # Install PHP dependencies
 RUN composer install
 
-RUN mkdir -p /app/config/jwt \
-    && openssl genrsa -out /app/config/jwt/private.pem -aes256 -passout pass:$(head -c 32 /dev/urandom | xxd -p) 4096 \
-    && openssl rsa -pubout -in /app/config/jwt/private.pem -passin pass:$(head -c 32 /dev/urandom | xxd -p) -out /app/config/jwt/public.pem
-
+RUN set -e; \
+    PASSPHRASE=$(head -c 32 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 32); \
+    mkdir -p /app/config/jwt; \
+    chmod -R 770 /app/config/jwt; \
+    openssl genpkey -algorithm RSA -aes256 -pass pass:$PASSPHRASE -out /app/config/jwt/private.pem -pkeyopt rsa_keygen_bits:4096; \
+    openssl rsa -pubout -in /app/config/jwt/private.pem -passin pass:$PASSPHRASE -out /app/config/jwt/public.pem; \
+    echo "JWT_PASSPHRASE=$PASSPHRASE" >> /app/.env
 # Générer un APP_SECRET aléatoire et l'injecter dans .env
 RUN APP_SECRET=$(head -c 32 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 64) && \
     sed -i "s/^APP_SECRET=.*/APP_SECRET=${APP_SECRET}/" .env

@@ -16,8 +16,8 @@ services:
       - '${SYMFONY_PORT}:8000'
     
     volumes:
-      - ./docker/jwt:/app/config/jwt
-      - ./docker/keys:/app/config/keys
+      - ./docker/jwt:/app/config/jwt:rw
+      - ./docker/keys:/app/config/keys:rw
     # Uncomment the following lines if you want to use volumes for local development
     #   - './user/:/app'
     #   # - './env:/.env'
