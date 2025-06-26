@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use ApiPlatform\Metadata\Parameter;
 use App\Entity\Friendship;
 use App\Repository\FriendshipRepository;
 use App\Repository\UserRepository;
@@ -11,6 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api/protected', name: 'api_protected_')]
@@ -194,15 +196,15 @@ class ApiProtectedController extends AbstractController
 
     #[Route('/translate', name: '_translate', methods: ["POST"])]
     public function translate(
-        Request $request
-    ): JsonResponse
-    {
+        Request $request,
+        ParameterBagInterface $params
+    ): JsonResponse {
         $data = $request->getContent();
-
+        $translateApiUrl = $params->get('TRANSLATE_API_URL');
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://localhost:5000/translate',
+            CURLOPT_URL => 'http://' . $translateApiUrl . '/translate',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

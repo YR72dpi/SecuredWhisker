@@ -36,7 +36,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
         };
 
         socket.onmessage = async (event) => {
-
+            
             const parsedMessage = JSON.parse(event.data)
 
             const privateKey = await SwDb.getPrivateKey();
@@ -85,7 +85,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                         "language": selectedLanguage
                     });
 
-                    const response = await fetch(process.env.NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST + "/api/protected/translate", {
+                    const response = await fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
                         method: "POST",
                         headers: myHeaders,
                         body: raw,
