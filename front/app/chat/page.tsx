@@ -36,7 +36,7 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch( process.env.NEXT_PUBLIC_USER_HOST +"/api/protected/selfUserData", requestOptions)
+            return fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST +"/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setIdentifier(result.identifier)

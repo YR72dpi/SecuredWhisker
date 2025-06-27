@@ -26,7 +26,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
     useEffect(() => {
         console.log("Connecting to room:", room);
         if (!room) return;
-        const socket = new WebSocket(process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
+        const socket = new WebSocket("wss://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
         setMessages([]);
 
@@ -36,7 +36,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
         };
 
         socket.onmessage = async (event) => {
-            
+
             const parsedMessage = JSON.parse(event.data)
 
             const privateKey = await SwDb.getPrivateKey();
@@ -85,7 +85,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                         "language": selectedLanguage
                     });
 
-                    const response = await fetch(process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
+                    const response = await fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
                         method: "POST",
                         headers: myHeaders,
                         body: raw,
@@ -121,30 +121,30 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                 </h2>
 
                 {showLanguageSelector && (
-                     <select
-                    value={selectedLanguage}
-                    onChange={e => setSelectedLanguage(e.target.value)}
-                    className="mb-2 p-2 border rounded"
-                >
-                    <option value="">Choice a language</option>
-                    <option value="french">Français</option>
-                    <option value="english">English</option>
-                    <option value="spanish">Español</option>
-                    <option value="deutsch">Deutsch</option>
-                    <option value="portuguese">Português</option>
-                    <option value="italian">Italiano</option>
-                    {/* dont supported for some reason, maybe utf8 or something like that
+                    <select
+                        value={selectedLanguage}
+                        onChange={e => setSelectedLanguage(e.target.value)}
+                        className="mb-2 p-2 border rounded"
+                    >
+                        <option value="">Choice a language</option>
+                        <option value="french">Français</option>
+                        <option value="english">English</option>
+                        <option value="spanish">Español</option>
+                        <option value="deutsch">Deutsch</option>
+                        <option value="portuguese">Português</option>
+                        <option value="italian">Italiano</option>
+                        {/* dont supported for some reason, maybe utf8 or something like that
                     <option value="chinese">中文</option>
                     <option value="japanese">日本語</option>
                     <option value="korean">한국어</option>
                     <option value="russian">Русский</option>
                     <option value="arabic">العربية</option>
                     <option value="hindi">हिन्दी</option> */}
-                    <option value="Reunionese Creole">Réunion Creole</option>
-                    {/* Ajoute d'autres langues ici */}
-                </select>
+                        <option value="Reunionese Creole">Réunion Creole</option>
+                        {/* Ajoute d'autres langues ici */}
+                    </select>
                 )}
-               
+
             </div>
 
             <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 bg-gray-100">
