@@ -29,6 +29,7 @@ services:
     #   - './user/:/app'
     #   # - './env:/.env'
     environment:
+      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
       - TRANSLATE_API_URL=http://text-manager-gpt:3000
       - SYMFONY_PROJECT_NAME=securedWhisker
       - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
@@ -102,11 +103,15 @@ services:
       context: ./TextManagerGPT
       dockerfile: Dockerfile
     container_name: TextManagerGPT
+    ports:
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - GPT_API_KEY=${GPT_API_KEY}
       - PORT=3000
     command: node dist/index.js
+    networks:
+      - app-network
 
 networks:
   app-network:
