@@ -29,7 +29,7 @@ services:
     #   - './user/:/app'
     #   # - './env:/.env'
     environment:
-      - TRANSLATE_API_URL=http://text-manager-gpt:${TextManagerGPT_PORT}
+      - TRANSLATE_API_URL=http://text-manager-gpt:3000
       - SYMFONY_PROJECT_NAME=securedWhisker
       - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
     depends_on:
@@ -76,9 +76,8 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_GPT_API_KEY: ${GPT_API_KEY}
-        NEXT_PUBLIC_USER_HOST: https://${SERVER_HOST}
-        NEXT_PUBLIC_MESSAGE_HOST: wss://${SOCKET_HOST}
-        NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST: http://text-manager-gpt:${TextManagerGPT_PORT}
+        NEXT_PUBLIC_USER_HOST: ${SERVER_HOST}
+        NEXT_PUBLIC_MESSAGE_HOST: ${SOCKET_HOST}
     restart: always
     ports:
       - ${NEXTJS_PORT}:3000
@@ -103,11 +102,10 @@ services:
       context: ./TextManagerGPT
       dockerfile: Dockerfile
     container_name: TextManagerGPT
-    ports:
-      - "${TextManagerGPT_PORT}:5000"
     environment:
       - NODE_ENV=production
       - GPT_API_KEY=${GPT_API_KEY}
+      - PORT=3000
     command: node dist/index.js
 
 networks:

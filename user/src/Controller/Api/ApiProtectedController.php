@@ -204,7 +204,7 @@ class ApiProtectedController extends AbstractController
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://' . $translateApiUrl . '/translate',
+            CURLOPT_URL => $translateApiUrl . '/translate',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -219,10 +219,8 @@ class ApiProtectedController extends AbstractController
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
         $translatedMessage = json_decode($response, true)['translated'];
-
 
         return $this->json([
             'message' => 'ok',
