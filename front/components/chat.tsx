@@ -93,6 +93,7 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                     });
 
                     const result = await response.json();
+                    // TODO : check if != null before re-assigning
                     messageToSend = result.translated;
                 }
 
