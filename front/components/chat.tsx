@@ -6,13 +6,19 @@ import { ChatLib } from "@/lib/ChatLib";
 import { RsaLib } from "@/lib/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
 
+export type ContactDataForChat = {
+    id: string;
+    username: string;
+    publicKey: string;
+}
+
 type ChatProps = {
     username: string;
-    room: string;
-    contactPublicKey?: string;
+    userId: string;
+    contactData: ContactDataForChat;
 };
 
-export function Chat({ username, room, contactPublicKey }: ChatProps) {
+export function Chat({ username, userId, contactData  }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -22,6 +28,8 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
     const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
     const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
+
+    const room = ChatLib.getRoomName(userId, contactData.id)
 
     useEffect(() => {
         console.log("Connecting to room:", room);
@@ -66,10 +74,10 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
             socket.close();
         };
 
-    }, [room, contactPublicKey]);
+    }, [contactData]);
 
     const sendMessage = async () => {
-        if (input.trim() !== "" && contactPublicKey) {
+        if (input.trim() !== "" && contactData.publicKey) {
             try {
                 let messageToSend = input;
 
@@ -97,12 +105,12 @@ export function Chat({ username, room, contactPublicKey }: ChatProps) {
                     messageToSend = result.translated;
                 }
 
-                const publicKeyPem = atob(contactPublicKey);
+                const publicKeyPem = atob(contactData.publicKey);
                 const cryptedMessage = await RsaLib.textToCrypted(messageToSend, publicKeyPem);
                 const formatedMessage = ChatLib.format(username, cryptedMessage);
                 ws.current?.send(formatedMessage);
 
-                setMessages(prev => [...prev, { from: username, message: messageToSend }]);
+                setMessages(prev => [...prev, { from: "Me", message: messageToSend }]);
                 setInput("");
             } catch (e) {
                 console.error("Erreur de chiffrement :", e);

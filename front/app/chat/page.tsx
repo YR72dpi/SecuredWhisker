@@ -1,6 +1,6 @@
 "use client"
 import { AddFriend } from "@/components/addFriend";
-import { Chat } from "@/components/chat";
+import { Chat, ContactDataForChat } from "@/components/chat";
 import { ContactList } from "@/components/contactList";
 import { ContactRequest } from "@/components/contactRequest";
 import {
@@ -8,7 +8,6 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { ChatLib } from "@/lib/ChatLib";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useState } from "react";
 
@@ -17,8 +16,7 @@ export default function Home() {
     const [userId, setUserId] = useState<string | null>(null)
     const [username, setUsername] = useState<string | null>(null)
 
-    const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
-    const [contactPublicKey, setContactPublicKey] = useState<string | null>(null);
+    const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
 
     useEffect(() => {
 
@@ -63,9 +61,7 @@ export default function Home() {
                                     <AddFriend />
                                     <ContactRequest />
                                     <ContactList
-                                        onSelectContact={setSelectedContactId}
-                                        contactPublicKey={setContactPublicKey}
-                                        username={setUsername}
+                                        onSelectContact={setSelectedContact}
                                     />
                                 </>
                             )}
@@ -87,14 +83,12 @@ export default function Home() {
                                         >
                                             <ResizablePanel defaultSize={100}>
                                                 <div className="h-full">
-                                                    {username && selectedContactId && userId && contactPublicKey && (
-                                                        
-                                                            
-                                                            <Chat
-                                                                username={username}
-                                                                room={ChatLib.getRoomName(userId, selectedContactId)}
-                                                                contactPublicKey={contactPublicKey} />
-                                                        
+                                                    {username && selectedContact && userId && (
+                                                        <Chat
+                                                            username={username}
+                                                            userId={userId}
+                                                            contactData={selectedContact} 
+                                                        />
                                                     )}
                                                 </div>
                                             </ResizablePanel>
@@ -116,3 +110,4 @@ export default function Home() {
         </>
     );
 }
+

@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
+import { ContactDataForChat } from "./chat";
 
 type ContactListProps = {
-    onSelectContact: (contactId: string) => void;
-    username: (username: string) => void;
-    contactPublicKey: (publicKey: string) => void;
+    onSelectContact: (contact: ContactDataForChat) => void;
 };
 
 type Contact = {
@@ -14,7 +13,7 @@ type Contact = {
     publicKey: string;
 };
 
-export function ContactList({ onSelectContact, username, contactPublicKey }: ContactListProps) {
+export function ContactList({ onSelectContact }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -57,9 +56,13 @@ export function ContactList({ onSelectContact, username, contactPublicKey }: Con
                         key={index} 
                         className="border-b p-2 break-all"
                         onClick={() => {
-                            onSelectContact(contact.id);
-                            username(contact.username);
-                            contactPublicKey(contact.publicKey);
+                            onSelectContact(
+                                {
+                                    id: contact.id,
+                                    username: contact.username,
+                                    publicKey: contact.publicKey
+                                }
+                            );
                         }}
                         >
                             {contact.username ?? "Unnamed contact"} 
