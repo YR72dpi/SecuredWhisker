@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan ${{secrets.ip}} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - uses: actions/checkout@v4
+            # Make sure the @v0.9.0 matches the current version of the action
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Mettre à jour (git pull)
+        run: ssh debian@${{secrets.ip}} "cd ~/SecuredWhisker && git pull origin main"
+
+      - name: Redémarrage du docker
+        run: ssh debian@${{secrets.ip}} "cd ~/SecuredWhisker && sudo docker compose up -d --build --force-recreate"
