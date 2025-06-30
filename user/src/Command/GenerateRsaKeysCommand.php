@@ -42,7 +42,7 @@ class GenerateRsaKeysCommand extends Command
                 mkdir($configPath . DIRECTORY_SEPARATOR . "keys");
                 $io->success("Created");
             } else {
-                $io->info('Keys folder alredy exist');
+                $io->info('Keys folder already exist');
             }
         } catch (\Throwable $th) {
             throw $th;
