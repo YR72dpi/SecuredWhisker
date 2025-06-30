@@ -59,7 +59,7 @@ export function AddFriend() {
             redirect: "follow"
         };
 
-        fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
+        fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
             .then(async (response) => {
                 const jsonResponse = await response.json()
                  if (!response.ok) {
@@ -132,4 +132,8 @@ export function AddFriend() {
             }
         </>
     )
+}
+
+function getApiProtocol() {
+    return process.env.NODE_ENV === "development" ? "http" : "https";
 }

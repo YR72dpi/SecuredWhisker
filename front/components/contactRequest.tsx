@@ -9,6 +9,10 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 
+function getApiProtocol() {
+    return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+
 type contactsRequestType = {
     uniqid: string;
     username?: string;
@@ -33,7 +37,7 @@ export function ContactRequest() {
                 redirect: "follow"
             };
 
-            const response = await fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/acceptContact", requestOptions);
+            const response = await fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/acceptContact", requestOptions);
 
             if (!response.ok) {
                 throw new Error("Failed to accept contact");
@@ -62,7 +66,7 @@ export function ContactRequest() {
                 redirect: "follow"
             };
 
-            fetch("https://"+process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
+            fetch(getApiProtocol() + "://"+process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     if (!cancelled) {

@@ -12,9 +12,13 @@ export type LoginResponse = {
     server_time: string
 }
 
+function getApiProtocol() {
+    return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+
 export class UserApi {
     static async getApiPublicKey() {
-        const data = await fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/publicKey")
+        const data = await fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/publicKey")
             .then((response) => response.json())
             .then((result) => result)
             .catch((error) => console.error(error));
@@ -29,7 +33,7 @@ export class UserApi {
 
         try {
             const request = await fetch(
-                "https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/user/subscribe",
+                getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/user/subscribe",
                 {
                     method: "POST",
                     headers: myHeaders,
@@ -55,7 +59,7 @@ export class UserApi {
 
         try {
             const request = await fetch(
-                "https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/user/login",
+                getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/user/login",
                 {
                     method: "POST",
                     headers: myHeaders,

@@ -18,6 +18,13 @@ type ChatProps = {
     contactData: ContactDataForChat;
 };
 
+function getApiProtocol() {
+    return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+function getWsProtocol() {
+    return process.env.NODE_ENV === "development" ? "ws" : "wss";
+}
+
 export function Chat({ username, userId, contactData  }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
@@ -34,7 +41,7 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
     useEffect(() => {
         console.log("Connecting to room:", room);
         if (!room) return;
-        const socket = new WebSocket("wss://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
+        const socket = new WebSocket(getWsProtocol() + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
         setMessages([]);
 
@@ -74,7 +81,7 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
             socket.close();
         };
 
-    }, [contactData]);
+    }, [contactData, room]);
 
     const sendMessage = async () => {
         if (input.trim() !== "" && contactData.publicKey) {
@@ -93,7 +100,7 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
                         "language": selectedLanguage
                     });
 
-                    const response = await fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
+                    const response = await fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
                         method: "POST",
                         headers: myHeaders,
                         body: raw,

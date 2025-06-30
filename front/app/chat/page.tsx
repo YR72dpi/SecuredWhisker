@@ -11,6 +11,10 @@ import {
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useState } from "react";
 
+function getApiProtocol() {
+    return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+
 export default function Home() {
     const [identifier, setIdentifier] = useState<string | null>(null)
     const [userId, setUserId] = useState<string | null>(null)
@@ -34,7 +38,7 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST +"/api/protected/selfUserData", requestOptions)
+            return fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST +"/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setIdentifier(result.identifier)
