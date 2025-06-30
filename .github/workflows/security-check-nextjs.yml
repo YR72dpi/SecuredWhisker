@@ -31,4 +31,4 @@ jobs:
 
       - name: Audit dependencies
         working-directory: ./front
-        run: npm audit --audit-level=high --production
+        run: npm audit --audit-level=high --omit=dev
