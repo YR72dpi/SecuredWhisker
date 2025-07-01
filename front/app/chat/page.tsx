@@ -21,6 +21,7 @@ export default function Home() {
     const [username, setUsername] = useState<string | null>(null)
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
+    const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
 
     useEffect(() => {
 
@@ -62,9 +63,10 @@ export default function Home() {
                             {identifier && (
                                 <>
                                     <AddFriend />
-                                    <ContactRequest />
+                                    <ContactRequest onContactAccepted={() => setContactsRefreshKey(k => k + 1)} />
                                     <ContactList
                                         onSelectContact={setSelectedContact}
+                                        refreshKey={contactsRefreshKey}
                                     />
                                 </>
                             )}

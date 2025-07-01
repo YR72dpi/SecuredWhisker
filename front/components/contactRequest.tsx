@@ -18,7 +18,11 @@ type contactsRequestType = {
     username?: string;
 }
 
-export function ContactRequest() {
+type ContactRequestProps = {
+    onContactAccepted?: () => void;
+};
+
+export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
     const [contactsRequest, setContactsRequest] = useState<contactsRequestType[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -45,6 +49,7 @@ export function ContactRequest() {
 
             // Retirer le contact accepté de la liste
             setContactsRequest((prev) => prev.filter((contact) => contact.uniqid !== uniqid));
+            if (onContactAccepted) onContactAccepted();
         } catch (error) {
             console.error(error);
         }

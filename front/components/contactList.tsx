@@ -14,6 +14,10 @@ type Contact = {
     publicKey: string;
 };
 
+function getApiProtocol() {
+    return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+
 export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,7 +37,7 @@ export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
                 redirect: "follow"
             };
 
-            fetch("https://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contacts", requestOptions)
+            fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contacts", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setContacts(result.data)
