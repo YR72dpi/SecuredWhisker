@@ -27,7 +27,6 @@ export default function Home() {
         (async () => {
 
             const jwtToken = await SwDb.getJwtToken()
-            console.log(jwtToken)
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);
@@ -99,12 +98,6 @@ export default function Home() {
                                         </ResizablePanelGroup>
                                     </div>
                                 </ResizablePanel>
-                                {/* <ResizableHandle withHandle />
-                                <ResizablePanel defaultSize={10}>
-                                    <div className="flex h-full items-center justify-center p-6">
-                                        <span className="font-semibold">input</span>
-                                    </div>
-                                </ResizablePanel> */}
                             </ResizablePanelGroup>
 
                         </div>
