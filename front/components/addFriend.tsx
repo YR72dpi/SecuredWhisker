@@ -33,6 +33,7 @@ export function AddFriend() {
     const [alert, setAlert] = useState<string>("")
     const [alertTitle, setAlertTitle] = useState<string>("")
     const [alertType, setAlertType] = useState<boolean>(false)
+    const [open, setOpen] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -68,16 +69,18 @@ export function AddFriend() {
                 }
                 return jsonResponse
             })
-            .then((result) => {
+            .then(() => {
                 setAlertTitle("Success")
                 setAlert("Request send")
                 setAlertType(true)
+                setOpen(false)
             })
             .catch((error) => {
                 console.error(error)
                 setAlertTitle("Error")
                 setAlert(error.message)
                 setAlertType(false)
+                setOpen(false)
             });
 
     }
@@ -90,7 +93,7 @@ export function AddFriend() {
 
     return (
         <>
-            <Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger className="border p-2 rounded">Add a mate</DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
