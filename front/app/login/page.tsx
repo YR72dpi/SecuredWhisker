@@ -44,7 +44,6 @@ export default function Home() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
 
     const serverPublicKey = await UserApi.getApiPublicKey();
     const passwordCrypted = await RsaLib.textToCrypted(values.password, serverPublicKey)
@@ -53,8 +52,6 @@ export default function Home() {
       username: values.username,
       password: passwordCrypted
     })
-
-    
 
     if (login === undefined) {
       setLoginError("Server error")
@@ -66,7 +63,6 @@ export default function Home() {
       router.push("/chat")
     }
     
-
   }
 
   return (
@@ -88,11 +84,8 @@ export default function Home() {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="username" {...field} />
+                  <Input placeholder="Username" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -104,11 +97,8 @@ export default function Home() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="password" {...field} />
+                  <Input type="password" placeholder="Password" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
