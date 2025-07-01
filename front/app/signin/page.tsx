@@ -58,8 +58,6 @@ export default function Home() {
       const generateRSAKeypair = await RsaLib.generateRSAKeyPair()
       const userPublicKey = generateRSAKeypair.publicKey
       const userPrivateKey = generateRSAKeypair.privateKey
-      console.log(userPublicKey)
-      console.log(userPrivateKey)
 
       await SwDb.addPrivateKey(btoa(userPrivateKey))
 
@@ -81,7 +79,6 @@ export default function Home() {
     }
 
     doSubmit()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingValues])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -107,11 +104,8 @@ export default function Home() {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="username" {...field} />
+                  <Input placeholder="Username" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -123,11 +117,8 @@ export default function Home() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="password" {...field} />
+                  <Input type="password" placeholder="Password" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
