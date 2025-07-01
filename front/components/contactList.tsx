@@ -4,6 +4,7 @@ import { ContactDataForChat } from "./chat";
 
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
+    refreshKey?: number;
 };
 
 type Contact = {
@@ -13,9 +14,11 @@ type Contact = {
     publicKey: string;
 };
 
-export function ContactList({ onSelectContact }: ContactListProps) {
+export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>("");
+    
 
     useEffect(() => {
         const getContacts = async () => {
@@ -35,41 +38,46 @@ export function ContactList({ onSelectContact }: ContactListProps) {
                 .then((result) => {
                     setContacts(result.data)
                     setIsLoading(false)
-                }
-                )
-                .catch((error) => console.error(error));
+                })
+                .catch((error) => {
+                    console.error(error)
+                    setIsLoading(false);
+                    setError("Failed to load contacts. Please try again later.");
+                });
         }
 
         getContacts()
-    }, [])
+    }, [refreshKey])
 
     return (
         <>
-
             {isLoading ? (<p>Loading....</p>) : ""}
-            {!isLoading && contacts.length === 0 ? (
-                <p>No contact</p>
-            ) : (
-                <ul className="mt-2 space-y-2">
-                    {contacts.map((contact, index) => (
-                        <li 
-                        key={index} 
-                        className="border-b p-2 break-all"
-                        onClick={() => {
-                            onSelectContact(
-                                {
-                                    id: contact.id,
-                                    username: contact.username,
-                                    publicKey: contact.publicKey
-                                }
-                            );
-                        }}
-                        >
-                            {contact.username ?? "Unnamed contact"} 
-                            <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
-                        </li>
-                    ))}
-                </ul>
+            {error !== "" && <p className="text-red-500">{error}</p>}
+            {!isLoading && error === "" && (
+                contacts.length === 0 ? (
+                    <p>No contact</p>
+                ) : (
+                    <ul className="mt-2 space-y-2">
+                        {contacts.map((contact, index) => (
+                            <li 
+                            key={index} 
+                            className="border-b p-2 break-all"
+                            onClick={() => {
+                                onSelectContact(
+                                    {
+                                        id: contact.id,
+                                        username: contact.username,
+                                        publicKey: contact.publicKey
+                                    }
+                                );
+                            }}
+                            >
+                                {contact.username ?? "Unnamed contact"} 
+                                <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )
             )}
         </>
     )
