@@ -31,6 +31,7 @@ const formSchema = z.object({
 
 export function AddFriend() {
     const [alert, setAlert] = useState<string>("")
+    const [alertTitle, setAlertTitle] = useState<string>("")
     const [alertType, setAlertType] = useState<boolean>(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -68,12 +69,13 @@ export function AddFriend() {
                 return jsonResponse
             })
             .then((result) => {
-                console.log(result)
+                setAlertTitle("Success")
                 setAlert("Request send")
                 setAlertType(true)
             })
             .catch((error) => {
                 console.error(error)
+                setAlertTitle("Error")
                 setAlert(error.message)
                 setAlertType(false)
             });
@@ -123,7 +125,7 @@ export function AddFriend() {
             {alert !== "" && (
                 <Alert variant={alertType ? "default" : "destructive"} className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
+                    <AlertTitle>{alertTitle}</AlertTitle>
                     <AlertDescription>
                         {alert}
                     </AlertDescription>
