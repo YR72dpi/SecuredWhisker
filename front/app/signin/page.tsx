@@ -79,7 +79,7 @@ export default function Home() {
     }
 
     doSubmit()
-  }, [pendingValues])
+  }, [pendingValues, router])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setPendingValues(values)
