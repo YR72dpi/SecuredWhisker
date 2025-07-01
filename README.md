@@ -41,51 +41,68 @@ The __RSA private key is stored in your browser__. If you clean up “Cookies an
 
 ## Features 📜
 
+- Signin
 - Login
-- Sign up
 - Add someone
 - Send / receive message
 - Translate messages (with chatGPT)
 
 ## How to use 🤔
 
+<!-- docker-compose --env-file .env.dev -f docker-compose.dev.yml up -->
+
 ``` bash 
 git clone --recurse-submodules https://github.com/YR72dpi/SecuredWhisker.git
+cd SecuredWhisker
+mv .env.example .env
+# Edit .env
+sudo docker compose up --build -d
 ```
+
+That's all.
 
 ### Configuration
 
+You mainly need to modify :
+
+- ``SERVER_HOST`` : that's the user microservice
+- ``SOCKET_HOST`` : the websocket server who transmit the messages
+- ``NEXTJS_DOMAIN`` : The front end
+
 ```env
 # SecuredWhisker
-VERSION=0.0.0
+VERSION=2.0.0
 
-# User manager (Symfony, PHP) 
-APP_ENV="dev"
+# User manager (Symfony, PHP)
+APP_ENV=prod
+DATABASE_URL="pgsql://root:securedwhisker@localhost:5432/securedwhisker?serverVersion=16&charset=utf8"
+CORS_ALLOW_ORIGIN='^.*$'
+SYMFONY_PORT=5000
+SERVER_HOST=swapi.your-domain-example.com
+###> nelmio/cors-bundle ###
 
-# Messages manager (Fiber, GO) 
+# message service (Fiber, GO)
 SHOW_ONLY_ERROR=false
+SOCKET_PORT=5050
+SOCKET_HOST=swws.your-domain-example.com
 
-# File manager (GO)
 # To complete
 
 # Frontend
-# To complete
+NEXTJS_PORT=5010
+NEXTJS_DOMAIN=securedWhisker.your-domain-example.com
 
-# POSTGRES (docker container)
+#TextManagerGPT
+GPT_API_KEY="your-gpt-api-key"
+TextManagerGPT_PORT=5020
+
+# POSTGRES (for docker compose)
 POSTGRES_DB=securedwhisker
 POSTGRES_PASSWORD=securedwhisker
 POSTGRES_USER=root
 POSTGRES_PORT=5432
+POSTGRES_VERSION=
 ```
-
-<!-- 
-
-_// TODO: To details_
-
-### Start
-_// TODO: To complete_
-
--->
 
 ## Architecture 🕸
 
@@ -128,6 +145,8 @@ graph LR;
 
 ## Stack 👁‍🗨
 
+- Domain and ssl management : Traefik 
+
 - User management
     - Language: __PHP__
     - Framework: __Symfony__
@@ -136,18 +155,14 @@ graph LR;
 
 - Messages management
     - Language: __GO__
-    <!-- - Framework: __Fiber__ -->
     - WebSocket: __Gorilla WebSocket__
-    <!-- - ORM: __Go Redis__ -->
-    <!-- - Database: __Redis__ -->
 
 - Translator : [YR72dpi/TextManagerGPT](https://github.com/YR72dpi/TextManagerGPT)
 
 - Frontend
     - Language: __TypeScript__
     - Framework: __NextJs__
-    - WebSockets : __socket.io__
-    - Encryption: __node-forge__
+    - Encryption:  __window.crypto__
     - Saving on client : __Dexie.js__ (library for indexedDB )
 
 All of that are Docker-_ized_
@@ -253,7 +268,11 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - React-native front
 - Gateway if necessary
 - Crypt private key on local storage in AES with the user password
-
+- Connect with other device with privite key transfers
+- send image (transmit the base64) (which means that you have to determine the type of message)
+- everything that passes through the web socket in TLV
+- make it https less
+- passing all of the stack in typescript (no php) (or in Go, who know ?)
 
 ## Support me 😘
 
