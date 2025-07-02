@@ -129,7 +129,7 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
         <div className="flex flex-col h-full p-4">
             <div className="mb-2 flex items-center justify-between">
                 <h2 className="text-xl font-semibold mb-2">
-                    Chat to {username}
+                    Chat to {contactData.username} ({contactData.id})
                     {connectionState === 0 && " 🟠"}
                     {connectionState === 1 && " 🟢"}
                     {connectionState === -1 && " 🔴"}
