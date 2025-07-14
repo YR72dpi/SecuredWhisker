@@ -12,7 +12,7 @@ AI-Generated and photoshopped logo
 [![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/security-check-nextjs.yml/badge.svg?branch=main "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/security-check-front.yml?query=branch%3Amain)
 [![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/lint-nextjs.yml/badge.svg?branch=dev "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/lint-nextjs.yml?query=branch%3Adev)
 
-This is a secure messaging application that allows users to send encrypted messages and files to each other, using RSA encryption on message and AES on file. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https.
+This is a secure messaging application that allows users to send encrypted messages to each other, using RSA encryption on message. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https.
 
 <sub><i>
 This is a one year school project but i would like to make it a real full project [See the subject](./docs/subject.md)
@@ -29,11 +29,9 @@ This is a one year school project but i would like to make it a real full projec
 
 ## Security 🔐
 
-The will of this project is to allow user to exchange messages and files securely even if there is no https.
+The will of this project is to allow user to exchange messages securely even if there is no https.
 
-All messages are encrypted with the recipient's public rsa key before being sent and stored on the server. And the recipient decrypts it with his private key stored in his browser. Which is AES encrypted with his password.
-
-About files, they will be encrypted in the browser in AES with a randomly generated or user-generated key.
+All messages are encrypted with the recipient's public rsa key before being sent and stored on the server. And the recipient decrypts it with his private key stored in his browser.
 
 ## ⚠ Warning ⚠
 
@@ -120,6 +118,7 @@ graph LR;
 
     Frontend -->|API Rest| UserService
     UserService -->|Storage| UserDatabase
+    UserService -->|Storage| Translator
 
     Frontend -->|WebSocket| MessageService
 ```
@@ -187,17 +186,31 @@ These data will be encrypted with the public key of the User Service and it will
 
 ```mermaid
 sequenceDiagram
-    Client->>Server: Ask recipient public key
-    Server-->>Client: Recipient Public Key
+    Client->>MessageServer: Ask recipient public key
+    MessageServer-->>Client: Recipient Public Key
     Client->>Client: Crypt message
-    Client->>Server: Send crypted message
+    Client->>MessageServer: Send crypted message
 ```
 
-### Receive Message
+### Sending Message (with translation)
 
 ```mermaid
 sequenceDiagram
-    Server->>Client: Receive crypted messages
+    Client->>UserServer: Ask recipient public key
+    UserServer-->>Client: Recipient Public Key
+    Client->>UserServer: Send the message and the wanted language
+    UserServer-->>GPTApi: Send the message and the wanted language
+    GPTApi-->>UserServer: Receive the translated message
+    UserServer-->>Client: Receive the translated message
+    Client->>Client: Crypt message
+    Client->>MessageServer: Send crypted message
+```
+
+### Receive Message 
+
+```mermaid
+sequenceDiagram
+    MessageServer->>Client: Receive crypted messages
     Client->>Client: Get his own private key
     Client->>Client: Decrypt message 
 ```
