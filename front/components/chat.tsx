@@ -95,6 +95,7 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
                     myHeaders.append("Authorization", "Bearer " + jwtToken);
                     myHeaders.append("Content-Type", "application/json");
 
+                    // TODO: crypt with the user service publickey before sending 
                     const raw = JSON.stringify({
                         "sentence": input,
                         "language": selectedLanguage
