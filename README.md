@@ -282,7 +282,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - React-native front
 - Gateway if necessary
 - Crypt private key on local storage in AES with the user password
-- Connect with other device with privite key transfers
+- Connect with other device with private key transfers
 - send image (transmit the base64) (which means that you have to determine the type of message)
 - everything that passes through the web socket in TLV
 - make it https less
