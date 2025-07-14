@@ -267,7 +267,16 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-_This changelog will make sense after that version 1.0.0 will be released_
+[1.0.0] - 2025-07-14
+
+__Added__
+
+Capability to :
+- Login
+- Register
+- Add someone
+- Chat
+- Translate with chatGPT
 
 [Full changelog](./docs/changelog.md)
 
