@@ -12,7 +12,7 @@ AI-Generated and photoshopped logo
 [![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/security-check-nextjs.yml/badge.svg?branch=main "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/security-check-front.yml?query=branch%3Amain)
 [![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/lint-nextjs.yml/badge.svg?branch=dev "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/lint-nextjs.yml?query=branch%3Adev)
 
-This is a secure messaging application that allows users to send encrypted messages to each other, using RSA encryption on message. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https.
+This is a secure messaging application that allows users to send encrypted messages to each other, using RSA encryption on message. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception, even if there is no https __(http-less not available yet)__.
 
 <sub><i>
 This is a one year school project but i would like to make it a real full project [See the subject](./docs/subject.md)
