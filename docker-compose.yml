@@ -42,10 +42,6 @@ services:
       - "traefik.http.routers.user.tls.certresolver=myresolver"
       - "traefik.http.services.user.loadbalancer.server.port=8000"
 
-      # - "traefik.http.routers.user.entrypoints=web"
-      # - "traefik.http.routers.user.middlewares=redirect-to-https"
-      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-
   database:
     container_name: user-database
     restart: always
