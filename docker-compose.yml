@@ -97,11 +97,11 @@ services:
       dockerfile: Dockerfile
     container_name: TextManagerGPT
     ports:
-      - "3000:3000"
+      - "${TextManagerGPT_PORT}:3000"
     environment:
       - NODE_ENV=production
       - GPT_API_KEY=${GPT_API_KEY}
-      - PORT=3000
+      - PORT=${TextManagerGPT_PORT}
     command: node dist/index.js
     networks:
       - app-network
