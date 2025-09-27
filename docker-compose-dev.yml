@@ -1,0 +1,108 @@
+services:
+  dev-message:
+    container_name: dev-message-microservice
+    build:
+      context: ./message
+      dockerfile: Dockerfile
+      args:
+        SHOW_ONLY_ERROR: ${SHOW_ONLY_ERROR}
+    ports:
+      - "${SOCKET_PORT}:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dev-message.rule=Host(`dev.${SOCKET_HOST}`)"
+      - "traefik.http.routers.dev-message.entrypoints=websecure"
+      - "traefik.http.routers.dev-message.tls.certresolver=myresolver"
+      - "traefik.http.services.dev-message.loadbalancer.server.port=8080"
+
+  dev-user:
+    container_name: dev-user-microservice
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    ports:
+      - '${SYMFONY_PORT}:8000'
+    volumes:
+    # Uncomment the following lines if you want to use volumes for local development
+      - './user/:/app'
+      - './env:/.env'
+    environment:
+      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
+      - TRANSLATE_API_URL=http://text-manager-gpt:3000
+      - SYMFONY_PROJECT_NAME=securedWhisker
+      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8
+    depends_on:
+      dev-database:
+        condition: service_healthy
+    networks:
+      - dev-app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dev-user.rule=Host(`dev.${SERVER_HOST}`)"
+      - "traefik.http.routers.dev-user.entrypoints=websecure"
+      - "traefik.http.routers.dev-user.tls.certresolver=myresolver"
+      - "traefik.http.services.dev-user.loadbalancer.server.port=8000"
+
+  dev-database:
+    container_name: dev-user-database
+    restart: always
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports: 
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./docker/db/data:/var/lib/postgresql/data:rw
+    networks:
+      - dev-app-network
+
+  dev-next-app:
+    container_name: next-app
+    build:
+      context: ./front/
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_GPT_API_KEY: ${GPT_API_KEY}
+        NEXT_PUBLIC_USER_HOST: ${SERVER_HOST}
+        NEXT_PUBLIC_MESSAGE_HOST: ${SOCKET_HOST}
+    restart: always
+    ports:
+      - ${NEXTJS_PORT}:3000
+    networks:
+      - dev-app-network
+    depends_on:
+      - dev-user
+      - dev-message
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dev-next-app.rule=Host(`dev.${NEXTJS_DOMAIN}`)"
+      - "traefik.http.routers.dev-next-app.entrypoints=websecure"
+      - "traefik.http.routers.dev-next-app.tls.certresolver=myresolver"
+      - "traefik.http.services.dev-next-app.loadbalancer.server.port=3000"
+
+  dev-text-manager-gpt:
+    build:
+      context: ./TextManagerGPT
+      dockerfile: Dockerfile
+    container_name: dev-TextManagerGPT
+    ports:
+      - "${TextManagerGPT_PORT}:3000"
+    environment:
+      - NODE_ENV=production
+      - GPT_API_KEY=${GPT_API_KEY}
+      - PORT=${TextManagerGPT_PORT}
+    command: node dist/index.js
+    networks:
+      - dev-app-network
+
+networks:
+  dev-app-network:
+    driver: bridge
