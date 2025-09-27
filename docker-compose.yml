@@ -25,14 +25,11 @@ services:
     volumes:
       - ./docker/jwt:/app/config/jwt:rw
       - ./docker/keys:/app/config/keys:rw
-    # Uncomment the following lines if you want to use volumes for local development
-    #   - './user/:/app'
-    #   # - './env:/.env'
     environment:
       - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
       - TRANSLATE_API_URL=http://text-manager-gpt:3000
       - SYMFONY_PROJECT_NAME=securedWhisker
-      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
+      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8
     depends_on:
       database:
         condition: service_healthy
@@ -64,7 +61,7 @@ services:
       retries: 5
       start_period: 30s
     ports: 
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - ./docker/db/data:/var/lib/postgresql/data:rw
     networks:
