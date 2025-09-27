@@ -2,9 +2,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { ChatLib } from "@/lib/ChatLib";
+import { ChatLib, MessagePayload } from "@/lib/ChatLib";
 import { RsaLib } from "@/lib/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
+import { AesLib } from "@/lib/AesLib";
 
 export type ContactDataForChat = {
     id: string;
@@ -25,7 +26,7 @@ function getWsProtocol() {
     return process.env.NODE_ENV === "development" ? "ws" : "wss";
 }
 
-export function Chat({ username, userId, contactData  }: ChatProps) {
+export function Chat({ username, userId, contactData }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -52,20 +53,25 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
 
         socket.onmessage = async (event) => {
 
-            const parsedMessage = JSON.parse(event.data)
-
+            const parsedMessage: MessagePayload = JSON.parse(event.data)
+            // recup le iv 
+            const ivMessage = parsedMessage.aesInitialValue
+            // recup la clé aes et on la dechiffre
             const privateKey = await SwDb.getPrivateKey();
-            // console.log(atob(privateKey?.privateKey || ""));
-            const decryptedMessage = await RsaLib.cryptedToText(
-                parsedMessage.message,
+            const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
+            const decryptAESKey = await RsaLib.cryptedToText(
+                cryptedAESKey,
                 atob(privateKey?.privateKey || "")
             );
+            // on dechiffre le message
+            const decryptedMessage =await  AesLib.cryptedToText(
+                parsedMessage.messageCryptedAES,
+                ivMessage,
+                decryptAESKey
+            )
 
-            // ajout a Messages
-            // afficher les miens
-
-            setMessages(prev => [...prev, { from: parsedMessage.from, message: decryptedMessage }]);
-        };
+            setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
+        }
 
         socket.onclose = () => {
             setConnectionState(0)
@@ -113,9 +119,22 @@ export function Chat({ username, userId, contactData  }: ChatProps) {
                     messageToSend = result.translated;
                 }
 
+                // recup la clé public
                 const publicKeyPem = atob(contactData.publicKey);
-                const cryptedMessage = await RsaLib.textToCrypted(messageToSend, publicKeyPem);
-                const formatedMessage = ChatLib.format(username, cryptedMessage);
+                // recup la clé aes
+                const AESKey = await AesLib.generateAESKey()
+                // chiffrer le message en aes
+                const aesCryptedMessage = await AesLib.textToCrypted(messageToSend, AESKey)
+                // chiffré la clé aes avec la clé public
+                const AESKeyCryptedWithRSA = await RsaLib.textToCrypted(AESKey, publicKeyPem)
+                // formater le payload
+
+                const formatedMessage = ChatLib.format({
+                    fromUsername: username,
+                    messageCryptedAES: aesCryptedMessage.encryptedData,
+                    aesInitialValue: aesCryptedMessage.iv,
+                    aesKeyCryptedRSA: AESKeyCryptedWithRSA
+                });
                 ws.current?.send(formatedMessage);
 
                 setMessages(prev => [...prev, { from: "Me", message: messageToSend }]);

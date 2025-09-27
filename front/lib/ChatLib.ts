@@ -1,12 +1,21 @@
 
+export type MessagePayload = {
+    fromUsername: string
+    messageCryptedAES : string,
+    aesInitialValue: string,
+    aesKeyCryptedRSA : string
+}
+
 export class ChatLib {
-    static format(username: string, message: string) {
+
+    static format(payload: MessagePayload) {
         return JSON.stringify({
-            from: username,
-            message: message
+            fromUsername: payload.fromUsername,
+            messageCryptedAES: payload.messageCryptedAES,
+            aesInitialValue: payload.aesInitialValue,
+            aesKeyCryptedRSA : payload.aesKeyCryptedRSA
         })
     }
-
 
     static getRoomName(id1: string, id2: string) {
         return [id1, id2].sort().join("");
