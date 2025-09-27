@@ -3,11 +3,15 @@ services:
     container_name: dev-message-microservice
     build:
       context: ./message
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
         SHOW_ONLY_ERROR: ${SHOW_ONLY_ERROR}
     ports:
       - "${SOCKET_PORT}:8080"
+    volumes:
+      - ./message:/app
+    environment:
+      - GO_ENV=development
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dev-message.rule=Host(`dev.${SOCKET_HOST}`)"
