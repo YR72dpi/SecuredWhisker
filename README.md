@@ -272,7 +272,7 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-### [1.2.0] - 2025-09-27
+### [1.1.0] - 2025-09-27
 
 ### Added
 
