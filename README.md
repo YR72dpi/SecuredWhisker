@@ -188,8 +188,10 @@ These data will be encrypted with the public key of the User Service and it will
 sequenceDiagram
     Client->>MessageServer: Ask recipient public key
     MessageServer-->>Client: Recipient Public Key
-    Client->>Client: Crypt message
-    Client->>MessageServer: Send crypted message
+    Client->>Client: Generate AES key
+    Client->>Client: Encrypt message with AES key
+    Client->>Client: Encrypt AES key with RSA public key
+    Client->>MessageServer: Send encrypted message + encrypted AES key
 ```
 
 ### Sending Message (with translation)
@@ -202,17 +204,20 @@ sequenceDiagram
     UserServer-->>GPTApi: Send the message and the wanted language
     GPTApi-->>UserServer: Receive the translated message
     UserServer-->>Client: Receive the translated message
-    Client->>Client: Crypt message
-    Client->>MessageServer: Send crypted message
+    Client->>Client: Generate AES key
+    Client->>Client: Encrypt message with AES key
+    Client->>Client: Encrypt AES key with RSA public key
+    Client->>MessageServer: Send encrypted message + encrypted AES key
 ```
 
 ### Receive Message 
 
 ```mermaid
 sequenceDiagram
-    MessageServer->>Client: Receive crypted messages
+    MessageServer->>Client: Receive encrypted messages + encrypted AES key
     Client->>Client: Get his own private key
-    Client->>Client: Decrypt message 
+    Client->>Client: Decrypt AES key with RSA private key
+    Client->>Client: Decrypt message with AES key
 ```
 
 ## Git flow
@@ -267,16 +272,16 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-[1.0.0] - 2025-07-14
+### [1.2.0] - 2025-09-27
 
-__Added__
+### Added
 
-Capability to :
-- Login
-- Register
-- Add someone
-- Chat
-- Translate with chatGPT
+- Button to copy user's identifier
+
+### Changed
+
+- Message crypted in AES and aes crypt with the recipent RSA public key.
+- Style of message
 
 [Full changelog](./docs/changelog.md)
 
