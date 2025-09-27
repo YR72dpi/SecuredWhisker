@@ -64,7 +64,7 @@ export function Chat({ username, userId, contactData }: ChatProps) {
                 atob(privateKey?.privateKey || "")
             );
             // on dechiffre le message
-            const decryptedMessage =await  AesLib.cryptedToText(
+            const decryptedMessage = await AesLib.cryptedToText(
                 parsedMessage.messageCryptedAES,
                 ivMessage,
                 decryptAESKey
@@ -161,7 +161,7 @@ export function Chat({ username, userId, contactData }: ChatProps) {
                         onChange={e => setSelectedLanguage(e.target.value)}
                         className="mb-2 p-2 border rounded"
                     >
-                        <option value="">Choice a language</option>
+                        <option value="">Language selection</option>
                         <option value="french">Français</option>
                         <option value="english">English</option>
                         <option value="spanish">Español</option>
@@ -169,23 +169,28 @@ export function Chat({ username, userId, contactData }: ChatProps) {
                         <option value="portuguese">Português</option>
                         <option value="italian">Italiano</option>
                         {/* dont supported for some reason, maybe utf8 or something like that
-                    <option value="chinese">中文</option>
-                    <option value="japanese">日本語</option>
-                    <option value="korean">한국어</option>
-                    <option value="russian">Русский</option>
-                    <option value="arabic">العربية</option>
-                    <option value="hindi">हिन्दी</option> */}
-                        <option value="Reunionese Creole">Réunion Creole</option>
-                        {/* Ajoute d'autres langues ici */}
+                        <option value="chinese">中文</option>
+                        <option value="japanese">日本語</option>
+                        <option value="korean">한국어</option>
+                        <option value="russian">Русский</option>
+                        <option value="arabic">العربية</option>
+                        <option value="hindi">हिन्दी</option> */}
                     </select>
                 )}
 
             </div>
 
-            <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 bg-gray-100">
+            <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 bg-gray-100 flex flex-col">
                 {messages.map((msg, index) => (
-                    <div key={index} className="mb-1 text-sm text-gray-800">
-                        <span className="font-semibold">{msg.from}:</span> {msg.message}
+                    <div key={index} className={`
+                        mb-1 text-sm text-gray-800 p-3 rounded
+                        ${msg.from === "Me" ?
+                            "self-end text-right bg-gray-300" :
+                            "self-start text-left bg-blue-300"
+                        }
+                    `}>
+                        {/* <span className="font-semibold">{msg.from}:</span>  */}
+                        {msg.message}
                     </div>
                 ))}
                 <div ref={bottomRef} />
