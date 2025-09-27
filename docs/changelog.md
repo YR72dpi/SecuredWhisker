@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Button to copy user's identifier
+
 ### Changed
 
 - Message crypted in AES and aes crypt with the recipent RSA public key.

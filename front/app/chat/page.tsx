@@ -8,6 +8,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useState } from "react";
 
@@ -38,7 +39,7 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST +"/api/protected/selfUserData", requestOptions)
+            return fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setIdentifier(result.identifier)
@@ -53,7 +54,19 @@ export default function Home() {
     return (
         <>
             <div className="p-14 block h-screen">
-                <span>Your identifier : {identifier ?? "Loading your identifier..."}</span>
+                <div className="flex gap-2 text-base p-1">
+                    <span>
+                        {identifier ? "Your identifier : " + identifier : "Loading your identifier..."}
+                    </span>
+                    {identifier && (
+                        <CopyButton
+                            size="sm"
+                            variant="outline"
+                            content={identifier}
+                            onCopy={() => console.log("Link copied!")}
+                        />
+                    )}
+                </div>
                 <ResizablePanelGroup
                     direction="horizontal"
                     className="h-full rounded-lg border w-[100vh]"
@@ -92,7 +105,7 @@ export default function Home() {
                                                         <Chat
                                                             username={username}
                                                             userId={userId}
-                                                            contactData={selectedContact} 
+                                                            contactData={selectedContact}
                                                         />
                                                     )}
                                                 </div>
