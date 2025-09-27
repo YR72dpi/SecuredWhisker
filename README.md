@@ -289,6 +289,8 @@ Additional labels for pre-release and build metadata are available as extensions
 
 Contributions are welcome! Feel free to open issues or submit pull requests to contribute to the development of this application.
 
+[See the guide](./docs/development_guide.md)
+
 ## To improve it
 
 - 2FA
