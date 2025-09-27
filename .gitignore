@@ -1,6 +1,6 @@
 fileIntegrityVerifier.js
 /do_not_upload/
-.env
+.env.dev
 redis.conf
 /docker
 *.bat
