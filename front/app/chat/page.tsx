@@ -53,7 +53,7 @@ export default function Home() {
 
     return (
         <>
-            <div className="p-14 block h-screen">
+            <div className="p-3 block h-[90vh]">
                 <div className="flex gap-2 text-base p-1">
                     <span>
                         {identifier ? "Your identifier : " + identifier : "Loading your identifier..."}
@@ -69,7 +69,7 @@ export default function Home() {
                 </div>
                 <ResizablePanelGroup
                     direction="horizontal"
-                    className="h-full rounded-lg border w-[100vh]"
+                    className="rounded-lg border w-[100vw]"
                 >
                     <ResizablePanel defaultSize={25}>
                         <div className="flex flex-col gap-1 p-6">
