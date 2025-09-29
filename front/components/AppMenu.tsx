@@ -10,7 +10,6 @@ import { CopyButton } from "./ui/shadcn-io/copy-button"
 import { AddFriend } from "./addFriend"
 import { ContactRequest } from "./contactRequest"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 
 type AppMenuProps = {
     identifier: string | null,
