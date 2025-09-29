@@ -10,6 +10,7 @@ import { CopyButton } from "./ui/shadcn-io/copy-button"
 import { AddFriend } from "./addFriend"
 import { ContactRequest } from "./contactRequest"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -20,6 +21,8 @@ export const AppMenu = ({
     identifier,
     onContactAccepted
 }: AppMenuProps) => {
+    const version = process.env.NEXT_PUBLIC_APP_VERSION
+
     return (
         <div className="p-3">
             <Menubar>
@@ -36,7 +39,7 @@ export const AppMenu = ({
                         <MenubarSeparator />
                         <MenubarItem>
                             <span className="text-sm text-gray-500 italic">
-                                Version: {process.env.NEXT_APP_VERSION ? process.env.NEXT_APP_VERSION : "Development"}
+                                Version: {version ? version : "Development"}
                             </span>
                         </MenubarItem>
                     </MenubarContent>
