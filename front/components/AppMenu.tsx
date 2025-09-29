@@ -10,6 +10,7 @@ import {
 import { CopyButton } from "./ui/shadcn-io/copy-button"
 import { AddFriend } from "./addFriend"
 import { ContactRequest } from "./contactRequest"
+import Link from "next/link"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -23,6 +24,17 @@ export const AppMenu = ({
     return (
         <div className="p-3">
             <Menubar>
+                 <MenubarMenu>
+                    <MenubarTrigger>Secured Whisker</MenubarTrigger>
+                    <MenubarContent>
+                        <Link target="_blank" title="Secured Whisker's repository" href="https://github.com/YR72dpi/SecuredWhisker">
+                            <MenubarItem>Repository</MenubarItem>
+                        </Link>
+                        <Link target="_blank" title="Secured Whisker's changelog" href="https://github.com/YR72dpi/SecuredWhisker/blob/main/docs/changelog.md">
+                            <MenubarItem>Changelog</MenubarItem>
+                        </Link>
+                    </MenubarContent>
+                </MenubarMenu>
                 <MenubarMenu>
                     <MenubarTrigger>Security</MenubarTrigger>
                     <MenubarContent>
