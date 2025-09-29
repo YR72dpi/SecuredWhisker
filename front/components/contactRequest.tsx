@@ -8,6 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
+import { Badge } from "@/components/ui/badge"
+import { MenubarItem } from "./ui/menubar";
 
 function getApiProtocol() {
     return process.env.NODE_ENV === "development" ? "http" : "https";
@@ -95,14 +97,19 @@ export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
     return (
         <>
             <Dialog>
-                <DialogTrigger className="border p-2 rounded">
-                    Contacts Request
+                <DialogTrigger asChild>
+                <MenubarItem 
+                    onSelect={(e) => e.preventDefault()}
+                    className="flex items-center justify-between gap-2"
+                >
+                    <span>Contacts Request</span>
                     {contactsRequest.length > 0 && (
-                        <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs">
+                        <Badge variant="destructive" className="ml-auto">
                             {contactsRequest.length}
-                        </span>
+                        </Badge>
                     )}
-                </DialogTrigger>
+                </MenubarItem>
+            </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Contacts Request</DialogTitle>

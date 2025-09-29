@@ -4,7 +4,8 @@ import { ContactDataForChat } from "./chat";
 
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
-    refreshKey?: number;
+    refreshKey?: number,
+    setNbrContact: (nbr: number) => void;
 };
 
 type Contact = {
@@ -18,7 +19,7 @@ function getApiProtocol() {
     return process.env.NODE_ENV === "development" ? "http" : "https";
 }
 
-export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
+export function ContactList({ onSelectContact, refreshKey, setNbrContact }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
@@ -42,6 +43,7 @@ export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
                 .then((result) => {
                     setContacts(result.data)
                     setIsLoading(false)
+                    setNbrContact(result.data.length)
                 })
                 .catch((error) => {
                     console.error(error)

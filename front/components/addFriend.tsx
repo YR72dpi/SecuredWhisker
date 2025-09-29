@@ -16,11 +16,13 @@ import { z } from "zod"
 import { SwDb } from "@/lib/SwDatabase";
 
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle
+    Alert,
+    AlertDescription,
+    AlertTitle
 } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { MenubarItem, MenubarTrigger } from "./ui/menubar";
+import { MenubarContent } from "@radix-ui/react-menubar";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {
@@ -64,7 +66,7 @@ export function AddFriend() {
         fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
             .then(async (response) => {
                 const jsonResponse = await response.json()
-                 if (!response.ok) {
+                if (!response.ok) {
                     throw new Error(jsonResponse.message || "Erreur inconnue");
                 }
                 return jsonResponse
@@ -94,47 +96,59 @@ export function AddFriend() {
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger className="border p-2 rounded">Add a mate</DialogTrigger>
+                <DialogTrigger asChild>
+                    <MenubarItem onSelect={(e) => e.preventDefault()}>
+                        Add a mate
+                    </MenubarItem>
+                </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Add a mate</DialogTitle>
                         <DialogDescription>
-                            <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="userIdentifier"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                {/* <FormLabel>Username</FormLabel> */}
-                                                <FormControl>
-                                                    <Input placeholder="user identifier" {...field} />
-                                                </FormControl>
-                                                {/* <FormDescription>
-                                       This is your public display name.
-                                     </FormDescription> */}
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Button type="submit">Submit</Button>
-                                </form>
-                            </Form>
+                            Enter the identifier of the user you want to add as a friend.
                         </DialogDescription>
                     </DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="userIdentifier"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Input placeholder="user identifier" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit">Submit</Button>
+                            </div>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 
             {alert !== "" && (
-                <Alert variant={alertType ? "default" : "destructive"} className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
+                <Alert
+                    variant={alertType ? "default" : "destructive"}
+                    className="fixed bottom-[15px] left-1/2 -translate-x-1/2 w-[80%] max-w-md bg-[#fff] z-50 shadow-lg"
+                >
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{alertTitle}</AlertTitle>
                     <AlertDescription>
                         {alert}
                     </AlertDescription>
                 </Alert>
-            )
-            }
+            )}
         </>
     )
 }
