@@ -18,6 +18,7 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 import { useRouter } from "next/navigation";
+import { HomeHeader } from "@/components/HomeHeader";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -86,14 +87,8 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col p-4 items-center h-screen font-[family-name:var(--font-geist-sans)]">
-      <h1 className="mb-4 text-4xl font-extrabold">Secured Whisker</h1>
-      <h2 className="mb-4 text-3xl">Signin</h2>
-      <nav>
-        <ul className="tw-nav">
-          <li><a href="/">Home</a></li>
-        </ul>
-      </nav>
+    <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">
+      <HomeHeader title="Sign in" />
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
