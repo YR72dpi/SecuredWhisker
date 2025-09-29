@@ -33,42 +33,52 @@ export const AppMenu = ({
                         <Link target="_blank" title="Secured Whisker's changelog" href="https://github.com/YR72dpi/SecuredWhisker/blob/main/docs/changelog.md">
                             <MenubarItem>Changelog</MenubarItem>
                         </Link>
-                    </MenubarContent>
-                </MenubarMenu>
-                <MenubarMenu>
-                    <MenubarTrigger>Security</MenubarTrigger>
-                    <MenubarContent>
-                        <MenubarItem>
-                            Copy my private key
-                            {/* <MenubarShortcut>⌘T</MenubarShortcut> */}
-                        </MenubarItem>
-                        <MenubarItem>
-                            Copy my public key
-                            {/* <MenubarShortcut>⌘T</MenubarShortcut> */}
-                        </MenubarItem>
-                        <MenubarItem>Transmet my private to another divices</MenubarItem>
+
                         <MenubarSeparator />
-                        <MenubarItem>Change My private key</MenubarItem>
+                        <MenubarItem>
+                            <span className="text-sm text-gray-500 italic">
+                                Version: {process.env.NEXT_APP_VERSION ? process.env.NEXT_APP_VERSION : "Development"}
+                            </span>
+                        </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
 
+                {/* <MenubarMenu> */}
+                    {/* <MenubarTrigger>Security</MenubarTrigger> */}
+                    {/* <MenubarContent> */}
+                        {/* <MenubarItem> */}
+                            {/* Copy my private key */}
+                            {/* <MenubarShortcut>⌘T</MenubarShortcut> */}
+                        {/* </MenubarItem> */}
+                        {/* <MenubarItem> */}
+                            {/* Copy my public key */}
+                            {/* <MenubarShortcut>⌘T</MenubarShortcut> */}
+                        {/* </MenubarItem> */}
+                        {/* <MenubarItem>Transmet my private to another divices</MenubarItem> */}
+                        {/* <MenubarSeparator /> */}
+                        {/* <MenubarItem>Change My private key</MenubarItem> */}
+                    {/* </MenubarContent> */}
+                {/* </MenubarMenu> */}
+
                 <MenubarMenu>
-                    <MenubarTrigger>Relation</MenubarTrigger>
+                    <MenubarTrigger>Relationship</MenubarTrigger>
                     <MenubarContent>
                         <MenubarItem>
-                            {identifier ? "Identifier" : "Loading your identifier..."}
+                            {identifier ? (
+                                <div className="flex gap-2 items-center">
+                                    <div>
+                                        Identifier: <span className="text-sm text-gray-500 italic">{identifier}</span>
+                                    </div> 
+                                    <CopyButton
+                                        onClick={(e) => e.preventDefault()}
+                                        size="sm"
+                                        variant="outline"
+                                        content={identifier}
+                                        onCopy={() => console.log("Link copied!")}
+                                    />
+                                </div>
+                            ) : "Loading your identifier..."}
                         </MenubarItem>
-                        {identifier && (
-                            <MenubarItem className="gap-2">
-                                <span>{identifier} </span>
-                                <CopyButton
-                                    size="sm"
-                                    variant="outline"
-                                    content={identifier}
-                                    onCopy={() => console.log("Link copied!")}
-                                />
-                            </MenubarItem>
-                        )}
                         <MenubarSeparator />
 
                         <AddFriend />
