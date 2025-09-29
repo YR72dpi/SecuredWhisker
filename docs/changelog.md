@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
+## [1.1.2] - 2025-09-29
+
+### Added
+
+- Menu with Secured Whisker links
+- Menu with relationship management
+
+### Changed
+
+/
+
+### Fixed
+
+/
+
+---
+
 ## [1.1.1] - 2025-09-29
 
 ### Added
@@ -12,9 +29,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- UI on home / login / sign in pages
+
 ### Fixed
 
-- UI on home / login / sign in pages
+/
+
+---
 
 ## [1.1.0] - 2025-09-27
 
@@ -43,7 +64,11 @@ Capability to :
 
 ### Changed
 
+/
+
 ### Fixed
+
+/
 
 ## [0.0.0] - 2024-11-07 - Beta
 
