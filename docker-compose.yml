@@ -79,7 +79,7 @@ services:
         NEXT_PUBLIC_GPT_API_KEY: ${GPT_API_KEY}
         NEXT_PUBLIC_USER_HOST: ${SERVER_HOST}
         NEXT_PUBLIC_MESSAGE_HOST: ${SOCKET_HOST}
-        NEXT_APP_VERSION: ${APP_VERSION}
+        NEXT_APP_VERSION: ${VERSION}
     restart: always
     ports:
       - ${NEXTJS_PORT}:3000
