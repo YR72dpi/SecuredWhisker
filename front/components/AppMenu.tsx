@@ -4,7 +4,6 @@ import {
     MenubarItem,
     MenubarMenu,
     MenubarSeparator,
-    MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { CopyButton } from "./ui/shadcn-io/copy-button"

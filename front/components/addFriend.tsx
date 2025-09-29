@@ -21,8 +21,7 @@ import {
     AlertTitle
 } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { MenubarItem, MenubarTrigger } from "./ui/menubar";
-import { MenubarContent } from "@radix-ui/react-menubar";
+import { MenubarItem } from "./ui/menubar";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {

@@ -53,7 +53,7 @@ export function ContactList({ onSelectContact, refreshKey, setNbrContact }: Cont
         }
 
         getContacts()
-    }, [refreshKey])
+    }, [refreshKey, setNbrContact])
 
     return (
         <>
