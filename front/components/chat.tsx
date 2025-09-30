@@ -79,6 +79,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                     )
                 } catch (err) {
                     // Ignore crypto errors
+                    console.error(err)
                     return;
                 }
 
@@ -94,6 +95,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
         };
 
         socket.onerror = (err) => {
+            console.error(err)
             setConnectionState(-1)
         };
 

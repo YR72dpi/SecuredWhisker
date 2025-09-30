@@ -24,8 +24,8 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
-    let classForOverrideForTitle = (width === undefined || width < 400) ? "font-bold" : "font-bold text-xl text-center"
-    let classForOverrideForList = (width === undefined || width < 400) ? "" : "text-center"
+    const classForOverrideForTitle = (width === undefined || width < 400) ? "font-bold" : "font-bold text-xl text-center"
+    const classForOverrideForList = (width === undefined || width < 400) ? "" : "text-center"
 
     useEffect(() => {
         const getContacts = async () => {

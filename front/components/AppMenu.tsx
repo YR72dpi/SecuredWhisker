@@ -14,8 +14,6 @@ import Link from "next/link"
 import { SwDb } from "@/lib/SwDatabase"
 import { useEffect, useState } from "react"
 import { ThemeToggle } from "./theme-toggle"
-import { Separator } from "@/components/ui/separator"
-import { Menu } from "@radix-ui/react-menubar"
 
 type AppMenuProps = {
     identifier: string | null,
