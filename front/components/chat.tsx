@@ -196,10 +196,10 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
             <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 flex flex-col">
                 {messages.map((msg, index) => (
                     <div key={index} className={`
-                        mb-1 text-sm text-gray-800 p-3 rounded
+                        mb-1 text-sm text-gray-800 p-3 
                         ${msg.from === "Me" ?
-                            "self-end text-right bg-gray-300" :
-                            "self-start text-left bg-blue-300"
+                            "self-end text-right bg-gray-300 [border-radius:5px_5px_0_5px]" :
+                            "self-start text-left bg-blue-300 [border-radius:5px_5px_5px_0px]"
                         }
                     `}>
                         {/* <span className="font-semibold">{msg.from}:</span>  */}
