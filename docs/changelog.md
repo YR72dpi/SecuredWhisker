@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
+## [1.1.4] - 2025-09-30
+
+### Added
+
+- Dark / light theme switch
+- From home page, redirect to the chat if there is a valid JWT Token
+- From chat page, redirect to the home page if there no or invald JWT Token
+
+### Changed
+
+- UI between the contacts list and the chat
+
+### Fixed
+
+/
+
+---
+
 ## [1.1.3] - 2025-09-30
 
 ### Added
