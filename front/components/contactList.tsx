@@ -42,7 +42,6 @@ export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
                 .then((result) => {
                     setContacts(result.data)
                     setIsLoading(false)
-                    console.log(result.data)
                 })
                 .catch((error) => {
                     console.error(error)
