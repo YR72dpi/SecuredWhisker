@@ -5,7 +5,6 @@ import { ContactDataForChat } from "./chat";
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
     refreshKey?: number,
-    setNbrContact: (nbr: number) => void;
 };
 
 type Contact = {
@@ -19,11 +18,11 @@ function getApiProtocol() {
     return process.env.NODE_ENV === "development" ? "http" : "https";
 }
 
-export function ContactList({ onSelectContact, refreshKey, setNbrContact }: ContactListProps) {
+export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
-    
+
 
     useEffect(() => {
         const getContacts = async () => {
@@ -43,7 +42,7 @@ export function ContactList({ onSelectContact, refreshKey, setNbrContact }: Cont
                 .then((result) => {
                     setContacts(result.data)
                     setIsLoading(false)
-                    setNbrContact(result.data.length)
+                    console.log(result.data)
                 })
                 .catch((error) => {
                     console.error(error)
@@ -53,7 +52,7 @@ export function ContactList({ onSelectContact, refreshKey, setNbrContact }: Cont
         }
 
         getContacts()
-    }, [refreshKey, setNbrContact])
+    }, [refreshKey])
 
     return (
         <>
@@ -63,26 +62,29 @@ export function ContactList({ onSelectContact, refreshKey, setNbrContact }: Cont
                 contacts.length === 0 ? (
                     <p>No contact</p>
                 ) : (
-                    <ul className="mt-2 space-y-2">
-                        {contacts.map((contact, index) => (
-                            <li 
-                            key={index} 
-                            className="border-b p-2 break-all"
-                            onClick={() => {
-                                onSelectContact(
-                                    {
-                                        id: contact.id,
-                                        username: contact.username,
-                                        publicKey: contact.publicKey
-                                    }
-                                );
-                            }}
-                            >
-                                {contact.username ?? "Unnamed contact"} 
-                                <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
-                            </li>
-                        ))}
-                    </ul>
+                    <>
+                        <span className="font-bold text-xl">Contacts ({contacts === null ? "Loading..." : contacts.length})</span><ul className="mt-2 space-y-2">
+                            {contacts.map((contact, index) => (
+                                <li
+                                    key={index}
+                                    className="border-b p break-all max-w-[400px]"
+                                    onClick={() => {
+                                        onSelectContact(
+                                            {
+                                                id: contact.id,
+                                                username: contact.username,
+                                                uniqid: contact.uniqid,
+                                                publicKey: contact.publicKey
+                                            }
+                                        );
+                                    }}
+                                >
+                                    {contact.username ?? "Unnamed contact"}
+                                    <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
                 )
             )}
         </>

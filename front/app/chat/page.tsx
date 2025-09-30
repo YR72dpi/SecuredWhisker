@@ -23,7 +23,7 @@ export default function Home() {
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
     const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
-    const [nbrContact, setNbrContact] = useState<null|number>(null)
+    const [nbrContact, setNbrContact] = useState<null | number>(null)
 
     useEffect(() => {
 
@@ -72,64 +72,32 @@ export default function Home() {
 
     return (
         <>
-            <AppMenu 
+            <div className="p-3 flex flex-col gap-3">
+                <AppMenu
                 identifier={identifier}
                 publicKey={publicKey}
                 onContactAccepted={() => setContactsRefreshKey(k => k + 1)}
             />
-            <div className="p-3 block h-[90vh]">
-                <ResizablePanelGroup
-                    direction="horizontal"
-                    className="rounded-lg border w-[100vw]"
-                >
-                    <ResizablePanel defaultSize={25}>
-                        <div className="flex flex-col gap-1 p-6">
-                            {identifier && (
-                                <>
-                                    <span className="font-bold text-xl">Contacts ({nbrContact === null ? "Loading..." : nbrContact})</span>
-                                    <ContactList
-                                        onSelectContact={setSelectedContact}
-                                        refreshKey={contactsRefreshKey}
-                                        setNbrContact={setNbrContact}
-                                    />
-                                </>
-                            )}
-                        </div>
-                    </ResizablePanel>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={75}>
-                        <div className="flex h-full items-center justify-center">
 
-                            <ResizablePanelGroup
-                                direction="vertical"
-                                className="h-full w-[100vh]"
-                            >
-                                <ResizablePanel defaultSize={75}>
-                                    <div className="flex h-full">
-                                        <ResizablePanelGroup
-                                            direction="vertical"
-                                            className="h-full w-full"
-                                        >
-                                            <ResizablePanel defaultSize={100}>
-                                                <div className="h-full">
-                                                    {username && selectedContact && userId && (
-                                                        <Chat
-                                                            username={username}
-                                                            userId={userId}
-                                                            contactData={selectedContact}
-                                                        />
-                                                    )}
-                                                </div>
-                                            </ResizablePanel>
-                                        </ResizablePanelGroup>
-                                    </div>
-                                </ResizablePanel>
-                            </ResizablePanelGroup>
+            {identifier && !selectedContact && (
+                <>
+                    <ContactList
+                        onSelectContact={setSelectedContact}
+                        refreshKey={contactsRefreshKey}
+                    />
+                </>
+            )}
 
-                        </div>
-                    </ResizablePanel>
-                </ResizablePanelGroup>
+            {username && selectedContact && userId && (
+                <Chat
+                    username={username}
+                    userId={userId}
+                    contactData={selectedContact}
+                    setContactData={setSelectedContact}
+                />
+            )}
             </div>
+
         </>
     );
 }

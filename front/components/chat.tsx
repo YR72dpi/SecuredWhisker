@@ -6,10 +6,12 @@ import { ChatLib, MessagePayload } from "@/lib/ChatLib";
 import { RsaLib } from "@/lib/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
 import { AesLib } from "@/lib/AesLib";
+import { ChevronLeftIcon } from "lucide-react";
 
 export type ContactDataForChat = {
     id: string;
     username: string;
+    uniqid: string;
     publicKey: string;
 }
 
@@ -17,6 +19,7 @@ type ChatProps = {
     username: string;
     userId: string;
     contactData: ContactDataForChat;
+    setContactData: (newContactData: ContactDataForChat | null) => void
 };
 
 function getApiProtocol() {
@@ -26,7 +29,7 @@ function getWsProtocol() {
     return process.env.NODE_ENV === "development" ? "ws" : "wss";
 }
 
-export function Chat({ username, userId, contactData }: ChatProps) {
+export function Chat({ username, userId, contactData, setContactData }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -146,14 +149,24 @@ export function Chat({ username, userId, contactData }: ChatProps) {
     }
 
     return (
-        <div className="flex flex-col h-full p-4">
+        <div className="flex flex-col h-[90vh]">
             <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-xl font-semibold mb-2">
-                    Chat to {contactData.username} ({contactData.id})
-                    {connectionState === 0 && " 🟠"}
-                    {connectionState === 1 && " 🟢"}
-                    {connectionState === -1 && " 🔴"}
-                </h2>
+                <Button variant="secondary" size="icon" className="size-8" onClick={() => setContactData(null)}>
+                    <ChevronLeftIcon />
+                </Button>
+                    <h2 className="flex-auto flex flex-col text-xl font-semibold pl-3">
+                        <div className="flex items-center gap-1">
+                            {contactData.username}
+                            <span className="text-xs">
+                                {connectionState === 0 && " 🟠"}
+                                {connectionState === 1 && ""}
+                                {/* {connectionState === 1 && " 🟢"} */}
+                                {connectionState === -1 && " 🔴"}
+                            </span>
+                        </div>
+                        <span className="text-xs text-gray-500 italic">({contactData.uniqid})</span>
+                    </h2>
+                
 
                 {showLanguageSelector && (
                     <select

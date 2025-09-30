@@ -38,7 +38,7 @@ export const AppMenu = ({
     }, [])
 
     return (
-        <div className="p-3">
+        <div>
             <Menubar>
                 <MenubarMenu>
                     <MenubarTrigger>Secured Whisker</MenubarTrigger>
