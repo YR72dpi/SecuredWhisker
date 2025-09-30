@@ -30,6 +30,10 @@ export default function Home() {
         (async () => {
 
             const jwtToken = await SwDb.getJwtToken()
+            if (!jwtToken) {
+                window.location.replace("/login");
+                return;
+            }
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);
@@ -41,14 +45,27 @@ export default function Home() {
             };
 
             return fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
-                .then((response) => response.json())
+                .then((response) => {
+                    if (!response.ok) {
+                        window.location.replace("/login");
+                        return;
+                    }
+                    return response.json();
+                })
                 .then((result) => {
+                    if (!result?.identifier) {
+                        window.location.replace("/login");
+                        return;
+                    }
                     setIdentifier(result.identifier)
                     setUsername(result.username)
                     setUserId(result.id)
                     setPublicKey(result.publicKey)
                 })
-                .catch((error) => console.error(error));
+                .catch((error) => {
+                    console.error(error);
+                    window.location.replace("/login");
+                });
         })()
 
     }, [])
