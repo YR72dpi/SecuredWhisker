@@ -43,6 +43,10 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const room = ChatLib.getRoomName(userId, contactData.id)
 
     useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    useEffect(() => {
         console.log("Connecting to room:", room);
         if (!room) return;
         const socket = new WebSocket(getWsProtocol() + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
@@ -174,7 +178,6 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                         <span className="text-xs text-gray-500 italic">({contactData.uniqid})</span>
                     </h2>
                 
-
                 {showLanguageSelector && (
                     <select
                         value={selectedLanguage}
