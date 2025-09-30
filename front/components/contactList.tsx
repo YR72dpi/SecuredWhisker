@@ -5,6 +5,7 @@ import { ContactDataForChat } from "./chat";
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
     refreshKey?: number,
+    width: number | undefined
 };
 
 type Contact = {
@@ -18,11 +19,13 @@ function getApiProtocol() {
     return process.env.NODE_ENV === "development" ? "http" : "https";
 }
 
-export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
+export function ContactList({ onSelectContact, refreshKey, width }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
+    let classForOverrideForTitle = (width === undefined || width < 400) ? "font-bold" : "font-bold text-xl text-center"
+    let classForOverrideForList = (width === undefined || width < 400) ? "" : "text-center"
 
     useEffect(() => {
         const getContacts = async () => {
@@ -62,12 +65,12 @@ export function ContactList({ onSelectContact, refreshKey }: ContactListProps) {
                         <p>No contact</p>
                     ) : (
                         <>
-                            <span className="font-bold text-xl text-center">Contacts ({contacts === null ? "Loading..." : contacts.length})</span>
+                            <span className={classForOverrideForTitle}>Contacts ({contacts === null ? "Loading..." : contacts.length})</span>
                             <ul className="mt-2 space-y-2 flex flex-col items-center">
                                 {contacts.map((contact, index) => (
                                     <li
                                         key={index}
-                                        className="border-b p break-all text-center w-[300px] max-w-[90%]"
+                                        className={"border-b p break-all w-[300px] max-w-[90%]" + classForOverrideForList}
                                         onClick={() => {
                                             onSelectContact(
                                                 {

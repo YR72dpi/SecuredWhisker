@@ -14,32 +14,38 @@ import Link from "next/link"
 import { SwDb } from "@/lib/SwDatabase"
 import { useEffect, useState } from "react"
 import { ThemeToggle } from "./theme-toggle"
+import { Separator } from "@/components/ui/separator"
+import { Menu } from "@radix-ui/react-menubar"
 
 type AppMenuProps = {
     identifier: string | null,
     publicKey: string | null,
-    onContactAccepted?: () => void
+    onContactAccepted?: () => void,
+    width: number | undefined
 }
 
 export const AppMenu = ({
     identifier,
     publicKey,
-    onContactAccepted
+    onContactAccepted,
+    width
 }: AppMenuProps) => {
     const version = process.env.NEXT_PUBLIC_APP_VERSION
-    const [privateKey, setPrivateKey] = useState<string|null>(null)
+    const [privateKey, setPrivateKey] = useState<string | null>(null)
 
     useEffect(() => {
         const init = async () => {
             const privateK = await SwDb.getPrivateKey()
-            if(privateK) setPrivateKey(privateK.privateKey)
+            if (privateK) setPrivateKey(privateK.privateKey)
         }
         init()
     }, [])
 
+    const classForOverride = (width === undefined || width < 400) ? "flex flex-col width-[50%] items-start border-none" : ""
+
     return (
         <div>
-            <Menubar>
+            <Menubar className={classForOverride}>
                 <MenubarMenu>
                     <MenubarTrigger>Secured Whisker</MenubarTrigger>
                     <MenubarContent>
@@ -64,7 +70,7 @@ export const AppMenu = ({
                         <MenubarItem>
                             <div className="flex gap-2 items-center">
                                 <div>Copy my private key</div>
-                            {privateKey && (
+                                {privateKey && (
                                     <CopyButton
                                         onClick={(e) => e.preventDefault()}
                                         size="sm"
@@ -78,7 +84,7 @@ export const AppMenu = ({
                         <MenubarItem>
                             <div className="flex gap-2 items-center">
                                 <div>Copy my public key</div>
-                            {publicKey && (
+                                {publicKey && (
                                     <CopyButton
                                         onClick={(e) => e.preventDefault()}
                                         size="sm"
