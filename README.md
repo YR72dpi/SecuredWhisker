@@ -276,7 +276,8 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ### Changed
 
-/
+- Light theme by default
+- Enable system theme
 
 ### Fixed
 
