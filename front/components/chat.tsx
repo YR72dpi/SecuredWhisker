@@ -55,25 +55,33 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
         };
 
         socket.onmessage = async (event) => {
+            try {
+                const parsedMessage: MessagePayload = JSON.parse(event.data)
+                const ivMessage = parsedMessage.aesInitialValue
+                const privateKey = await SwDb.getPrivateKey();
+                const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
+                
+                // Ignore silently any crypto errors since it works
+                let decryptAESKey, decryptedMessage;
+                try {
+                    decryptAESKey = await RsaLib.cryptedToText(
+                        cryptedAESKey,
+                        atob(privateKey?.privateKey || "")
+                    );
+                    decryptedMessage = await AesLib.cryptedToText(
+                        parsedMessage.messageCryptedAES,
+                        ivMessage,
+                        decryptAESKey
+                    )
+                } catch (err) {
+                    // Ignore crypto errors
+                    return;
+                }
 
-            const parsedMessage: MessagePayload = JSON.parse(event.data)
-            // recup le iv 
-            const ivMessage = parsedMessage.aesInitialValue
-            // recup la clé aes et on la dechiffre
-            const privateKey = await SwDb.getPrivateKey();
-            const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
-            const decryptAESKey = await RsaLib.cryptedToText(
-                cryptedAESKey,
-                atob(privateKey?.privateKey || "")
-            );
-            // on dechiffre le message
-            const decryptedMessage = await AesLib.cryptedToText(
-                parsedMessage.messageCryptedAES,
-                ivMessage,
-                decryptAESKey
-            )
-
-            setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
+                setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
+            } catch (err) {
+                console.error("Message parsing error:", err);
+            }
         }
 
         socket.onclose = () => {
@@ -83,7 +91,6 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
 
         socket.onerror = (err) => {
             setConnectionState(-1)
-            console.error("Erreur WebSocket :", err);
         };
 
         return () => {
@@ -143,7 +150,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 setMessages(prev => [...prev, { from: "Me", message: messageToSend }]);
                 setInput("");
             } catch (e) {
-                console.error("Erreur de chiffrement :", e);
+                console.error("Encryption error:", e);
             }
         }
     }
