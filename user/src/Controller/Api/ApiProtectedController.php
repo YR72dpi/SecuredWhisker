@@ -41,7 +41,8 @@ class ApiProtectedController extends AbstractController
             'message' => 'ok',
             "identifier" => $user->getFullIdentifier(),
             "username" => $user->getUsername(),
-            "id" => $user->getId()
+            "id" => $user->getId(),
+            "publicKey" => $user->getPublicKey()
         ]);
     }
 

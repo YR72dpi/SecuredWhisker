@@ -19,6 +19,7 @@ export default function Home() {
     const [identifier, setIdentifier] = useState<string | null>(null)
     const [userId, setUserId] = useState<string | null>(null)
     const [username, setUsername] = useState<string | null>(null)
+    const [publicKey, setPublicKey] = useState<string | null>(null)
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
     const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
@@ -45,6 +46,7 @@ export default function Home() {
                     setIdentifier(result.identifier)
                     setUsername(result.username)
                     setUserId(result.id)
+                    setPublicKey(result.publicKey)
                 })
                 .catch((error) => console.error(error));
         })()
@@ -55,6 +57,7 @@ export default function Home() {
         <>
             <AppMenu 
                 identifier={identifier}
+                publicKey={publicKey}
                 onContactAccepted={() => setContactsRefreshKey(k => k + 1)}
             />
             <div className="p-3 block h-[90vh]">
