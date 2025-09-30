@@ -268,16 +268,21 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-### [1.1.0] - 2025-09-27
+## [1.1.3] - 2025-09-30
 
 ### Added
 
-- Button to copy user's identifier
+- Possibility to copy the private and public RSA key
 
 ### Changed
 
-- Message crypted in AES and aes crypt with the recipent RSA public key.
-- Style of message
+- Delete the subject
+
+### Fixed
+
+/
+
+---
 
 [Full changelog](./docs/changelog.md)
 
