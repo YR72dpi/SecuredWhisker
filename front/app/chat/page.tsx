@@ -1,11 +1,6 @@
 "use client"
 import { Chat, ContactDataForChat } from "@/components/chat";
 import { ContactList } from "@/components/contactList";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable"
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useState } from "react";
 
@@ -23,7 +18,6 @@ export default function Home() {
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
     const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
-    const [nbrContact, setNbrContact] = useState<null | number>(null)
 
     useEffect(() => {
 
