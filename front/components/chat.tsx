@@ -223,11 +223,12 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 <Input
                     type="text"
                     value={input}
+                    disabled={connectionState !== 1}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Écris ton message..."
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
-                <Button onClick={sendMessage}>Envoyer</Button>
+                <Button onClick={sendMessage} disabled={connectionState !== 1} >Envoyer</Button>
             </div>
         </div>
     );
