@@ -180,7 +180,7 @@ export function Chat({ username, userId, contactData }: ChatProps) {
 
             </div>
 
-            <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 bg-gray-100 flex flex-col">
+            <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 flex flex-col">
                 {messages.map((msg, index) => (
                     <div key={index} className={`
                         mb-1 text-sm text-gray-800 p-3 rounded

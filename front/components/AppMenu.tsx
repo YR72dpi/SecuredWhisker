@@ -13,6 +13,7 @@ import { ContactRequest } from "./contactRequest"
 import Link from "next/link"
 import { SwDb } from "@/lib/SwDatabase"
 import { useEffect, useState } from "react"
+import { ThemeToggle } from "./theme-toggle"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -48,7 +49,6 @@ export const AppMenu = ({
                         <Link target="_blank" title="Secured Whisker's changelog" href="https://github.com/YR72dpi/SecuredWhisker/blob/main/docs/changelog.md">
                             <MenubarItem>Changelog</MenubarItem>
                         </Link>
-
                         <MenubarSeparator />
                         <MenubarItem>
                             <span className="text-sm text-gray-500 italic">
@@ -121,6 +121,8 @@ export const AppMenu = ({
 
                     </MenubarContent>
                 </MenubarMenu>
+
+                <ThemeToggle />
             </Menubar>
         </div>
     )
