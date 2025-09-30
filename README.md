@@ -268,17 +268,16 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.1.4] - 2025-09-30
+## [1.1.5] - 2025-09-30
 
 ### Added
 
-- Dark / light theme switch
-- From home page, redirect to the chat if there is a valid JWT Token
-- From chat page, redirect to the home page if there no or invald JWT Token
+- Favicon
+- PWA
 
 ### Changed
 
-- UI between the contacts list and the chat
+/
 
 ### Fixed
 
