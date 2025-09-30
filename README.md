@@ -268,12 +268,11 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.1.5] - 2025-09-30
+## [1.1.6] - 2025-09-30
 
 ### Added
 
-- Favicon
-- PWA
+- Responsive for phone 
 
 ### Changed
 
