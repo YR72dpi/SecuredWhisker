@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ChatLib, MessagePayload } from "@/lib/ChatLib";
@@ -7,6 +7,7 @@ import { RsaLib } from "@/lib/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
 import { AesLib } from "@/lib/AesLib";
 import { ChevronLeftIcon } from "lucide-react";
+import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
 
 export type ContactDataForChat = {
     id: string;
@@ -22,13 +23,6 @@ type ChatProps = {
     setContactData: (newContactData: ContactDataForChat | null) => void
 };
 
-function getApiProtocol() {
-    return process.env.NODE_ENV === "development" ? "http" : "https";
-}
-function getWsProtocol() {
-    return process.env.NODE_ENV === "development" ? "ws" : "wss";
-}
-
 export function Chat({ username, userId, contactData, setContactData }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
@@ -43,10 +37,10 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const room = ChatLib.getRoomName(userId, contactData.id)
     const reconnectInterval = useRef<NodeJS.Timeout>();
 
-    const connectWebSocket = () => {
+    const connectWebSocket = useCallback(() => {
         if (!room) return;
 
-        const socket = new WebSocket(getWsProtocol() + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
+        const socket = new WebSocket(WS_PROTOCOL + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
 
         socket.onopen = () => {
@@ -99,7 +93,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
             console.error(err)
             setConnectionState(-1)
         };
-    }
+    }, [room])
 
     useEffect(() => {
         console.log("Connecting to room:", room);
@@ -111,7 +105,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 clearInterval(reconnectInterval.current);
             }
         };
-    }, [contactData, room]);
+    }, [contactData, room, connectWebSocket]);
 
     // Add new useEffect for reconnection logic
     useEffect(() => {
@@ -126,13 +120,11 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
         else { inputRef.current?.blur() }
 
         return () => {
-            if (reconnectInterval.current)  clearInterval(reconnectInterval.current);
+            if (reconnectInterval.current) clearInterval(reconnectInterval.current);
         };
-    }, [connectionState]);
+    }, [connectionState, connectWebSocket]);
 
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
     const sendMessage = async () => {
         inputRef.current?.blur()
@@ -154,7 +146,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                         "language": selectedLanguage
                     });
 
-                    const response = await fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
+                    const response = await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/translate", {
                         method: "POST",
                         headers: myHeaders,
                         body: raw,

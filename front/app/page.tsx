@@ -3,10 +3,7 @@ import { HomeHeader } from "@/components/HomeHeader";
 import Image from "next/image";
 import { useEffect } from "react";
 import { SwDb } from "@/lib/SwDatabase";
-
-function getApiProtocol() {
-  return process.env.NODE_ENV === "development" ? "http" : "https";
-}
+import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 export default function Home() {
   useEffect(() => {
@@ -23,7 +20,7 @@ export default function Home() {
         redirect: "follow",
       };
 
-      fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+      fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
         .then((response) => {
           if (response.ok) window.location.replace("/chat");
         })

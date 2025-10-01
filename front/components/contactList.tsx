@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 import { ContactDataForChat } from "./chat";
+import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
@@ -14,10 +15,6 @@ type Contact = {
     uniqid: string;
     publicKey: string;
 };
-
-function getApiProtocol() {
-    return process.env.NODE_ENV === "development" ? "http" : "https";
-}
 
 export function ContactList({ onSelectContact, refreshKey, width }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -40,7 +37,7 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
                 redirect: "follow"
             };
 
-            fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contacts", requestOptions)
+            fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contacts", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setContacts(result.data)

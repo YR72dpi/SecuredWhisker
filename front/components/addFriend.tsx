@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { MenubarItem } from "./ui/menubar";
+import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {
@@ -62,7 +63,7 @@ export function AddFriend() {
             redirect: "follow"
         };
 
-        fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
+        fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
             .then(async (response) => {
                 const jsonResponse = await response.json()
                 if (!response.ok) {
@@ -150,8 +151,4 @@ export function AddFriend() {
             )}
         </>
     )
-}
-
-function getApiProtocol() {
-    return process.env.NODE_ENV === "development" ? "http" : "https";
 }

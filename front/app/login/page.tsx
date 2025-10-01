@@ -19,6 +19,7 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 import { HomeHeader } from "@/components/HomeHeader";
+import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -29,10 +30,6 @@ const formSchema = z.object({
       message: "Password must be at least 10 characters.",
     })
 })
-
-function getApiProtocol() {
-  return process.env.NODE_ENV === "development" ? "http" : "https";
-}
 
 export default function Home() {
   
@@ -83,7 +80,7 @@ export default function Home() {
           redirect: "follow",
         };
   
-        fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+        fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
           .then((response) => {
             if (response.ok) window.location.replace("/chat");
           })

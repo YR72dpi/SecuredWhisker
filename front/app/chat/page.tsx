@@ -5,10 +5,7 @@ import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AppMenu } from "@/components/AppMenu";
-
-function getApiProtocol() {
-    return process.env.NODE_ENV === "development" ? "http" : "https";
-}
+import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 function useWindowWidth() {
     const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
@@ -55,7 +52,7 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+            return fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
                 .then((response) => {
                     if (!response.ok) {
                         window.location.replace("/login");

@@ -10,10 +10,7 @@ import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 import { Badge } from "@/components/ui/badge"
 import { MenubarItem } from "./ui/menubar";
-
-function getApiProtocol() {
-    return process.env.NODE_ENV === "development" ? "http" : "https";
-}
+import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 type contactsRequestType = {
     uniqid: string;
@@ -43,7 +40,7 @@ export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
                 redirect: "follow"
             };
 
-            const response = await fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/acceptContact", requestOptions);
+            const response = await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/acceptContact", requestOptions);
 
             if (!response.ok) {
                 throw new Error("Failed to accept contact");
@@ -73,7 +70,7 @@ export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
                 redirect: "follow"
             };
 
-            fetch(getApiProtocol() + "://"+process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
+            fetch(API_PROTOCOL + "://"+process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     if (!cancelled) {
