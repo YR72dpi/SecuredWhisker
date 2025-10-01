@@ -135,7 +135,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     }, [messages]);
 
     const sendMessage = async () => {
-        // inputRef.current?.blur()
+        inputRef.current?.blur()
 
         if (input.trim() !== "" && contactData.publicKey) {
             try {
