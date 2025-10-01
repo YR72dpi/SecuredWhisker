@@ -33,6 +33,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
     const [input, setInput] = useState<string>("")
     const [connectionState, setConnectionState] = useState<number>(0)
 
@@ -43,12 +44,17 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const room = ChatLib.getRoomName(userId, contactData.id)
 
     useEffect(() => {
+        if(connectionState === 1 && inputRef.current) inputRef.current.focus()
+    }, [connectionState])
+
+    useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
     useEffect(() => {
         console.log("Connecting to room:", room);
         if (!room) return;
+
         const socket = new WebSocket(getWsProtocol() + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
         setMessages([]);
@@ -64,7 +70,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 const ivMessage = parsedMessage.aesInitialValue
                 const privateKey = await SwDb.getPrivateKey();
                 const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
-                
+
                 // Ignore silently any crypto errors since it works
                 let decryptAESKey, decryptedMessage;
                 try {
@@ -167,19 +173,19 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 <Button variant="secondary" size="icon" className="size-8" onClick={() => setContactData(null)}>
                     <ChevronLeftIcon />
                 </Button>
-                    <h2 className="flex-auto flex flex-col text-xl font-semibold pl-3">
-                        <div className="flex items-center gap-1">
-                            {contactData.username}
-                            <span className="text-xs">
-                                {connectionState === 0 && " 🟠"}
-                                {connectionState === 1 && ""}
-                                {/* {connectionState === 1 && " 🟢"} */}
-                                {connectionState === -1 && " 🔴"}
-                            </span>
-                        </div>
-                        <span className="text-xs text-gray-500 italic">({contactData.uniqid})</span>
-                    </h2>
-                
+                <h2 className="flex-auto flex flex-col text-xl font-semibold pl-3">
+                    <div className="flex items-center gap-1">
+                        {contactData.username}
+                        <span className="text-xs">
+                            {connectionState === 0 && " 🟠"}
+                            {connectionState === 1 && ""}
+                            {/* {connectionState === 1 && " 🟢"} */}
+                            {connectionState === -1 && " 🔴"}
+                        </span>
+                    </div>
+                    <span className="text-xs text-gray-500 italic">({contactData.uniqid})</span>
+                </h2>
+
                 {showLanguageSelector && (
                     <select
                         value={selectedLanguage}
@@ -223,6 +229,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
 
             <div className="flex gap-2">
                 <Input
+                    ref={inputRef}
                     type="text"
                     value={input}
                     disabled={connectionState !== 1}
@@ -230,7 +237,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                     placeholder="Écris ton message..."
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
-                <Button onClick={sendMessage} disabled={connectionState !== 1} >Envoyer</Button>
+                <Button onClick={sendMessage} disabled={connectionState !== 1}>Envoyer</Button>
             </div>
         </div>
     );
