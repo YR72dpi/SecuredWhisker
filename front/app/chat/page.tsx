@@ -35,7 +35,6 @@ export default function Home() {
     const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
 
     const width = useWindowWidth();
-    console.log(width)
 
     useEffect(() => {
 
@@ -85,7 +84,6 @@ export default function Home() {
     return (
         <>
             <div className="p-3 flex flex-col gap-3">
-
 
                 {(width === undefined || width < 400) ? (
                     <>

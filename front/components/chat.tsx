@@ -34,11 +34,10 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
+    
     const [input, setInput] = useState<string>("")
     const [connectionState, setConnectionState] = useState<number>(0)
-
     const [selectedLanguage, setSelectedLanguage] = useState<string>("");
-
     const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
 
     const room = ChatLib.getRoomName(userId, contactData.id)
