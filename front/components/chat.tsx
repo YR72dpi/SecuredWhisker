@@ -41,26 +41,22 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
 
     const room = ChatLib.getRoomName(userId, contactData.id)
+    const reconnectInterval = useRef<NodeJS.Timeout>();
 
-    useEffect(() => {
-        if(connectionState === 1 && inputRef.current) inputRef.current.focus()
-    }, [connectionState])
-
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-
-    useEffect(() => {
-        console.log("Connecting to room:", room);
+    const connectWebSocket = () => {
         if (!room) return;
-
+        
         const socket = new WebSocket(getWsProtocol() + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
-        setMessages([]);
 
         socket.onopen = () => {
-            setConnectionState(1)
+            setConnectionState(1);
             console.log("Connected");
+            // Clear reconnection interval if connection successful
+            if (reconnectInterval.current) {
+                clearInterval(reconnectInterval.current);
+                reconnectInterval.current = undefined;
+            }
         };
 
         socket.onmessage = async (event) => {
@@ -103,12 +99,35 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
             console.error(err)
             setConnectionState(-1)
         };
+    }
+
+    useEffect(() => {
+        console.log("Connecting to room:", room);
+        connectWebSocket();
 
         return () => {
-            socket.close();
+            ws.current?.close();
+            if (reconnectInterval.current) {
+                clearInterval(reconnectInterval.current);
+            }
         };
-
     }, [contactData, room]);
+
+    // Add new useEffect for reconnection logic
+    useEffect(() => {
+        if (connectionState === 0 && !reconnectInterval.current) {
+            reconnectInterval.current = setInterval(() => {
+                console.log("Attempting to reconnect...");
+                connectWebSocket();
+            }, 500);
+        }
+
+        return () => {
+            if (reconnectInterval.current) {
+                clearInterval(reconnectInterval.current);
+            }
+        };
+    }, [connectionState]);
 
     const sendMessage = async () => {
         if (input.trim() !== "" && contactData.publicKey) {
