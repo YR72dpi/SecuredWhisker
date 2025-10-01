@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
+## [1.1.7] - 2025-10-01
+
+### Added
+
+- autofocus on the input
+-  try to reconnect to websocket server if disconnected
+- manage auto scroll on when there is many message
+- "unfocus" the input after sending message
+
+### Changed
+
+-  delete console log
+
+### Fixed
+
+/
+
+---
+
 ## [1.1.6] - 2025-09-30
 
 ### Added

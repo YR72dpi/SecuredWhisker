@@ -268,16 +268,18 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.1.6] - 2025-09-30
+## [1.1.7] - 2025-10-01
 
 ### Added
 
-- Responsive for phone 
+- autofocus on the input
+-  try to reconnect to websocket server if disconnected
+- manage auto scroll on when there is many message
+- "unfocus" the input after sending message
 
 ### Changed
 
-- Light theme by default
-- Enable system theme
+-  delete console log
 
 ### Fixed
 
