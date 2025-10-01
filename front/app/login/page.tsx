@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { UserApi } from "@/lib/UserApi";
 import { RsaLib } from "@/lib/RsaLib";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
 import { useRouter } from "next/navigation";
@@ -30,6 +30,10 @@ const formSchema = z.object({
     })
 })
 
+function getApiProtocol() {
+  return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+
 export default function Home() {
   
   const [loginError, setLoginError] = useState<string>("")
@@ -43,8 +47,7 @@ export default function Home() {
     },
   })
 
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
     const serverPublicKey = await UserApi.getApiPublicKey();
     const passwordCrypted = await RsaLib.textToCrypted(values.password, serverPublicKey)
@@ -65,6 +68,28 @@ export default function Home() {
     }
     
   }
+
+  useEffect(() => {
+      (async () => {
+        const jwtToken = await SwDb.getJwtToken();
+        if (!jwtToken) return;
+  
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + jwtToken);
+  
+        const requestOptions: RequestInit = {
+          method: "GET",
+          headers: myHeaders,
+          redirect: "follow",
+        };
+  
+        fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+          .then((response) => {
+            if (response.ok) window.location.replace("/chat");
+          })
+          .catch(() => {});
+      })();
+    }, []);
 
   return (
     <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">

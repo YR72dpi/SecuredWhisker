@@ -33,6 +33,10 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 });
 
+function getApiProtocol() {
+  return process.env.NODE_ENV === "development" ? "http" : "https";
+}
+
 export default function Home() {
 
   const [subscribeError, setSubscribeError] = useState<string>("")
@@ -47,6 +51,8 @@ export default function Home() {
       confirmPassword: "",
     },
   });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => setPendingValues(values)
 
   useEffect(() => {
     if (!pendingValues) return;
@@ -82,9 +88,27 @@ export default function Home() {
     doSubmit()
   }, [pendingValues, router])
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setPendingValues(values)
-  }
+  useEffect(() => {
+    (async () => {
+      const jwtToken = await SwDb.getJwtToken();
+      if (!jwtToken) return;
+
+      const myHeaders = new Headers();
+      myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+      const requestOptions: RequestInit = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+
+      fetch(getApiProtocol() + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+        .then((response) => {
+          if (response.ok) window.location.replace("/chat");
+        })
+        .catch(() => { });
+    })();
+  }, []);
 
   return (
     <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">
