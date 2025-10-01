@@ -34,7 +34,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
-    
+
     const [input, setInput] = useState<string>("")
     const [connectionState, setConnectionState] = useState<number>(0)
     const [selectedLanguage, setSelectedLanguage] = useState<string>("");
@@ -45,7 +45,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
 
     const connectWebSocket = () => {
         if (!room) return;
-        
+
         const socket = new WebSocket(getWsProtocol() + "://" + process.env.NEXT_PUBLIC_MESSAGE_HOST + `/ws?room=${room}`);
         ws.current = socket;
 
@@ -122,14 +122,21 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
             }, 500);
         }
 
+        if (connectionState === 1 && inputRef.current) { inputRef.current.focus() }
+        else { inputRef.current?.blur() }
+
         return () => {
-            if (reconnectInterval.current) {
-                clearInterval(reconnectInterval.current);
-            }
+            if (reconnectInterval.current)  clearInterval(reconnectInterval.current);
         };
     }, [connectionState]);
 
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     const sendMessage = async () => {
+        // inputRef.current?.blur()
+
         if (input.trim() !== "" && contactData.publicKey) {
             try {
                 let messageToSend = input;
