@@ -166,21 +166,9 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
         }
     }
 
-    // Add viewport height handler
-    useEffect(() => {
-        const updateHeight = () => {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-        };
-
-        updateHeight();
-        window.addEventListener('resize', updateHeight);
-        return () => window.removeEventListener('resize', updateHeight);
-    }, []);
-
     return (
-        <div className="flex flex-col h-[90dvh] h-[calc(90*var(--vh,1vh))]">
-            <div className="mb-2 flex items-center justify-between shrink-0">
+        <div className="flex flex-col h-[90vh]">
+            <div className="mb-2 flex items-center justify-between">
                 <Button variant="secondary" size="icon" className="size-8" onClick={() => setContactData(null)}>
                     <ChevronLeftIcon />
                 </Button>
@@ -222,7 +210,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
 
             </div>
 
-            <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto border rounded-md p-2 mb-4 flex flex-col">
                 {messages.map((msg, index) => (
                     <div key={index} className={`
                         mb-1 text-sm text-gray-800 p-3 
@@ -238,7 +226,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 <div ref={bottomRef} />
             </div>
 
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-2">
                 <Input
                     ref={inputRef}
                     type="text"
