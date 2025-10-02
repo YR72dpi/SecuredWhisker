@@ -14,6 +14,8 @@ import Link from "next/link"
 import { SwDb } from "@/lib/SwDatabase"
 import { useEffect, useState } from "react"
 import { ThemeToggle } from "./theme-toggle"
+import { QRCodeTransmetter } from "./QRCode/QRCodeTransmetter"
+import { QRCodeReceiver } from "./QRCode/QRCodeReceiver"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -39,7 +41,7 @@ export const AppMenu = ({
         init()
     }, [])
 
-    const classForOverride = (width === undefined || width < 400) ? "flex flex-col width-[50%] items-start border-none" : ""
+    const classForOverride = (width === undefined || width < 400) ? "flex flex-col width-[50%] items-start border-none h-[15vh]" : ""
 
     return (
         <div>
@@ -65,10 +67,11 @@ export const AppMenu = ({
                 <MenubarMenu>
                     <MenubarTrigger>Security</MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem>
-                            <div className="flex gap-2 items-center">
-                                <div>Copy my private key</div>
-                                {privateKey && (
+
+                        {privateKey && (
+                            <MenubarItem>
+                                <div className="flex gap-2 items-center">
+                                    <div>Copy my private key</div>
                                     <CopyButton
                                         onClick={(e) => e.preventDefault()}
                                         size="sm"
@@ -76,9 +79,10 @@ export const AppMenu = ({
                                         content={atob(privateKey)}
                                         onCopy={() => console.log("Private Key copied!")}
                                     />
-                                )}
-                            </div>
-                        </MenubarItem>
+
+                                </div>
+                            </MenubarItem>
+                        )}
                         <MenubarItem>
                             <div className="flex gap-2 items-center">
                                 <div>Copy my public key</div>
@@ -93,9 +97,10 @@ export const AppMenu = ({
                                 )}
                             </div>
                         </MenubarItem>
-                        {/* <MenubarItem>Transmet my private to another divices</MenubarItem> */}
-                        {/* <MenubarSeparator /> */}
-                        {/* <MenubarItem>Change My private key</MenubarItem> */}
+                        <MenubarSeparator />
+
+                        <QRCodeTransmetter />  <QRCodeReceiver />
+
                     </MenubarContent>
                 </MenubarMenu>
 

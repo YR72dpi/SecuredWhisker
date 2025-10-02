@@ -1,6 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 
-interface PrivateKey {
+export interface PrivateKey {
   privateKey: string;
 }
 
@@ -48,4 +48,3 @@ class SwDatabase extends Dexie {
 }
 
 export const SwDb = new SwDatabase();
-export type { PrivateKey };

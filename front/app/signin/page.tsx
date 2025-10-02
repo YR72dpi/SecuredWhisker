@@ -55,7 +55,6 @@ export default function Home() {
     if (!pendingValues) return;
 
     const doSubmit = async () => {
-      console.log(pendingValues)
       const serverPublicKey = await UserApi.getApiPublicKey();
       const passwordCrypted = await RsaLib.textToCrypted(pendingValues.password, serverPublicKey)
 

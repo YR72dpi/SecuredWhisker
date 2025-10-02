@@ -2,10 +2,12 @@
 import { Chat, ContactDataForChat } from "@/components/chat";
 import { ContactList } from "@/components/contactList";
 import { SwDb } from "@/lib/SwDatabase";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AppMenu } from "@/components/AppMenu";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
 
 function useWindowWidth() {
     const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
@@ -23,10 +25,13 @@ function useWindowWidth() {
 }
 
 export default function Home() {
+    const [canShowPage, setCanShowPage] = useState(false)
+
     const [identifier, setIdentifier] = useState<string | null>(null)
     const [userId, setUserId] = useState<string | null>(null)
     const [username, setUsername] = useState<string | null>(null)
     const [publicKey, setPublicKey] = useState<string | null>(null)
+    const hasPrivateKey = useRef<boolean>(false)
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
     const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
@@ -42,6 +47,9 @@ export default function Home() {
                 window.location.replace("/login");
                 return;
             }
+
+            const privateKeyInterface = await SwDb.getPrivateKey()
+            hasPrivateKey.current = privateKeyInterface ? true : false
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);
@@ -69,20 +77,50 @@ export default function Home() {
                     setUsername(result.username)
                     setUserId(result.id)
                     setPublicKey(result.publicKey)
+                    setCanShowPage(true)
+
                 })
                 .catch((error) => {
                     console.error(error);
                     window.location.replace("/login");
                 });
         })()
-
     }, [])
 
     return (
-        <>
-            <div className="p-3 flex flex-col gap-3">
 
-                {(width === undefined || width < 400) ? (
+        canShowPage && (
+            <div className="p-3 flex flex-col gap-3" >
+
+                {(width && width >= 400) ? (
+                    <>
+                        <AppMenu
+                            identifier={identifier}
+                            publicKey={publicKey}
+                            onContactAccepted={() => setContactsRefreshKey(k => k + 1)}
+                            width={width}
+                        />
+
+                        {hasPrivateKey.current && identifier && !selectedContact && (
+                            <>
+                                <ContactList
+                                    onSelectContact={setSelectedContact}
+                                    refreshKey={contactsRefreshKey}
+                                    width={width}
+                                />
+                            </>
+                        )}
+
+                        {hasPrivateKey.current && username && selectedContact && userId && (
+                            <Chat
+                                username={username}
+                                userId={userId}
+                                contactData={selectedContact}
+                                setContactData={setSelectedContact}
+                            />
+                        )}
+                    </>
+                ) : (
                     <>
                         <Tabs defaultValue="chat">
                             <TabsList>
@@ -100,7 +138,7 @@ export default function Home() {
                             </TabsContent>
                             <TabsContent value="chat">
 
-                                {identifier && !selectedContact && (
+                                {hasPrivateKey.current && identifier && !selectedContact && (
                                     <>
                                         <ContactList
                                             onSelectContact={setSelectedContact}
@@ -110,7 +148,7 @@ export default function Home() {
                                     </>
                                 )}
 
-                                {username && selectedContact && userId && (
+                                {hasPrivateKey.current && username && selectedContact && userId && (
                                     <Chat
                                         username={username}
                                         userId={userId}
@@ -118,43 +156,39 @@ export default function Home() {
                                         setContactData={setSelectedContact}
                                     />
                                 )}
+
                             </TabsContent>
                         </Tabs>
                     </>
-                ) : (
-                    <>
-                        <AppMenu
-                            identifier={identifier}
-                            publicKey={publicKey}
-                            onContactAccepted={() => setContactsRefreshKey(k => k + 1)}
-                            width={width}
-                        />
 
-                        {identifier && !selectedContact && (
-                            <>
-                                <ContactList
-                                    onSelectContact={setSelectedContact}
-                                    refreshKey={contactsRefreshKey}
-                                    width={width}
-                                />
-                            </>
-                        )}
-
-                        {username && selectedContact && userId && (
-                            <Chat
-                                username={username}
-                                userId={userId}
-                                contactData={selectedContact}
-                                setContactData={setSelectedContact}
-                            />
-                        )}
-                    </>
                 )}
 
+                {
+                    !hasPrivateKey.current && (
 
-            </div>
+                        <Alert variant="destructive">
+                            <AlertCircleIcon />
+                            <AlertTitle className="font-bold">No private key here 😥</AlertTitle>
+                            <AlertDescription>
+                                <p>To decode your message, you need to have your private key on this browser</p>
+                                <ul className="list-inside list-disc text-sm">
+                                    <li>
+                                        On the browser where you subscribe: Menu bar {">"} Security {">"} Private key transfert (tx)
+                                    </li>
+                                    <li>
+                                        On the this browser: Menu bar {">"} Security {">"} Private key transfert (rx)
+                                    </li>
+                                </ul>
+                            </AlertDescription>
+                        </Alert>
+                    )
+                }
 
-        </>
+            </div >
+        )
+
+
+
     );
 }
 

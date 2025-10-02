@@ -1,3 +1,4 @@
+import { Buffer64 } from "./Buffer64";
 
 export type KeyPair = {
   publicKey: string
@@ -16,13 +17,13 @@ export class RsaLib {
       publicKey,
       encoded
     );
-    return RsaLib.arrayBufferToBase64(encrypted);
+    return Buffer64.arrayBufferToBase64(encrypted);
   }
 
   static async cryptedToText(encryptedText: string, privateKeyPem: string): Promise<string> {
     // Convertir PEM en ArrayBuffer
     const privateKey = await RsaLib.importPrivateKey(privateKeyPem);
-    const encryptedBuffer = RsaLib.base64ToArrayBuffer(encryptedText);
+    const encryptedBuffer = Buffer64.base64ToArrayBuffer(encryptedText) as BufferSource;
     const decrypted = await window.crypto.subtle.decrypt(
       { name: "RSA-OAEP" },
       privateKey,
@@ -51,8 +52,8 @@ export class RsaLib {
     const publicKeyBuffer = await window.crypto.subtle.exportKey('spki', keyPair.publicKey);
 
     // Conversion ArrayBuffer -> base64
-    const privateKeyBase64 = this.arrayBufferToBase64(privateKeyBuffer);
-    const publicKeyBase64 = this.arrayBufferToBase64(publicKeyBuffer);
+    const privateKeyBase64 = Buffer64.arrayBufferToBase64(privateKeyBuffer);
+    const publicKeyBase64 = Buffer64.arrayBufferToBase64(publicKeyBuffer);
 
     // Format PEM
     const privateKeyPem = this.formatPem(privateKeyBase64, 'PRIVATE');
@@ -65,15 +66,6 @@ export class RsaLib {
 
   }
 
-  private static arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  }
-
   private static formatPem(base64: string, type: string): string {
     const lines = base64.match(/.{1,64}/g) || [];
     return `-----BEGIN ${type} KEY-----\n${lines.join('\n')}\n-----END ${type} KEY-----`;
@@ -83,7 +75,7 @@ export class RsaLib {
   private static async importPublicKey(pem: string): Promise<CryptoKey> {
     // Nettoyer le PEM
     const b64 = pem.replace(/-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\n/g, '');
-    const binaryDer = RsaLib.base64ToArrayBuffer(b64);
+    const binaryDer = Buffer64.base64ToArrayBuffer(b64) as BufferSource;
     return window.crypto.subtle.importKey(
       'spki',
       binaryDer,
@@ -95,7 +87,7 @@ export class RsaLib {
 
   private static async importPrivateKey(pem: string): Promise<CryptoKey> {
     const b64 = pem.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, '');
-    const binaryDer = RsaLib.base64ToArrayBuffer(b64);
+    const binaryDer = Buffer64.base64ToArrayBuffer(b64) as BufferSource;
     return window.crypto.subtle.importKey(
       'pkcs8',
       binaryDer,
@@ -104,15 +96,4 @@ export class RsaLib {
       ['decrypt']
     );
   }
-
-  private static base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binary_string = atob(base64);
-    const len = binary_string.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
-  }
-
 }

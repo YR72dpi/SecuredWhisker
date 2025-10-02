@@ -54,40 +54,34 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
     }, [refreshKey])
 
     return (
-            <>
-                {isLoading ? (<p>Loading....</p>) : ""}
-                {error !== "" && <p className="text-red-500">{error}</p>}
-                {!isLoading && error === "" && (
-                    contacts.length === 0 ? (
-                        <p>No contact</p>
-                    ) : (
-                        <>
-                            <span className={classForOverrideForTitle}>Contacts ({contacts === null ? "Loading..." : contacts.length})</span>
-                            <ul className="mt-2 space-y-2 flex flex-col items-center">
-                                {contacts.map((contact, index) => (
-                                    <li
-                                        key={index}
-                                        className={"border-b p break-all w-[300px] max-w-[90%]" + classForOverrideForList}
-                                        onClick={() => {
-                                            onSelectContact(
-                                                {
-                                                    id: contact.id,
-                                                    username: contact.username,
-                                                    uniqid: contact.uniqid,
-                                                    publicKey: contact.publicKey
-                                                }
-                                            );
-                                        }}
-                                    >
-                                        {contact.username ?? "Unnamed contact"}
-                                        <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </>
-                    )
-                )
-            }
+        <>
+
+            {error !== "" && <p className="text-red-500">{error}</p>}
+
+            <span className={classForOverrideForTitle}>{isLoading ? (<p>Loading....</p>) : "Contacts"} {contacts !== null && !isLoading && ("("+ contacts.length+")")}</span>
+            <ul className="mt-2 space-y-2 flex flex-col items-center">
+                {contacts.map((contact, index) => (
+                    <li
+                        key={index}
+                        className={"border-b p break-all w-[300px] max-w-[90%]" + classForOverrideForList}
+                        onClick={() => {
+                            onSelectContact(
+                                {
+                                    id: contact.id,
+                                    username: contact.username,
+                                    uniqid: contact.uniqid,
+                                    publicKey: contact.publicKey
+                                }
+                            );
+                        }}
+                    >
+                        {contact.username ?? "Unnamed contact"}
+                        <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
+                    </li>
+                ))}
+            </ul>
+
+
         </>
     )
 }
