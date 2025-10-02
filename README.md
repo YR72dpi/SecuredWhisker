@@ -268,18 +268,15 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.1.7] - 2025-10-01
+## [1.1.8] - 2025-10-02
 
 ### Added
 
-- autofocus on the input
--  try to reconnect to websocket server if disconnected
-- manage auto scroll on when there is many message
-- "unfocus" the input after sending message
+- Ability to transfer the private key from one browser to another using a QR code or manual entry
 
 ### Changed
 
--  delete console log
+/
 
 ### Fixed
 
