@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { MenubarItem } from "../ui/menubar"
 import { SwDb } from "@/lib/SwDatabase";
@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
-import { QrReader } from "react-qr-reader";
+import { BrowserQRCodeReader } from "@zxing/browser";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -35,6 +35,9 @@ export const QRCodeReceiver = () => {
 
     const [transfertCodeMode, setTransfertCodeMode] = useState<TransfertMode.QRCODE | TransfertMode.MANUAL | null>()
 
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const codeReaderRef = useRef<BrowserQRCodeReader | null>(null);
+
     const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
         resolver: zodResolver(passwordFormSchema),
         defaultValues: {
@@ -58,6 +61,46 @@ export const QRCodeReceiver = () => {
         const transfertCodeFromForm = transfertCodeForm.watch("transfertCode");
         setTransfertCode(transfertCodeFromForm);
     }
+
+    const startQRScanner = async () => {
+        if (!videoRef.current) return;
+
+        try {
+            const codeReader = new BrowserQRCodeReader();
+            codeReaderRef.current = codeReader;
+
+            const videoInputDevices = await codeReader.listVideoInputDevices();
+            
+            // Préférer la caméra arrière
+            const selectedDeviceId = videoInputDevices.length > 0 
+                ? videoInputDevices[videoInputDevices.length - 1].deviceId 
+                : undefined;
+
+            await codeReader.decodeFromVideoDevice(
+                selectedDeviceId,
+                videoRef.current,
+                (result, error) => {
+                    if (result) {
+                        setTransfertCode(result.getText());
+                        stopQRScanner();
+                    }
+                    if (error && !(error.name === 'NotFoundException')) {
+                        console.error(error);
+                    }
+                }
+            );
+        } catch (error) {
+            console.error("Error starting QR scanner:", error);
+            alert("Impossible d'accéder à la caméra. Veuillez vérifier les permissions.");
+        }
+    };
+
+    const stopQRScanner = () => {
+        if (codeReaderRef.current) {
+            codeReaderRef.current.reset();
+            codeReaderRef.current = null;
+        }
+    };
 
     const fetchCryptedRSAKeyPayload = async (): Promise<{ message: string, privateKeyPayload: string, server_time: string }> => {
         const jwtToken = await SwDb.getJwtToken()
@@ -95,8 +138,21 @@ export const QRCodeReceiver = () => {
             setTransfertCodeMode(null)
             passwordForm.reset()
             transfertCodeForm.reset()
+            stopQRScanner()
         }
     }, [open])
+
+    useEffect(() => {
+        if (transfertCodeMode === TransfertMode.QRCODE) {
+            startQRScanner();
+        } else {
+            stopQRScanner();
+        }
+
+        return () => {
+            stopQRScanner();
+        };
+    }, [transfertCodeMode]);
 
     useEffect(() => {
         (async () => {
@@ -165,27 +221,22 @@ export const QRCodeReceiver = () => {
                         ) : (
                             transfertCodeMode === TransfertMode.QRCODE ? (
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className="w-full max-w-md">
-                                        <QrReader
-                                            onResult={(result, error) => {
-                                                if (result) {
-                                                    setTransfertCode(result.getText());
-                                                }
-                                                if (error) {
-                                                    console.info(error);
-                                                }
-                                            }}
-                                            constraints={{ facingMode: "environment" }}
-                                            containerStyle={{ width: "100%" }}
-                                            videoStyle={{ width: "100%" }}
+                                    <div className="relative w-full max-w-md aspect-video bg-black rounded-lg overflow-hidden">
+                                        <video
+                                            ref={videoRef}
+                                            className="w-full h-full object-cover"
                                         />
+                                        <div className="absolute inset-0 border-4 border-green-500 opacity-50 m-8"></div>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
                                         Positionnez le QR code devant la caméra
                                     </p>
                                     <Button
                                         variant="outline"
-                                        onClick={() => setTransfertCodeMode(null)}
+                                        onClick={() => {
+                                            stopQRScanner();
+                                            setTransfertCodeMode(null);
+                                        }}
                                     >
                                         Annuler
                                     </Button>
