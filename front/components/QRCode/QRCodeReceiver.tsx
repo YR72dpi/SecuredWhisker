@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
-import { BrowserQRCodeReader } from "@zxing/browser";
+import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -36,7 +36,7 @@ export const QRCodeReceiver = () => {
     const [transfertCodeMode, setTransfertCodeMode] = useState<TransfertMode.QRCODE | TransfertMode.MANUAL | null>()
 
     const videoRef = useRef<HTMLVideoElement>(null);
-    const codeReaderRef = useRef<BrowserQRCodeReader | null>(null);
+    const controlsRef = useRef<IScannerControls | null>(null);
 
     const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
         resolver: zodResolver(passwordFormSchema),
@@ -67,16 +67,35 @@ export const QRCodeReceiver = () => {
 
         try {
             const codeReader = new BrowserQRCodeReader();
-            codeReaderRef.current = codeReader;
 
-            const videoInputDevices = await codeReader.listVideoInputDevices();
-            
-            // Préférer la caméra arrière
-            const selectedDeviceId = videoInputDevices.length > 0 
-                ? videoInputDevices[videoInputDevices.length - 1].deviceId 
-                : undefined;
+            const videoInputDevices = await BrowserQRCodeReader.listVideoInputDevices();
 
-            await codeReader.decodeFromVideoDevice(
+            // Filtrer les caméras virtuelles et préférer les caméras physiques
+            const physicalCameras = videoInputDevices.filter(device =>
+                !device.label.toLowerCase().includes('obs') &&
+                !device.label.toLowerCase().includes('virtual') &&
+                !device.label.toLowerCase().includes('snap')
+            );
+
+            // Préférer la caméra arrière (environment) ou la dernière caméra physique
+            let selectedDeviceId: string | undefined;
+
+            if (physicalCameras.length > 0) {
+                // Chercher une caméra arrière
+                const backCamera = physicalCameras.find(device =>
+                    device.label.toLowerCase().includes('back') ||
+                    device.label.toLowerCase().includes('rear') ||
+                    device.label.toLowerCase().includes('environment')
+                );
+
+                selectedDeviceId = backCamera
+                    ? backCamera.deviceId
+                    : physicalCameras[physicalCameras.length - 1].deviceId;
+            } else if (videoInputDevices.length > 0) {
+                selectedDeviceId = videoInputDevices[0].deviceId;
+            }
+
+            const controls = await codeReader.decodeFromVideoDevice(
                 selectedDeviceId,
                 videoRef.current,
                 (result, error) => {
@@ -89,6 +108,8 @@ export const QRCodeReceiver = () => {
                     }
                 }
             );
+
+            controlsRef.current = controls;
         } catch (error) {
             console.error("Error starting QR scanner:", error);
             alert("Impossible d'accéder à la caméra. Veuillez vérifier les permissions.");
@@ -96,9 +117,9 @@ export const QRCodeReceiver = () => {
     };
 
     const stopQRScanner = () => {
-        if (codeReaderRef.current) {
-            codeReaderRef.current.reset();
-            codeReaderRef.current = null;
+        if (controlsRef.current) {
+            controlsRef.current.stop();
+            controlsRef.current = null;
         }
     };
 
