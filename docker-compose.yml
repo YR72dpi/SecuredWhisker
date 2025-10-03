@@ -80,6 +80,7 @@ services:
         NEXT_PUBLIC_USER_HOST: ${SERVER_HOST}
         NEXT_PUBLIC_MESSAGE_HOST: ${SOCKET_HOST}
         NEXT_PUBLIC_APP_VERSION: ${VERSION}
+        NEXT_PUBLIC_IP_WHITELIST: ${IP_WHITELIST}
     restart: always
     ports:
       - ${NEXTJS_PORT}:3000
