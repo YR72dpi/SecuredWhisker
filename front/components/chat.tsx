@@ -127,7 +127,6 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
     const sendMessage = async () => {
-        inputRef.current?.blur()
 
         if (input.trim() !== "" && contactData.publicKey) {
             try {
