@@ -292,16 +292,15 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 
 ## To improve it
 
-- 2FA
 - Create groups
-- React-native front
-- Gateway if necessary
 - Crypt private key on local storage in AES with the user password
-- Connect with other device with private key transfers
 - send image (transmit the base64) (which means that you have to determine the type of message)
 - everything that passes through the web socket in TLV
 - make it https less
 - passing all of the stack in typescript (no php) (or in Go, who know ?)
+- add friends by QR Code
+- save messages
+- Contact list auto reload
 
 ## Support me 😘
 
