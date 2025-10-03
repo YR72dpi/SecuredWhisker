@@ -59,7 +59,7 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
 
             {error !== "" && <p className="text-red-500">{error}</p>}
 
-            <span className={classForOverrideForTitle}>{isLoading ? (<p>Loading....</p>) : "Contacts"} {contacts !== null && !isLoading && ("("+ contacts.length+")")}</span>
+            <span className={classForOverrideForTitle}>{isLoading ? (<p>Loading....</p>) : "Contacts"} {contacts !== null && !isLoading && ("(" + contacts.length + ")")}</span>
             <ul className="mt-2 space-y-2 flex flex-col items-center">
                 {contacts.map((contact, index) => (
                     <li

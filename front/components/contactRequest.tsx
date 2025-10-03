@@ -76,9 +76,7 @@ export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
                     if (!cancelled) {
                         setContactsRequest(result.data)
                         setIsLoading(false)
-                        setTimeout(() => {
-                            getContactRequest();
-                        }, 5000); // 5 secondes d'attente avant le prochain appel
+                        setTimeout(() => { getContactRequest(); }, 5000);
                     }
                 })
                 .catch((error) => console.error(error));
