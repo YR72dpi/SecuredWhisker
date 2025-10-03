@@ -27,10 +27,12 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
     useEffect(() => {
         const getContacts = async () => {
             const jwtToken = await SwDb.getJwtToken()
+            if (!jwtToken) { window.location.replace("/login"); return; }
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("Authorization", "Bearer " + jwtToken);
+
             const requestOptions: RequestInit = {
                 method: "GET",
                 headers: myHeaders,
