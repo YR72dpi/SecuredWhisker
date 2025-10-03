@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
+## [1.1.9] - 2025-10-XX
+
+### Added
+
+/
+
+### Changed
+
+/
+
+### Fixed
+
+- View messages at the bottom of the chatbox as on all other chat applications
+
+---
+
 ## [1.1.8] - 2025-10-02
 
 ### Added
