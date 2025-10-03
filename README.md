@@ -300,6 +300,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - passing all of the stack in typescript (no php) (or in Go, who know ?)
 - add friends by QR Code
 - save messages
+- offline page
 
 ## Support me 😘
 
