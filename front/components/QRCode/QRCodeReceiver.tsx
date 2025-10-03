@@ -74,12 +74,13 @@ export const QRCodeReceiver = () => {
             const physicalCameras = videoInputDevices.filter(device =>
                 !device.label.toLowerCase().includes('obs') &&
                 !device.label.toLowerCase().includes('virtual') &&
+                !device.label.toLowerCase().includes('screen') &&
                 !device.label.toLowerCase().includes('snap')
             );
 
             // Préférer la caméra arrière (environment) ou la dernière caméra physique
             let selectedDeviceId: string | undefined;
-
+            
             if (physicalCameras.length > 0) {
                 // Chercher une caméra arrière
                 const backCamera = physicalCameras.find(device =>
@@ -242,12 +243,12 @@ export const QRCodeReceiver = () => {
                         ) : (
                             transfertCodeMode === TransfertMode.QRCODE ? (
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className="relative w-full max-w-md aspect-video bg-black rounded-lg overflow-hidden">
+                                    <div className="relative w-full max-w-md aspect-square bg-black rounded-lg overflow-hidden">
                                         <video
                                             ref={videoRef}
                                             className="w-full h-full object-cover"
                                         />
-                                        <div className="absolute inset-0 border-4 border-green-500 opacity-50 m-8"></div>
+                                        <div className="absolute inset-0 border-4 border-white   opacity-50 m-8"></div>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
                                         Position the QR code in front of the camera.
