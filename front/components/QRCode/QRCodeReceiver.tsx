@@ -112,7 +112,7 @@ export const QRCodeReceiver = () => {
             controlsRef.current = controls;
         } catch (error) {
             console.error("Error starting QR scanner:", error);
-            alert("Impossible d'accéder à la caméra. Veuillez vérifier les permissions.");
+            alert("Unable to access the camera. Please check permissions.");
         }
     };
 
@@ -250,7 +250,7 @@ export const QRCodeReceiver = () => {
                                         <div className="absolute inset-0 border-4 border-green-500 opacity-50 m-8"></div>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
-                                        Positionnez le QR code devant la caméra
+                                        Position the QR code in front of the camera.
                                     </p>
                                     <Button
                                         variant="outline"
