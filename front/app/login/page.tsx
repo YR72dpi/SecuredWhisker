@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert"
 import { HomeHeader } from "@/components/HomeHeader";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
+import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -32,8 +33,10 @@ const formSchema = z.object({
 })
 
 export default function Home() {
-  
+
   const [loginError, setLoginError] = useState<string>("")
+  const [canShowPage, setCanShowPage] = useState<boolean>(false)
+
   const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,79 +66,70 @@ export default function Home() {
       setLoginError("")
       router.push("/chat")
     }
-    
+
   }
 
   useEffect(() => {
-      (async () => {
-        const jwtToken = await SwDb.getJwtToken();
-        if (!jwtToken) return;
-  
-        const myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer " + jwtToken);
-  
-        const requestOptions: RequestInit = {
-          method: "GET",
-          headers: myHeaders,
-          redirect: "follow",
-        };
-  
-        fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
-          .then((response) => {
-            if (response.ok) window.location.replace("/chat");
-          })
-          .catch(() => {});
-      })();
-    }, []);
+    (async () => {
+
+      const jwtToken = await JwtTokenLib.getValidatedJwtTokenOrRedirect()
+      if (jwtToken) window.location.replace("/chat");
+      else setCanShowPage(true)
+      
+    })();
+  }, []);
 
   return (
-    <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">
-      <HomeHeader title="Log in"/>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Submit</Button>
-        </form>
-      </Form>
+    canShowPage && (
+      <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">
+        <HomeHeader title="Log in" />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Submit</Button>
+          </form>
+        </Form>
 
-      {loginError !== "" && (
-        <Alert variant="destructive" className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {loginError}
-          </AlertDescription>
-        </Alert>
-      )}
+        {loginError !== "" && (
+          <Alert variant="destructive" className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              {loginError}
+            </AlertDescription>
+          </Alert>
+        )}
 
-      <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
-        Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
-      </a>
-    </div>
+        <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
+          Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
+        </a>
+      </div>
+    )
+
   );
 }

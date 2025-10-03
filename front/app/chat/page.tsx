@@ -8,6 +8,7 @@ import { AppMenu } from "@/components/AppMenu";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
+import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
 function useWindowWidth() {
     const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
@@ -42,11 +43,8 @@ export default function Home() {
 
         (async () => {
 
-            const jwtToken = await SwDb.getJwtToken()
-            if (!jwtToken) {
-                window.location.replace("/login");
-                return;
-            }
+            const jwtToken = await JwtTokenLib.getValidatedJwtTokenOrRedirect(true)
+            if (!jwtToken) return;
 
             const privateKeyInterface = await SwDb.getPrivateKey()
             hasPrivateKey.current = privateKeyInterface ? true : false
@@ -61,18 +59,8 @@ export default function Home() {
             };
 
             return fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
-                .then((response) => {
-                    if (!response.ok) {
-                        window.location.replace("/login");
-                        return;
-                    }
-                    return response.json();
-                })
+                .then((response) => response.json())
                 .then((result) => {
-                    if (!result?.identifier) {
-                        window.location.replace("/login");
-                        return;
-                    }
                     setIdentifier(result.identifier)
                     setUsername(result.username)
                     setUserId(result.id)
@@ -80,10 +68,7 @@ export default function Home() {
                     setCanShowPage(true)
 
                 })
-                .catch((error) => {
-                    console.error(error);
-                    window.location.replace("/login");
-                });
+                .catch((error) => console.error(error));
         })()
     }, [])
 
