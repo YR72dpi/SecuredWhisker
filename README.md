@@ -41,6 +41,7 @@ The __RSA private key is stored in your browser__. If you clean up “Cookies an
 - Send / receive message
 - Translate messages (with chatGPT)
 - Copy Rsa key pair if needed
+- Secure transfer of private keys via QR code or manual entry
 
 ## How to use 🤔
 
@@ -268,19 +269,21 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.1.8] - 2025-10-02
+## [1.1.9] - 2025-10-03
 
 ### Added
 
-- Ability to transfer the private key from one browser to another using a QR code or manual entry
+/
 
 ### Changed
 
-/
+- Some UI elements
+- QR code reader square shapped
+- Some wording
 
 ### Fixed
 
-/
+- View messages at the bottom of the chatbox as on all other chat applications
 
 ---
 
