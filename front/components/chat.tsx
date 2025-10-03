@@ -208,7 +208,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                         onChange={e => setSelectedLanguage(e.target.value)}
                         className="mb-2 p-2 border rounded"
                     >
-                        <option value="">Language selection</option>
+                        <option value="">Translate your messages</option>
                         <option value="french">Français</option>
                         <option value="english">English</option>
                         <option value="spanish">Español</option>
@@ -250,10 +250,10 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                     value={input}
                     disabled={connectionState !== 1}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Écris ton message..."
+                    placeholder="Write your message..."
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
-                <Button onClick={sendMessage} disabled={connectionState !== 1}>Envoyer</Button>
+                <Button onClick={sendMessage} disabled={connectionState !== 1}>Send</Button>
             </div>
         </div>
     );
