@@ -35,7 +35,6 @@ export default function Home() {
     const hasPrivateKey = useRef<boolean>(false)
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
-    const [contactsRefreshKey, setContactsRefreshKey] = useState(0)
 
     const width = useWindowWidth();
 
@@ -82,7 +81,6 @@ export default function Home() {
                         <AppMenu
                             identifier={identifier}
                             publicKey={publicKey}
-                            onContactAccepted={() => setContactsRefreshKey(k => k + 1)}
                             width={width}
                         />
 
@@ -90,7 +88,6 @@ export default function Home() {
                             <>
                                 <ContactList
                                     onSelectContact={setSelectedContact}
-                                    refreshKey={contactsRefreshKey}
                                     width={width}
                                 />
                             </>
@@ -117,7 +114,6 @@ export default function Home() {
                                 <AppMenu
                                     identifier={identifier}
                                     publicKey={publicKey}
-                                    onContactAccepted={() => setContactsRefreshKey(k => k + 1)}
                                     width={width}
                                 />
                             </TabsContent>

@@ -20,14 +20,12 @@ import { QRCodeReceiver } from "./QRCode/QRCodeReceiver"
 type AppMenuProps = {
     identifier: string | null,
     publicKey: string | null,
-    onContactAccepted?: () => void,
     width: number | undefined
 }
 
 export const AppMenu = ({
     identifier,
     publicKey,
-    onContactAccepted,
     width
 }: AppMenuProps) => {
     const version = process.env.NEXT_PUBLIC_APP_VERSION
@@ -126,7 +124,7 @@ export const AppMenu = ({
                         <MenubarSeparator />
 
                         <AddFriend />
-                        <ContactRequest onContactAccepted={onContactAccepted} />
+                        <ContactRequest />
 
                     </MenubarContent>
                 </MenubarMenu>

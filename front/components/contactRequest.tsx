@@ -17,11 +17,7 @@ type contactsRequestType = {
     username?: string;
 }
 
-type ContactRequestProps = {
-    onContactAccepted?: () => void;
-};
-
-export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
+export function ContactRequest() {
     const [contactsRequest, setContactsRequest] = useState<contactsRequestType[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -48,17 +44,16 @@ export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
 
             // Retirer le contact accepté de la liste
             setContactsRequest((prev) => prev.filter((contact) => contact.uniqid !== uniqid));
-            if (onContactAccepted) onContactAccepted();
         } catch (error) {
             console.error(error);
         }
     };
 
     useEffect(() => {
-        let cancelled = false;
 
         const getContactRequest = async () => {
             const jwtToken = await SwDb.getJwtToken()
+            if (!jwtToken) { window.location.replace("/login"); return; }
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -70,41 +65,38 @@ export function ContactRequest({ onContactAccepted }: ContactRequestProps) {
                 redirect: "follow"
             };
 
-            fetch(API_PROTOCOL + "://"+process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
+            fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/contactRequest", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
-                    if (!cancelled) {
-                        setContactsRequest(result.data)
-                        setIsLoading(false)
-                        setTimeout(() => { getContactRequest(); }, 5000);
-                    }
+                    setContactsRequest(result.data)
+                    setIsLoading(false)
                 })
                 .catch((error) => console.error(error));
         }
 
         getContactRequest()
+        const intervalId = setInterval(() => { getContactRequest() }, 5000)
 
-        return () => {
-            cancelled = true;
-        };
+        return () => clearInterval(intervalId);
+
     }, [])
 
     return (
         <>
             <Dialog>
                 <DialogTrigger asChild>
-                <MenubarItem 
-                    onSelect={(e) => e.preventDefault()}
-                    className="flex items-center justify-between gap-2"
-                >
-                    <span>Contacts Request</span>
-                    {contactsRequest.length > 0 && (
-                        <Badge variant="destructive" className="ml-auto">
-                            {contactsRequest.length}
-                        </Badge>
-                    )}
-                </MenubarItem>
-            </DialogTrigger>
+                    <MenubarItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="flex items-center justify-between gap-2"
+                    >
+                        <span>Contacts Request</span>
+                        {contactsRequest.length > 0 && (
+                            <Badge variant="destructive" className="ml-auto">
+                                {contactsRequest.length}
+                            </Badge>
+                        )}
+                    </MenubarItem>
+                </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Contacts Request</DialogTitle>

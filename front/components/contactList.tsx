@@ -25,6 +25,7 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
     const classForOverrideForList = (width === undefined || width < 400) ? "" : "text-center"
 
     useEffect(() => {
+
         const getContacts = async () => {
             const jwtToken = await SwDb.getJwtToken()
             if (!jwtToken) { window.location.replace("/login"); return; }
@@ -44,7 +45,6 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
                 .then((result) => {
                     setContacts(result.data)
                     setIsLoading(false)
-                    setTimeout(() => { getContacts() }, 5000)
                 })
                 .catch((error) => {
                     console.error(error)
@@ -54,7 +54,11 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
         }
 
         getContacts()
-    }, [refreshKey])
+        const intervalId = setInterval(() => { getContacts() }, 5000)
+
+        return () => clearInterval(intervalId);
+        
+    }, [])
 
     return (
         <>
