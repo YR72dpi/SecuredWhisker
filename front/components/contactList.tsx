@@ -42,6 +42,7 @@ export function ContactList({ onSelectContact, refreshKey, width }: ContactListP
                 .then((result) => {
                     setContacts(result.data)
                     setIsLoading(false)
+                    setTimeout(() => { getContacts() }, 5000)
                 })
                 .catch((error) => {
                     console.error(error)
