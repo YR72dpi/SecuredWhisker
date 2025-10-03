@@ -6,7 +6,7 @@ import { ChatLib, MessagePayload } from "@/lib/ChatLib";
 import { RsaLib } from "@/lib/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
 import { AesLib } from "@/lib/AesLib";
-import { ChevronLeftIcon } from "lucide-react";
+import { ChevronLeftIcon, Send } from "lucide-react";
 import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
 
 export type ContactDataForChat = {
@@ -243,7 +243,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 <div ref={bottomRef} />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 h-11">
                 <Input
                     ref={inputRef}
                     type="text"
@@ -252,8 +252,15 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Write your message..."
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    className="h-full"
                 />
-                <Button onClick={sendMessage} disabled={connectionState !== 1}>Send</Button>
+                <Button 
+                    onClick={sendMessage}  disabled={connectionState !== 1} 
+                    variant="outline" className="flex-[0 1 44px] h-full"
+                    title="Send"
+                >
+                    <Send />
+                </Button>
             </div>
         </div>
     );
