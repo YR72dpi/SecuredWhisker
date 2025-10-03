@@ -269,22 +269,19 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.1.9] - 2025-10-03
+## [1.2.0] - 2025-10-03
 
 ### Added
 
-/
+- IP white list on front end
 
 ### Changed
 
-- Some UI elements
-- QR code reader square shapped
-- Some wording
+/
 
 ### Fixed
 
-- View messages at the bottom of the chatbox as on all other chat applications
-
+/
 ---
 
 [Full changelog](./docs/changelog.md)
