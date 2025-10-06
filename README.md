@@ -269,19 +269,21 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.2.0] - 2025-10-03
+## [1.3.0] - 2025-10-06
 
 ### Added
 
-- IP white list on front end
+- PWA offline page
+- ability to save message
 
 ### Changed
 
-/
+- reload contact list
 
 ### Fixed
 
-/
+- svg visible in denied access page
+
 ---
 
 [Full changelog](./docs/changelog.md)
@@ -299,8 +301,6 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - make it https less
 - passing all of the stack in typescript (no php) (or in Go, who know ?)
 - add friends by QR Code
-- save messages
-- offline page
 
 ## Support me 😘
 
