@@ -8,6 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+/
+
+### Changed
+
+- error management on fetching server public key
+
+### Fixed
+
+- svg visible in denied access page
+
+---
+
+## [1.3.0] - 2025-10-06
+
+### Added
+
 - PWA offline page
 - ability to save message
 
