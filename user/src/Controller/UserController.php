@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller;
 
 use App\Entity\User;
 use App\Kernel;

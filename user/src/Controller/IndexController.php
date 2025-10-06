@@ -28,7 +28,6 @@ class IndexController extends AbstractController
             $isDbConnectionOk = true;
         } catch (\Throwable $th) {
             $isDbConnectionOk = false;
-            dump($th);
         }
         return $this->json([
             'message' => "That's Secured Whisker's user micro service",

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller\Protected;
 
 use App\Entity\MessageRegister;
 use App\Repository\MessageRegisterRepository;
@@ -64,7 +64,7 @@ class MessagesController extends AbstractController
     public function getMessage(
         string $roomId,
         LoggerInterface $logger,
-        MessageRegisterRepository $messageRegisterRepository,
+        getMessageRegisterRepository $messageRegisterRepository,
         Security $security
     ): JsonResponse {
         try {

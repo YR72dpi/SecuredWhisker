@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller\Protected;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\Attribute\Route;

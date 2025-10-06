@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller\Protected;
 
 use App\Entity\Friendship;
 use App\Repository\FriendshipRepository;
