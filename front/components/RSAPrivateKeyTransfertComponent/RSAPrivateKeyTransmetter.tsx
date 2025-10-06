@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { MenubarItem } from "../ui/menubar"
-import { RSAKeyTransmission } from "@/lib/RsaPrivateKeyTransfert/RSAKeyTransmission";
+import { RSAKeyTransmission } from "@/lib/RsaPrivateKeyTransfert/TransfertEncryptionManager";
 import { SwDb } from "@/lib/SwDatabase";
 import QRCode from 'qrcode';
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
@@ -10,7 +10,7 @@ import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateK
 import { CopyButton } from "../ui/shadcn-io/copy-button";
 import Image from "next/image"
 
-export const QRCodeTransmetter = () => {
+export const RSAPrivateKeyTransmetter = () => {
     const [open, setOpen] = useState<boolean>(false)
 
     const [privateKey, setPrivateKey] = useState<string | null>(null)

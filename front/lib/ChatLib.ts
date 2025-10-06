@@ -29,6 +29,7 @@ export class ChatLib {
         return JSON.stringify(payloadObject)
     }
 
+    // TODO : make the room name less guessable
     static getRoomName(id1: string, id2: string) {
         return [id1, id2].sort().join("");
     }

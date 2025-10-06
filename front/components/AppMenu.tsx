@@ -14,8 +14,8 @@ import Link from "next/link"
 import { SwDb } from "@/lib/SwDatabase"
 import { useEffect, useState } from "react"
 import { ThemeToggle } from "./theme-toggle"
-import { QRCodeTransmetter } from "./QRCode/QRCodeTransmetter"
-import { QRCodeReceiver } from "./QRCode/QRCodeReceiver"
+import { RSAPrivateKeyTransmetter } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyTransmetter"
+import { RSAPrivateKeyReceiver } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyReceiver"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -97,7 +97,8 @@ export const AppMenu = ({
                         </MenubarItem>
                         <MenubarSeparator />
 
-                        <QRCodeTransmetter />  <QRCodeReceiver />
+                        <RSAPrivateKeyTransmetter /> 
+                        <RSAPrivateKeyReceiver />
 
                     </MenubarContent>
                 </MenubarMenu>

@@ -1,4 +1,4 @@
-import { RSAKeyTransmission } from "./RSAKeyTransmission";
+import { RSAKeyTransmission } from "./TransfertEncryptionManager";
 
 export class RsaPrivateKeyTransfert {
     

@@ -25,7 +25,7 @@ const manunalIdFormSchema = z.object({
     transfertCode: z.string()
 });
 
-export const QRCodeReceiver = () => {
+export const RSAPrivateKeyReceiver = () => {
     const [open, setOpen] = useState<boolean>(false)
 
     const [privateKey, setPrivateKey] = useState<string | null>(null)
