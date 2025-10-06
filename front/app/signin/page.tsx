@@ -11,7 +11,6 @@ import { RsaLib } from "@/lib/RsaLib";
 import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
-
 import {
   Alert,
   AlertDescription,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/alert"
 import { useRouter } from "next/navigation";
 import { HomeHeader } from "@/components/HomeHeader";
-import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
 const formSchema = z.object({
@@ -90,7 +88,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
 
-      const jwtToken = await JwtTokenLib.getValidatedJwtTokenOrRedirect()
+      const jwtToken = await JwtTokenLib.isValidJwtToken()
       if (jwtToken) window.location.replace("/chat");
       else setCanShowPage(true)
 

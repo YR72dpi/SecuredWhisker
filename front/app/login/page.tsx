@@ -19,7 +19,6 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 import { HomeHeader } from "@/components/HomeHeader";
-import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
 const formSchema = z.object({
@@ -72,7 +71,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
 
-      const jwtToken = await JwtTokenLib.getValidatedJwtTokenOrRedirect()
+      const jwtToken = await JwtTokenLib.isValidJwtToken()
       if (jwtToken) window.location.replace("/chat");
       else setCanShowPage(true)
       

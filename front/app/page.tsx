@@ -2,8 +2,6 @@
 import { HomeHeader } from "@/components/HomeHeader";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { SwDb } from "@/lib/SwDatabase";
-import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
 export default function Home() {
@@ -12,7 +10,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
 
-      const jwtToken = await JwtTokenLib.getValidatedJwtTokenOrRedirect()
+      const jwtToken = await JwtTokenLib.isValidJwtToken()
       if (jwtToken) window.location.replace("/chat");
       else setCanShowPage(true)
       

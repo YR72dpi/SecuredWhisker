@@ -42,8 +42,9 @@ export default function Home() {
 
         (async () => {
 
-            const jwtToken = await JwtTokenLib.getValidatedJwtTokenOrRedirect(true)
-            if (!jwtToken) return;
+            const jwtToken = await JwtTokenLib.isValidJwtToken()
+            if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtToken)
+            if (!jwtToken) window.location.replace("/");
 
             const privateKeyInterface = await SwDb.getPrivateKey()
             hasPrivateKey.current = privateKeyInterface ? true : false

@@ -3,9 +3,10 @@ import { SwDb } from "./SwDatabase";
 
 export class JwtTokenLib {
 
-    static async getValidatedJwtTokenOrRedirect(redirect: boolean|null = null): Promise<string | null> {
+    static async isValidJwtToken(): Promise<string | boolean> {
+
         const jwtToken = await SwDb.getJwtToken()
-        if (!jwtToken && redirect) { window.location.replace("/"); return null }
+        if (!jwtToken) { return false }
 
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + jwtToken);
@@ -16,26 +17,21 @@ export class JwtTokenLib {
             redirect: "follow"
         };
 
-        await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+        return await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
             .then((response) => {
-                if (!response.ok) {
-                    if (redirect) window.location.replace("/");
-                    return null;
-                }
+                if (!response.ok) return false
                 return response.json();
             })
             .then((result) => {
-                if (!result?.identifier) {
-                    if (redirect) window.location.replace("/");
-                    return null;
+                if (result?.identifier) {
+                    return jwtToken
+                } else {
+                    return false;
                 }
             })
             .catch((error) => {
                 console.error(error);
-                if (redirect) window.location.replace("/");
-                return null;
+                return false;
             });
-
-        return jwtToken
     }
 }
