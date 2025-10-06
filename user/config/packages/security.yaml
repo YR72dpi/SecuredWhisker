@@ -20,7 +20,7 @@ security:
                 - App\Security\CustomAuthenticator
         
         api:
-            pattern: ^/api/protected
+            pattern: ^/api/
             stateless: true
             provider: app_user_provider
             jwt: ~

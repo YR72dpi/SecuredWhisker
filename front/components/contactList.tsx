@@ -5,7 +5,6 @@ import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
-    refreshKey?: number,
     width: number | undefined
 };
 
@@ -16,7 +15,7 @@ type Contact = {
     publicKey: string;
 };
 
-export function ContactList({ onSelectContact, refreshKey, width }: ContactListProps) {
+export function ContactList({ onSelectContact, width }: ContactListProps) {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");

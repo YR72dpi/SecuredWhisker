@@ -19,11 +19,24 @@ export type ContactDataForChat = {
 type ChatProps = {
     username: string;
     userId: string;
+    userPublicKey: string
     contactData: ContactDataForChat;
     setContactData: (newContactData: ContactDataForChat | null) => void
 };
 
-export function Chat({ username, userId, contactData, setContactData }: ChatProps) {
+type RecoverRegisteredMessage = {
+    message: string
+    messagesRegistered: string[]
+    server_time: string
+}
+
+export function Chat({
+    username,
+    userId,
+    userPublicKey,
+    contactData,
+    setContactData
+}: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -32,6 +45,8 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
     const [input, setInput] = useState<string>("")
     const [connectionState, setConnectionState] = useState<number>(0)
     const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+    const [haveToSaveMessage, setHaveToSaveMessage] = useState<boolean>(true);
+    const [isSavedMessagesPrinted, setIsSavedMessagePrint] = useState<boolean>(false)
     const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
 
     const room = ChatLib.getRoomName(userId, contactData.id)
@@ -51,6 +66,7 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 clearInterval(reconnectInterval.current);
                 reconnectInterval.current = undefined;
             }
+
         };
 
         socket.onmessage = async (event) => {
@@ -95,37 +111,6 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
         };
     }, [room])
 
-    useEffect(() => {
-        console.log("Connecting to room:", room);
-        connectWebSocket();
-
-        return () => {
-            ws.current?.close();
-            if (reconnectInterval.current) {
-                clearInterval(reconnectInterval.current);
-            }
-        };
-    }, [contactData, room, connectWebSocket]);
-
-    // Add new useEffect for reconnection logic
-    useEffect(() => {
-        if (connectionState === 0 && !reconnectInterval.current) {
-            reconnectInterval.current = setInterval(() => {
-                console.log("Attempting to reconnect...");
-                connectWebSocket();
-            }, 500);
-        }
-
-        if (connectionState === 1 && inputRef.current) { inputRef.current.focus() }
-        else { inputRef.current?.blur() }
-
-        return () => {
-            if (reconnectInterval.current) clearInterval(reconnectInterval.current);
-        };
-    }, [connectionState, connectWebSocket]);
-
-    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-
     const sendMessage = async () => {
 
         if (input.trim() !== "" && contactData.publicKey) {
@@ -167,15 +152,40 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                 const AESKeyCryptedWithRSA = await RsaLib.textToCrypted(AESKey, publicKeyPem)
                 // formater le payload
 
-                const formatedMessage = ChatLib.format({
+                const formatedMessageReceiver = ChatLib.format({
                     fromUsername: username,
                     messageCryptedAES: aesCryptedMessage.encryptedData,
                     aesInitialValue: aesCryptedMessage.iv,
                     aesKeyCryptedRSA: AESKeyCryptedWithRSA
                 });
-                ws.current?.send(formatedMessage);
 
-                setMessages(prev => [...prev, { from: "Me", message: messageToSend }]);
+                if (haveToSaveMessage) {
+                    // recup la clé public
+                    const userPublicKeyPem = atob(userPublicKey);
+                    // recup la clé aes
+                    const userAESKey = await AesLib.generateAESKey()
+                    // chiffrer le message en aes
+                    const userAesCryptedMessage = await AesLib.textToCrypted(messageToSend, userAESKey)
+                    // chiffré la clé aes avec la clé public
+                    const userAESKeyCryptedWithRSA = await RsaLib.textToCrypted(userAESKey, userPublicKeyPem)
+                    // formater le payload
+
+                    const formatedMessageSender = ChatLib.format({
+                        fromUsername: username,
+                        messageCryptedAES: userAesCryptedMessage.encryptedData,
+                        aesInitialValue: userAesCryptedMessage.iv,
+                        aesKeyCryptedRSA: userAESKeyCryptedWithRSA
+                    });
+
+                    saveMessages(
+                        formatedMessageSender,
+                        formatedMessageReceiver
+                    )
+                }
+
+                ws.current?.send(formatedMessageReceiver);
+
+                setMessages(prev => [...prev, { from: username, message: messageToSend }]);
                 setInput("");
             } catch (e) {
                 console.error("Encryption error:", e);
@@ -183,9 +193,165 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
         }
     }
 
+    const saveMessages = async (
+        formatedMessageForSender: string,
+        formatedMessageForReceiver: string
+    ) => {
+
+        const jwtToken = await SwDb.getJwtToken()
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+        const raw = JSON.stringify([
+            {
+                room: room,
+                payload: formatedMessageForReceiver,
+                forWhom: contactData.id
+            },
+            {
+                room: room,
+                payload: formatedMessageForSender,
+                forWhom: userId
+            }
+        ]);
+
+        const requestOptions: RequestInit = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/messages", requestOptions)
+            .then(async (response) => {
+                const jsonResponse = await response.json()
+                if (!response.ok) throw new Error(jsonResponse.message || "Erreur inconnue");
+                return jsonResponse
+            })
+            .then(() => {
+
+            })
+            .catch((error) => {
+                console.error(error)
+            });
+    }
+
+    const showSavedMessage = async () => {
+        if (!isSavedMessagesPrinted) {
+            let cancelled = false;
+
+            (async () => {
+                try {
+                    const jwtToken = await SwDb.getJwtToken();
+                    const privateKey = await SwDb.getPrivateKey();
+
+                    const myHeaders = new Headers();
+                    myHeaders.append("Content-Type", "application/json");
+                    myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+                    const response = await fetch(
+                        API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/messages/" + room,
+                        {
+                            method: "GET",
+                            headers: myHeaders,
+                            redirect: "follow"
+                        }
+                    );
+
+                    if (!response.ok) throw new Error("Error during fetching saved messages");
+
+                    const result = await response.json() as RecoverRegisteredMessage;
+                    console.log(result);
+
+                    if (cancelled) return;
+
+                    // Décrypter tous les messages d'abord
+                    const decryptedMessages: { from: string, message: string }[] = [];
+
+                    for (const payloadString of result.messagesRegistered) {
+                        console.log(payloadString);
+                        try {
+                            const payload = JSON.parse(payloadString) as MessagePayload;
+
+                            const decryptAESKey = await RsaLib.cryptedToText(
+                                payload.aesKeyCryptedRSA,
+                                atob(privateKey?.privateKey || "")
+                            );
+
+                            const decryptedMessage = await AesLib.cryptedToText(
+                                payload.messageCryptedAES,
+                                payload.aesInitialValue,
+                                decryptAESKey
+                            );
+
+                            decryptedMessages.push({
+                                from: payload.fromUsername,
+                                message: decryptedMessage
+                            });
+                        } catch (err) {
+                            console.error("Error during decrypt saved message:", err);
+                        }
+                    }
+
+                    if (!cancelled && decryptedMessages.length > 0) setMessages(prev => [...prev, ...decryptedMessages]);
+                    if (!cancelled) setIsSavedMessagePrint(true);
+
+                } catch (error) {
+                    console.error(error);
+                    if (!cancelled) {
+                        setIsSavedMessagePrint(true); // Marquer comme tenté même en cas d'erreur
+                    }
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }
+    }
+
+    useEffect(() => {
+        console.log("Connecting to room:", room);
+        connectWebSocket();
+
+        return () => {
+            ws.current?.close();
+            if (reconnectInterval.current) {
+                clearInterval(reconnectInterval.current);
+            }
+        };
+    }, [room, connectWebSocket]);
+
+    // Add new useEffect for reconnection logic
+    useEffect(() => {
+
+        if (connectionState === 0 && !reconnectInterval.current) {
+            reconnectInterval.current = setInterval(() => {
+                console.log("Attempting to reconnect...");
+                connectWebSocket();
+            }, 1000);
+        }
+
+        if (connectionState === 1 && inputRef.current) {
+            showSavedMessage()
+            inputRef.current.focus()
+        } else {
+            inputRef.current?.blur()
+        }
+
+        return () => {
+            if (reconnectInterval.current) clearInterval(reconnectInterval.current);
+        };
+
+    }, [connectionState, connectWebSocket]);
+
+    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
     return (
-        <div className="flex flex-col h-[90vh]">
-            <div className="mb-2 flex items-center justify-between">
+        <div className="flex flex-col h-[calc(90vh)] gap-3">
+            <div className="flex items-center justify-between">
                 <Button variant="secondary" size="icon" className="size-8" onClick={() => setContactData(null)}>
                     <ChevronLeftIcon />
                 </Button>
@@ -201,66 +367,81 @@ export function Chat({ username, userId, contactData, setContactData }: ChatProp
                     </div>
                     <span className="text-xs text-gray-500 italic">({contactData.uniqid})</span>
                 </h2>
+            </div>
 
-                {showLanguageSelector && (
-                    <select
-                        value={selectedLanguage}
-                        onChange={e => setSelectedLanguage(e.target.value)}
-                        className="mb-2 p-2 border rounded"
-                    >
-                        <option value="">Translate your messages</option>
-                        <option value="french">Français</option>
-                        <option value="english">English</option>
-                        <option value="spanish">Español</option>
-                        <option value="deutsch">Deutsch</option>
-                        <option value="portuguese">Português</option>
-                        <option value="italian">Italiano</option>
-                        {/* dont supported for some reason, maybe utf8 or something like that
+            <div className="flex-1 justify-end overflow-y-auto border rounded-md p-2 flex flex-col">
+                {messages.map((msg, index) => (
+                    <div key={index} className={`
+                        mb-1 text-sm text-gray-800 p-3 
+                        ${msg.from === username ?
+                            "self-end text-right bg-gray-300 [border-radius:5px_5px_0_5px]" :
+                            "self-start text-left bg-blue-300 [border-radius:5px_5px_5px_0px]"
+                        }
+                    `}>
+                        <div className="flex flex-col items-start max-w-[75%]">
+                            <span className="font-semibold">{msg.from}: </span>
+                            {msg.message}
+                        </div>
+                    </div>
+                ))}
+                <div ref={bottomRef} />
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <div className="flex justify-between gap-2 h-11 items-center">
+                    <div className="flex items-center gap-2">
+                        <Input
+                            type="checkbox"
+                            id="checkBoxSaveMessage"
+                            className="h-11 w-11"
+                            checked={haveToSaveMessage}
+                            onChange={e => setHaveToSaveMessage(e.target.checked)}
+                        />
+                        <label htmlFor="checkBoxSaveMessage">Save Message</label>
+                    </div>
+
+                    {showLanguageSelector && (
+                        <select
+                            value={selectedLanguage}
+                            onChange={e => setSelectedLanguage(e.target.value)}
+                            className="p-2 border h-11 rounded"
+                        >
+                            <option value="">Translate your messages</option>
+                            <option value="french">Français</option>
+                            <option value="english">English</option>
+                            <option value="spanish">Español</option>
+                            <option value="deutsch">Deutsch</option>
+                            <option value="portuguese">Português</option>
+                            <option value="italian">Italiano</option>
+                            {/* dont supported for some reason, maybe utf8 or something like that
                         <option value="chinese">中文</option>
                         <option value="japanese">日本語</option>
                         <option value="korean">한국어</option>
                         <option value="russian">Русский</option>
                         <option value="arabic">العربية</option>
                         <option value="hindi">हिन्दी</option> */}
-                    </select>
-                )}
-
-            </div>
-
-            <div className="flex-1 justify-end overflow-y-auto border rounded-md p-2 mb-4 flex flex-col">
-                {messages.map((msg, index) => (
-                    <div key={index} className={`
-                        mb-1 text-sm text-gray-800 p-3 
-                        ${msg.from === "Me" ?
-                            "self-end text-right bg-gray-300 [border-radius:5px_5px_0_5px]" :
-                            "self-start text-left bg-blue-300 [border-radius:5px_5px_5px_0px]"
-                        }
-                    `}>
-                        {/* <span className="font-semibold">{msg.from}:</span>  */}
-                        {msg.message}
-                    </div>
-                ))}
-                <div ref={bottomRef} />
-            </div>
-
-            <div className="flex gap-2 h-11">
-                <Input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    disabled={connectionState !== 1}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Write your message..."
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    className="h-full"
-                />
-                <Button 
-                    onClick={sendMessage}  disabled={connectionState !== 1} 
-                    variant="outline" className="flex-[0 1 44px] h-full"
-                    title="Send"
-                >
-                    <Send />
-                </Button>
+                        </select>
+                    )}
+                </div>
+                <div className="flex gap-2 h-11">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={input}
+                        disabled={connectionState !== 1 && isSavedMessagesPrinted}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Write your message..."
+                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                        className="h-full"
+                    />
+                    <Button
+                        onClick={sendMessage} disabled={connectionState !== 1 && isSavedMessagesPrinted}
+                        variant="outline" className="flex-[0 1 44px] h-full"
+                        title="Send"
+                    >
+                        <Send />
+                    </Button>
+                </div>
             </div>
         </div>
     );

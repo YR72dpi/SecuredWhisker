@@ -75,7 +75,7 @@ export class AesLib {
 
   /* === Utility function === */
 
-  private static arrayBufferToBase64(buffer: ArrayBuffer|Uint8Array<ArrayBuffer>): string {
+  private static arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array<ArrayBuffer>): string { 
     const bytes = new Uint8Array(buffer);
     let binary = '';
     for (let i = 0; i < bytes.byteLength; i++) {

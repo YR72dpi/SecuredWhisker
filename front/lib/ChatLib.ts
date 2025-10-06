@@ -1,6 +1,14 @@
 
-export type MessagePayload = {
+export type MessagePayloadParams = {
     fromUsername: string
+    messageCryptedAES : string,
+    aesInitialValue: string,
+    aesKeyCryptedRSA : string
+}
+
+export type MessagePayload = {
+    fromUsername: string,
+    dateTime: Date
     messageCryptedAES : string,
     aesInitialValue: string,
     aesKeyCryptedRSA : string
@@ -8,13 +16,17 @@ export type MessagePayload = {
 
 export class ChatLib {
 
-    static format(payload: MessagePayload) {
-        return JSON.stringify({
+    static format(payload: MessagePayloadParams) : string {
+
+        const payloadObject : MessagePayload = {
             fromUsername: payload.fromUsername,
+            dateTime: (new Date()),
             messageCryptedAES: payload.messageCryptedAES,
             aesInitialValue: payload.aesInitialValue,
             aesKeyCryptedRSA : payload.aesKeyCryptedRSA
-        })
+        }
+
+        return JSON.stringify(payloadObject)
     }
 
     static getRoomName(id1: string, id2: string) {

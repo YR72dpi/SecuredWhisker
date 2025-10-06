@@ -94,10 +94,11 @@ export default function Home() {
                             </>
                         )}
 
-                        {hasPrivateKey.current && username && selectedContact && userId && (
+                        {publicKey && hasPrivateKey.current && username && selectedContact && userId && (
                             <Chat
                                 username={username}
                                 userId={userId}
+                                userPublicKey={publicKey}
                                 contactData={selectedContact}
                                 setContactData={setSelectedContact}
                             />
@@ -124,16 +125,16 @@ export default function Home() {
                                     <>
                                         <ContactList
                                             onSelectContact={setSelectedContact}
-                                            refreshKey={contactsRefreshKey}
                                             width={width}
                                         />
                                     </>
                                 )}
 
-                                {hasPrivateKey.current && username && selectedContact && userId && (
+                                {publicKey && hasPrivateKey.current && username && selectedContact && userId && (
                                     <Chat
                                         username={username}
                                         userId={userId}
+                                        userPublicKey={publicKey}
                                         contactData={selectedContact}
                                         setContactData={setSelectedContact}
                                     />

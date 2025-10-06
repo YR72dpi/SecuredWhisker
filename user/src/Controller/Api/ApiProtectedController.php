@@ -2,11 +2,9 @@
 
 namespace App\Controller\Api;
 
-use ApiPlatform\Metadata\Parameter;
 use App\Entity\Friendship;
 use App\Repository\FriendshipRepository;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,8 +32,8 @@ class ApiProtectedController extends AbstractController
         $user = $security->getUser();
 
         if (!$user) return $this->json([
-            'message' => 'ok',
-        ], 404);
+            'message' => 'not ok',
+        ], JsonResponse::HTTP_UNAUTHORIZED);
 
         return $this->json([
             'message' => 'ok',
