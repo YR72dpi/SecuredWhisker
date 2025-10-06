@@ -8,6 +8,7 @@ import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Button } from "../ui/button";
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
 import { CopyButton } from "../ui/shadcn-io/copy-button";
+import Image from "next/image"
 
 export const QRCodeTransmetter = () => {
     const [open, setOpen] = useState<boolean>(false)
@@ -114,9 +115,11 @@ export const QRCodeTransmetter = () => {
                     {qrCodeUrl === "" ? 'Generating...' : (
                         <>
                             <figure className="flex flex-col gap-5">
-                                <img
+                                <Image
                                     src={qrCodeUrl}
-                                    alt="QR Code"
+                                    alt="Qr code to scan to transfert private key"
+                                    width={300}
+                                    height={300}
                                     className="mx-auto border-4 border-gray-200 rounded-lg"
                                 />
                                 <figcaption className="flex gap-3 justify-center">
