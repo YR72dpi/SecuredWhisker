@@ -29,7 +29,8 @@ export class UserApi {
 
             try {
                 return publicKey;
-            } catch (decodeError) {
+            } catch (err) {
+                console.error(err)
                 throw new Error('Error decoding base64 public key');
             }
 
