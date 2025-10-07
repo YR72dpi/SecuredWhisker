@@ -64,7 +64,7 @@ class MessagesController extends AbstractController
     public function getMessage(
         string $roomId,
         LoggerInterface $logger,
-        getMessageRegisterRepository $messageRegisterRepository,
+        MessageRegisterRepository $messageRegisterRepository,
         Security $security
     ): JsonResponse {
         try {
