@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - beta
+      - main
 
 jobs:
   deploy:
@@ -13,19 +13,15 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan ${{secrets.ip}} >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-          
-      - name: Checkout du dépôt
-        uses: actions/checkout@v4
-        with:
-          ref: beta
 
-      - name: Démarrer l'agent SSH
-        uses: webfactory/ssh-agent@v0.9.0
+      - uses: actions/checkout@v4
+            # Make sure the @v0.9.0 matches the current version of the action
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      - name: Mettre à jour le dépôt distant
-        run: ssh debian@${{ secrets.ip }} "cd ~/SecuredWhisker && git pull origin beta"
+      - name: Mettre à jour (git pull)
+        run: ssh debian@${{secrets.ip}} "cd ~/SecuredWhisker && git pull origin main"
 
       - name: Redémarrage du docker
         run: ssh debian@${{secrets.ip}} "cd ~/SecuredWhisker && sudo docker compose up -d --build --force-recreate"
