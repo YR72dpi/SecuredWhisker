@@ -44,7 +44,6 @@ security:
         - { path: ^/api/protected, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/messages, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/qrcodce, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/user, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
