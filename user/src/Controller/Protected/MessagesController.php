@@ -42,7 +42,7 @@ class MessagesController extends AbstractController
                     ->setRoomId($roomId)
                     ->setDateTime($now)
                     ->setForWhom($forWhom)
-                    ->setMessagePayload($payload);
+                    ->setMessagePayload(json_encode($payload));
 
                 $em->persist($message);
             }
@@ -74,7 +74,12 @@ class MessagesController extends AbstractController
 
             // $roomIdHash = hash('sha256', $this->appSecret . $roomId);
             $messagesRegistered = $messageRegisterRepository->getMessages($roomId, $userId);
-            $messageRegisteredPayloadOnly = array_column($messagesRegistered, "message_payload");
+            $messageRegisteredPayloadOnlyStringList = array_column($messagesRegistered, "message_payload");
+
+            $messageRegisterPayload = [];
+            foreach($messageRegisteredPayloadOnlyStringList as $messageRegisteredPayloadOnlyString) {
+                $messageRegisterPayload[] = json_decode($messageRegisteredPayloadOnlyString);
+            }
 
         } catch (\Exception $err) {
             $logger->error("Error when saving message: " . $err->getMessage());
@@ -85,7 +90,7 @@ class MessagesController extends AbstractController
 
         return new JsonResponse([
             "message" => "ok",
-            "messagesRegistered" => $messageRegisteredPayloadOnly
+            "messagesRegistered" => $messageRegisterPayload
         ], Response::HTTP_OK);
     }
 }

@@ -18,7 +18,7 @@ export type MessagePayload = {
 
 export class ChatLib {
 
-    static format(payload: MessagePayloadParams) : string {
+    static format(payload: MessagePayloadParams, returnObject: boolean = false) : MessagePayload|string {
 
         const payloadObject : MessagePayload = {
             fromUsername: payload.fromUsername,
@@ -29,7 +29,7 @@ export class ChatLib {
             aesKeyCryptedRSA : payload.aesKeyCryptedRSA
         }
 
-        return JSON.stringify(payloadObject)
+        return returnObject ? payloadObject : JSON.stringify(payloadObject)
     }
 
     // TODO : make the room name less guessable

@@ -27,7 +27,7 @@ type ChatProps = {
 
 type RecoverRegisteredMessage = {
     message: string
-    messagesRegistered: string[]
+    messagesRegistered: MessagePayload[]
     server_time: string
 }
 
@@ -114,7 +114,7 @@ export function Chat({
 
     const sendMessage = async () => {
 
-        if (input.trim() !== "" && contactData.publicKey) {
+        if (input.trim() !== "" && contactData.publicKey && userPublicKey) {
             try {
                 let messageToSend = input;
 
@@ -161,7 +161,7 @@ export function Chat({
                     messageCryptedAES: aesCryptedMessageForContact.encryptedData,
                     aesInitialValue: aesCryptedMessageForContact.iv,
                     aesKeyCryptedRSA: contactAESKeyCryptedWithRSA
-                });
+                }, true) as MessagePayload;
 
                 if (haveToSaveMessage) {
                     // recup la clé public
@@ -180,7 +180,7 @@ export function Chat({
                         messageCryptedAES: aesCryptedMessageForCurrentUser.encryptedData,
                         aesInitialValue: aesCryptedMessageForCurrentUser.iv,
                         aesKeyCryptedRSA: currentUserAESKeyCryptedWithRSA
-                    });
+                    }, true) as MessagePayload;
 
                     await saveMessages(
                         formatedMessageSender,
@@ -188,7 +188,7 @@ export function Chat({
                     )
                 }
 
-                ws.current?.send(formatedMessageReceiver);
+                ws.current?.send(JSON.stringify(formatedMessageReceiver));
 
                 setMessages(prev => [...prev, { from: username, message: messageToSend }]);
                 setInput("");
@@ -199,8 +199,8 @@ export function Chat({
     }
 
     const saveMessages = async (
-        formatedMessageForSender: string,
-        formatedMessageForReceiver: string
+        formatedMessageForSender: MessagePayload,
+        formatedMessageForReceiver: MessagePayload
     ) => {
 
         const jwtToken = await SwDb.getJwtToken()
@@ -250,59 +250,59 @@ export function Chat({
                     const jwtToken = await SwDb.getJwtToken();
                     const privateKey = await SwDb.getPrivateKey();
 
-                    const myHeaders = new Headers();
-                    myHeaders.append("Content-Type", "application/json");
-                    myHeaders.append("Authorization", "Bearer " + jwtToken);
 
-                    const response = await fetch(
-                        API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/messages/" + room,
-                        {
-                            method: "GET",
-                            headers: myHeaders,
-                            redirect: "follow"
+                    if (privateKey && privateKey.privateKey && jwtToken) {
+
+                        const myHeaders = new Headers();
+                        myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+                        const response = await fetch(
+                            API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/messages/" + room,
+                            {
+                                method: "GET",
+                                headers: myHeaders,
+                                redirect: "follow"
+                            }
+                        );
+
+                        if (!response.ok) throw new Error("Error during fetching saved messages");
+
+                        const result = await response.json() as RecoverRegisteredMessage;
+
+                        if (cancelled) return;
+
+                        const decryptedMessages: { from: string, message: string }[] = [];
+
+                        for (const payloadString of result.messagesRegistered) {
+                            try {
+                                const payload = payloadString as MessagePayload;
+                                const decryptAESKey = await RsaLib.cryptedToText(
+                                    payload.aesKeyCryptedRSA,
+                                    atob(privateKey.privateKey)
+                                );
+
+                                const decryptedMessage = await AesLib.cryptedToText(
+                                    payload.messageCryptedAES,
+                                    payload.aesInitialValue,
+                                    decryptAESKey
+                                );
+
+                                decryptedMessages.push({
+                                    from: payload.fromUsername,
+                                    message: decryptedMessage
+                                });
+                            } catch (err) {
+                                console.error("Error during decrypt saved message:", err);
+                            }
                         }
-                    );
 
-                    if (!response.ok) throw new Error("Error during fetching saved messages");
-
-                    const result = await response.json() as RecoverRegisteredMessage;
-
-                    if (cancelled) return;
-
-                    // Décrypter tous les messages d'abord
-                    const decryptedMessages: { from: string, message: string }[] = [];
-
-                    for (const payloadString of result.messagesRegistered) {
-                        try {
-                            const payload = JSON.parse(payloadString) as MessagePayload;
-                            const decryptAESKey = await RsaLib.cryptedToText(
-                                payload.aesKeyCryptedRSA,
-                                atob(privateKey?.privateKey || "")
-                            );
-
-                            const decryptedMessage = await AesLib.cryptedToText(
-                                payload.messageCryptedAES,
-                                payload.aesInitialValue,
-                                decryptAESKey
-                            );
-
-                            decryptedMessages.push({
-                                from: payload.fromUsername,
-                                message: decryptedMessage
-                            });
-                        } catch (err) {
-                            console.error("Error during decrypt saved message:", err);
-                        }
+                        if (!cancelled && decryptedMessages.length > 0) setMessages(prev => [...prev, ...decryptedMessages]);
+                        if (!cancelled) setIsSavedMessagePrint(true);
                     }
-
-                    if (!cancelled && decryptedMessages.length > 0) setMessages(prev => [...prev, ...decryptedMessages]);
-                    if (!cancelled) setIsSavedMessagePrint(true);
 
                 } catch (error) {
                     console.error(error);
-                    if (!cancelled) {
-                        setIsSavedMessagePrint(true); // Marquer comme tenté même en cas d'erreur
-                    }
+                    if (!cancelled) setIsSavedMessagePrint(true); // Marquer comme tenté même en cas d'erreur
                 }
             })();
 
