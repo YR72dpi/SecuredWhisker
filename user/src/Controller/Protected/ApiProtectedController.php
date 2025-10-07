@@ -37,7 +37,7 @@ class ApiProtectedController extends AbstractController
 
         return $this->json([
             'message' => 'ok',
-            "identifier" => $user->getFullIdentifier(),
+            "identifier" => $user->getUniqid(),
             "username" => $user->getUsername(),
             "id" => $user->getId(),
             "publicKey" => $user->getPublicKey()
@@ -53,12 +53,10 @@ class ApiProtectedController extends AbstractController
         EntityManagerInterface $em
     ): JsonResponse {
         $user = $security->getUser();
-        $data = json_decode($request->getContent(), true);
-        $splitedIdentifier = explode("_", $data["userIdentifier"]);
+        $uniqid = json_decode($request->getContent(), true)["userIdentifier"];
 
         $wantedUser = $userRepository->findOneBy([
-            "username" => $splitedIdentifier[0],
-            "uniqid" => $splitedIdentifier[1],
+            "uniqid" => $uniqid,
         ]);
 
         if (!$wantedUser) return $this->json([

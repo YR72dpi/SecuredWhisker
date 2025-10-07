@@ -150,11 +150,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFullIdentifier(): string
-    {
-        return $this->username . '_' . $this->uniqid;
-    }
-
     /**
      * @return Collection<int, Friendship>
      */
