@@ -30,11 +30,10 @@ class MessageRegisterRepository extends ServiceEntityRepository
 
         $connection = $this->getEntityManager()->getConnection();
         $statement = $connection->prepare($sql);
+        $statement->bindValue("hashedRoomId", $hashedRoomId);
+        $statement->bindValue("forWhom", $userId);
         
-        $result = $statement->executeQuery([
-            "hashedRoomId" => $hashedRoomId,
-            "forWhom" => $userId
-        ]);
+        $result = $statement->executeQuery();
 
         return $result->fetchAllAssociative();
 
