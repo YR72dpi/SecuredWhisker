@@ -143,38 +143,38 @@ export function Chat({
                 }
 
                 // recup la clé public
-                const publicKeyPem = atob(contactData.publicKey);
+                const contactPublicKeyPem = atob(contactData.publicKey);
                 // recup la clé aes
-                const AESKey = await AesLib.generateAESKey()
+                const contactAESKey = await AesLib.generateAESKey()
                 // chiffrer le message en aes
-                const aesCryptedMessage = await AesLib.textToCrypted(messageToSend, AESKey)
+                const aesCryptedMessageForContact = await AesLib.textToCrypted(messageToSend, contactAESKey)
                 // chiffré la clé aes avec la clé public
-                const AESKeyCryptedWithRSA = await RsaLib.textToCrypted(AESKey, publicKeyPem)
+                const contactAESKeyCryptedWithRSA = await RsaLib.textToCrypted(contactAESKey, contactPublicKeyPem)
                 // formater le payload
 
                 const formatedMessageReceiver = ChatLib.format({
                     fromUsername: username,
-                    messageCryptedAES: aesCryptedMessage.encryptedData,
-                    aesInitialValue: aesCryptedMessage.iv,
-                    aesKeyCryptedRSA: AESKeyCryptedWithRSA
+                    messageCryptedAES: aesCryptedMessageForContact.encryptedData,
+                    aesInitialValue: aesCryptedMessageForContact.iv,
+                    aesKeyCryptedRSA: contactAESKeyCryptedWithRSA
                 });
 
                 if (haveToSaveMessage) {
                     // recup la clé public
-                    const userPublicKeyPem = atob(userPublicKey);
+                    const currentUserPublicKeyPem = atob(userPublicKey);
                     // recup la clé aes
-                    const userAESKey = await AesLib.generateAESKey()
+                    const currentUserAESKey = await AesLib.generateAESKey()
                     // chiffrer le message en aes
-                    const userAesCryptedMessage = await AesLib.textToCrypted(messageToSend, userAESKey)
+                    const aesCryptedMessageForCurrentUser = await AesLib.textToCrypted(messageToSend, currentUserAESKey)
                     // chiffré la clé aes avec la clé public
-                    const userAESKeyCryptedWithRSA = await RsaLib.textToCrypted(userAESKey, userPublicKeyPem)
+                    const currentUserAESKeyCryptedWithRSA = await RsaLib.textToCrypted(currentUserAESKey, currentUserPublicKeyPem)
                     // formater le payload
 
                     const formatedMessageSender = ChatLib.format({
                         fromUsername: username,
-                        messageCryptedAES: userAesCryptedMessage.encryptedData,
-                        aesInitialValue: userAesCryptedMessage.iv,
-                        aesKeyCryptedRSA: userAESKeyCryptedWithRSA
+                        messageCryptedAES: aesCryptedMessageForCurrentUser.encryptedData,
+                        aesInitialValue: aesCryptedMessageForCurrentUser.iv,
+                        aesKeyCryptedRSA: currentUserAESKeyCryptedWithRSA
                     });
 
                     saveMessages(
@@ -230,9 +230,7 @@ export function Chat({
                 if (!response.ok) throw new Error(jsonResponse.message || "Erreur inconnue");
                 return jsonResponse
             })
-            .then(() => {
-
-            })
+            .then(() => { })
             .catch((error) => {
                 console.error(error)
             });
@@ -271,7 +269,6 @@ export function Chat({
                     const decryptedMessages: { from: string, message: string }[] = [];
 
                     for (const payloadString of result.messagesRegistered) {
-                        console.log(payloadString);
                         try {
                             const payload = JSON.parse(payloadString) as MessagePayload;
 
