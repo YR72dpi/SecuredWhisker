@@ -14,6 +14,7 @@ export function middleware(request: NextRequest) {
 
     console.log("\n")
     console.log("========== White List Middleware ==========")
+    console.log("Date time: \t\t" + (new Date()).toISOString())
     console.log("Authorised IP address: \t" + (ALLOWED_IPS === "" ? "All" : ALLOWED_IPS))
     console.log("Incoming IP: \t\t" + ip)
     console.log("Is authorised: \t\t" + (isAllowedIp || ALLOWED_IPS == "" ? "Yes" : "No"))
