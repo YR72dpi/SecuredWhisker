@@ -12,25 +12,27 @@ export class JwtTokenLib {
         myHeaders.append("Authorization", "Bearer " + jwtToken);
 
         const requestOptions: RequestInit = {
-            method: "GET",
+            method: "POST",
             headers: myHeaders,
             redirect: "follow"
         };
 
-        return await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+        const link = API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/user/validJwtToken"
+
+        return await fetch(link, requestOptions)
             .then((response) => {
                 if (!response.ok) return false
                 return response.json();
             })
             .then((result) => {
-                if (result?.identifier) {
+                if (result?.isConnectable) {
                     return jwtToken
                 } else {
                     return false;
                 }
             })
             .catch((error) => {
-                console.error(error);
+                console.error("Error during fetching jwt token" + error);
                 return false;
             });
     }

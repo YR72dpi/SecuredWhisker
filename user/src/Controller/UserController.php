@@ -16,10 +16,31 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Service\CryptService;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/api/user', name: 'api_user_')]
 class UserController extends AbstractController
 {
+    
+    #[Route('/validJwtToken', name: 'validJwtToken', methods: ["POST"])]
+    public function validJwtToken(
+        Security $security
+    ): JsonResponse {
+        $account = $security->getUser();
+        $userUserOk = $account instanceof User || $account instanceof UserInterface;
+
+        if ($userUserOk) return new JsonResponse([
+            "message" => "ok",
+            "isConnectable" => $userUserOk
+        ]);
+
+        return new JsonResponse([
+            "message" => "not ok",
+            "isConnectable" => $userUserOk
+        ]);
+    }
+
     #[Route('/subscribe', name: 'subscribe', methods: ["POST"])]
     public function index(
         Request $request,
