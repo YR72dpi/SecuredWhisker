@@ -1,6 +1,7 @@
 
 export type MessagePayloadParams = {
     fromUsername: string
+    messageHash: string,
     messageCryptedAES : string,
     aesInitialValue: string,
     aesKeyCryptedRSA : string
@@ -8,7 +9,8 @@ export type MessagePayloadParams = {
 
 export type MessagePayload = {
     fromUsername: string,
-    dateTime: Date
+    dateTime: Date,
+    messageHash: string,
     messageCryptedAES : string,
     aesInitialValue: string,
     aesKeyCryptedRSA : string
@@ -20,6 +22,7 @@ export class ChatLib {
 
         const payloadObject : MessagePayload = {
             fromUsername: payload.fromUsername,
+            messageHash: payload.messageHash,
             dateTime: (new Date()),
             messageCryptedAES: payload.messageCryptedAES,
             aesInitialValue: payload.aesInitialValue,

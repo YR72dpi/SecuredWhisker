@@ -8,6 +8,7 @@ import { SwDb } from "@/lib/SwDatabase";
 import { AesLib } from "@/lib/AesLib";
 import { ChevronLeftIcon, Send } from "lucide-react";
 import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
+import { sha256 } from "@/lib/sha256";
 
 export type ContactDataForChat = {
     id: string;
@@ -142,6 +143,8 @@ export function Chat({
                     messageToSend = result.translated;
                 }
 
+                const messageHash = await sha256(messageToSend)
+
                 // recup la clé public
                 const contactPublicKeyPem = atob(contactData.publicKey);
                 // recup la clé aes
@@ -154,6 +157,7 @@ export function Chat({
 
                 const formatedMessageReceiver = ChatLib.format({
                     fromUsername: username,
+                    messageHash: messageHash,
                     messageCryptedAES: aesCryptedMessageForContact.encryptedData,
                     aesInitialValue: aesCryptedMessageForContact.iv,
                     aesKeyCryptedRSA: contactAESKeyCryptedWithRSA
@@ -172,12 +176,13 @@ export function Chat({
 
                     const formatedMessageSender = ChatLib.format({
                         fromUsername: username,
+                        messageHash: messageHash,
                         messageCryptedAES: aesCryptedMessageForCurrentUser.encryptedData,
                         aesInitialValue: aesCryptedMessageForCurrentUser.iv,
                         aesKeyCryptedRSA: currentUserAESKeyCryptedWithRSA
                     });
 
-                    saveMessages(
+                    await saveMessages(
                         formatedMessageSender,
                         formatedMessageReceiver
                     )
@@ -261,7 +266,6 @@ export function Chat({
                     if (!response.ok) throw new Error("Error during fetching saved messages");
 
                     const result = await response.json() as RecoverRegisteredMessage;
-                    console.log(result);
 
                     if (cancelled) return;
 
@@ -271,7 +275,6 @@ export function Chat({
                     for (const payloadString of result.messagesRegistered) {
                         try {
                             const payload = JSON.parse(payloadString) as MessagePayload;
-
                             const decryptAESKey = await RsaLib.cryptedToText(
                                 payload.aesKeyCryptedRSA,
                                 atob(privateKey?.privateKey || "")
