@@ -73,43 +73,60 @@ export function Chat({
         socket.onmessage = async (event) => {
             try {
                 const parsedMessage: MessagePayload = JSON.parse(event.data)
-                const ivMessage = parsedMessage.aesInitialValue
-                const privateKey = await SwDb.getPrivateKey();
-                const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
 
-                // Ignore silently any crypto errors since it works
-                let decryptAESKey, decryptedMessage;
-                try {
-                    decryptAESKey = await RsaLib.cryptedToText(
-                        cryptedAESKey,
-                        atob(privateKey?.privateKey || "")
-                    );
-                    decryptedMessage = await AesLib.cryptedToText(
-                        parsedMessage.messageCryptedAES,
-                        ivMessage,
-                        decryptAESKey
-                    )
-                } catch (err) {
-                    // Ignore crypto errors
-                    console.error(err)
-                    return;
+                if (parsedMessage.fromUsername !== username) {
+                    const ivMessage = parsedMessage.aesInitialValue
+                    const privateKey = await SwDb.getPrivateKey();
+                    const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
+
+                    let decryptAESKey: string|null = null
+                    let decryptedMessage: string;
+
+                    if (privateKey?.privateKey && privateKey.privateKey) {
+                        try {
+                            decryptAESKey = await RsaLib.cryptedToText(
+                                cryptedAESKey,
+                                atob(privateKey.privateKey)
+                            );
+
+                        } catch (err) {
+                            console.error("Error decrypting RSA crypted AES Key: " + err)
+                            return;
+                        }
+
+                        if(decryptAESKey !== null) {
+                            try {
+                                decryptedMessage = await AesLib.cryptedToText(
+                                    parsedMessage.messageCryptedAES,
+                                    ivMessage,
+                                    decryptAESKey
+                                )
+
+                                setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
+                            
+                            } catch (err) {
+                                console.error("Error decrypting message with decrypted AES key: ", err);
+                                return;
+                            }
+                        }
+                    }
                 }
 
-                setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
             } catch (err) {
-                console.error("Message parsing error:", err);
+                console.error("Error on websocket's onmessage", err);
             }
         }
 
         socket.onclose = () => {
             setConnectionState(0)
             console.log("Disconnected");
-        };
+        }
 
         socket.onerror = (err) => {
             console.error(err)
             setConnectionState(-1)
-        };
+        }
+
     }, [room])
 
     const sendMessage = async () => {
@@ -268,7 +285,7 @@ export function Chat({
                         if (!response.ok) throw new Error("Error during fetching saved messages");
 
                         const result = await response.json() as RecoverRegisteredMessage;
-
+                        console.log(result)
                         if (cancelled) return;
 
                         const decryptedMessages: { from: string, message: string }[] = [];
