@@ -4,19 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
-## [1.3.0] - 2025-10-06
+## [1.3.1] - 2025-10-xx
 
 ### Added
 
-/
+- (UI) Spinne loader
 
 ### Changed
 
-- error management on fetching server public key
+- Check JWT token by GET method
+- Contacts list line height (to 44px)
 
 ### Fixed
 
-- Symfony routes protection
+- Decrypt saved message on all browser 
 
 ---
 
