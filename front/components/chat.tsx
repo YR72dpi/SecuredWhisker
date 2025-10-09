@@ -27,7 +27,7 @@ type ChatProps = {
 
 type RecoverRegisteredMessage = {
     message: string
-    messagesRegistered: MessagePayload[]
+    messagesRegistered: string[]
     server_time: string
 }
 
@@ -226,15 +226,18 @@ export function Chat({
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Bearer " + jwtToken);
 
+        const formatedMessageForReceiverStringify = btoa(JSON.stringify(formatedMessageForReceiver))
+        const formatedMessageForSenderStringify = btoa(JSON.stringify(formatedMessageForSender))
+
         const raw = JSON.stringify([
             {
                 room: room,
-                payload: formatedMessageForReceiver,
+                payload: formatedMessageForReceiverStringify,
                 forWhom: contactData.id
             },
             {
                 room: room,
-                payload: formatedMessageForSender,
+                payload: formatedMessageForSenderStringify,
                 forWhom: userId
             }
         ]);
@@ -290,7 +293,8 @@ export function Chat({
                         const decryptedMessages: { from: string, message: string }[] = [];
 
                         for (const payloadString of result.messagesRegistered) {
-                            const payload = payloadString as MessagePayload;
+                            console.log(payloadString)
+                            const payload = JSON.parse(atob(payloadString)) as MessagePayload;
                             let decryptAESKey: string | null = null
                             let decryptedMessage: string | null = null
 
