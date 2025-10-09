@@ -36,7 +36,7 @@ export class RsaLib {
         encodedText
       );
       return Buffer64.arrayBufferToBase64(encrypted);
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(`Encryption failed: ${error.message}`);
     }
   }
@@ -65,7 +65,7 @@ export class RsaLib {
         encryptedBytes // Uint8Array is a valid BufferSource
       );
       return new TextDecoder().decode(decrypted);
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(`Decryption failed: ${error.message}`);
     }
   }
@@ -103,7 +103,7 @@ export class RsaLib {
         publicKey: this.formatPem(publicKeyBase64, 'PUBLIC'),
         privateKey: this.formatPem(privateKeyBase64, 'PRIVATE'),
       };
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(`Key generation failed: ${error.message}`);
     }
   }
@@ -151,7 +151,7 @@ export class RsaLib {
         true,
         ['encrypt']
       );
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(`Failed to import public key: ${error.message}`);
     }
   }
@@ -191,7 +191,7 @@ export class RsaLib {
         false,
         ['decrypt']
       );
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(`Failed to import private key: ${error.message}`);
     }
   }

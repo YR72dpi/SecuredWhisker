@@ -295,13 +295,12 @@ export function Chat({
                             let decryptedMessage: string | null = null
 
                             try {
-                                
                                 decryptAESKey = await RsaLib.cryptedToText(
                                     payload.aesKeyCryptedRSA,
                                     atob(privateKey.privateKey)
                                 );
                                 console.log('Decrypted AES key:', decryptAESKey);
-                            } catch (err : Error) {
+                            } catch (err : any) {
                                 console.error('Error during decryption:', err.message);
                                 console.log('Encrypted text:', payload.aesKeyCryptedRSA);
                                 console.log('Private key (obfuscated):', privateKey.privateKey.substring(0, 50) + '...');
