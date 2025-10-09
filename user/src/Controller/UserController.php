@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class UserController extends AbstractController
 {
     
-    #[Route('/validJwtToken', name: 'validJwtToken', methods: ["POST"])]
+    #[Route('/validJwtToken', name: 'validJwtToken', methods: ["GET"])]
     public function validJwtToken(
         Security $security
     ): JsonResponse {

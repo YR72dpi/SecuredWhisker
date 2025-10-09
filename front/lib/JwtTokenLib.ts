@@ -12,7 +12,7 @@ export class JwtTokenLib {
         myHeaders.append("Authorization", "Bearer " + jwtToken);
 
         const requestOptions: RequestInit = {
-            method: "POST",
+            method: "GET",
             headers: myHeaders,
             redirect: "follow"
         };
