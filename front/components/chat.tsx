@@ -291,10 +291,10 @@ export function Chat({
                         const decryptedMessages: { from: string, message: string }[] = [];
 
                         for (const payloadString of result.messagesRegistered) {
-                            let payload = payloadString as MessagePayload;
+                            const payload = payloadString as MessagePayload;
                             let decryptAESKey: string | null = null
                             let decryptedMessage: string | null = null
-                            
+
                             try {
                                 decryptAESKey = await RsaLib.cryptedToText(
                                     payload.aesKeyCryptedRSA,
