@@ -79,7 +79,7 @@ export function Chat({
                     const privateKey = await SwDb.getPrivateKey();
                     const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
 
-                    let decryptAESKey: string|null = null
+                    let decryptAESKey: string | null = null
                     let decryptedMessage: string;
 
                     if (privateKey?.privateKey && privateKey.privateKey) {
@@ -94,7 +94,7 @@ export function Chat({
                             return;
                         }
 
-                        if(decryptAESKey !== null) {
+                        if (decryptAESKey !== null) {
                             try {
                                 decryptedMessage = await AesLib.cryptedToText(
                                     parsedMessage.messageCryptedAES,
@@ -103,7 +103,7 @@ export function Chat({
                                 )
 
                                 setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
-                            
+
                             } catch (err) {
                                 console.error("Error decrypting message with decrypted AES key: ", err);
                                 return;
@@ -291,26 +291,37 @@ export function Chat({
                         const decryptedMessages: { from: string, message: string }[] = [];
 
                         for (const payloadString of result.messagesRegistered) {
+                            let payload = payloadString as MessagePayload;
+                            let decryptAESKey: string | null = null
+                            let decryptedMessage: string | null = null
+                            
                             try {
-                                const payload = payloadString as MessagePayload;
-                                const decryptAESKey = await RsaLib.cryptedToText(
+                                decryptAESKey = await RsaLib.cryptedToText(
                                     payload.aesKeyCryptedRSA,
                                     atob(privateKey.privateKey)
                                 );
-
-                                const decryptedMessage = await AesLib.cryptedToText(
-                                    payload.messageCryptedAES,
-                                    payload.aesInitialValue,
-                                    decryptAESKey
-                                );
-
-                                decryptedMessages.push({
-                                    from: payload.fromUsername,
-                                    message: decryptedMessage
-                                });
                             } catch (err) {
-                                console.error("Error during decrypt saved message:", err);
+                                console.error("Error during decrypting AES RSA crypted key:", err);
                             }
+
+                            if (decryptAESKey !== null) {
+                                try {
+                                    decryptedMessage = await AesLib.cryptedToText(
+                                        payload.messageCryptedAES,
+                                        payload.aesInitialValue,
+                                        decryptAESKey
+                                    );
+                                } catch (err) {
+                                    console.error("Error during decrypting AES crypted saved message:", err);
+                                }
+
+                            }
+
+                            if (decryptedMessage!== null ) decryptedMessages.push({
+                                from: payload.fromUsername,
+                                message: decryptedMessage
+                            });
+
                         }
 
                         if (!cancelled && decryptedMessages.length > 0) setMessages(prev => [...prev, ...decryptedMessages]);
