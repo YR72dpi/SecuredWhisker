@@ -72,14 +72,18 @@ export function Chat({
 
         socket.onmessage = async (event) => {
             try {
-                const parsedMessage: MessagePayload = JSON.parse(event.data)
+                const parsedMessage: MessagePayload = JSON.parse(event.data);
+                console.log("Received message:", parsedMessage); // Ajoutez ce log
 
                 if (parsedMessage.fromUsername !== username) {
-                    const ivMessage = parsedMessage.aesInitialValue
+                    const ivMessage = parsedMessage.aesInitialValue;
                     const privateKey = await SwDb.getPrivateKey();
-                    const cryptedAESKey = parsedMessage.aesKeyCryptedRSA
+                    const cryptedAESKey = parsedMessage.aesKeyCryptedRSA;
 
-                    let decryptAESKey: string | null = null
+                    console.log("IV:", ivMessage);
+                    console.log("Encrypted AES Key:", cryptedAESKey);
+
+                    let decryptAESKey: string | null = null;
                     let decryptedMessage: string;
 
                     if (privateKey?.privateKey && privateKey.privateKey) {
@@ -88,9 +92,9 @@ export function Chat({
                                 cryptedAESKey,
                                 atob(privateKey.privateKey)
                             );
-
+                            console.log("Decrypted AES Key:", decryptAESKey);
                         } catch (err) {
-                            console.error("Error decrypting RSA crypted AES Key: " + err)
+                            console.error("Error decrypting RSA crypted AES Key: " + err);
                             return;
                         }
 
@@ -100,10 +104,10 @@ export function Chat({
                                     parsedMessage.messageCryptedAES,
                                     ivMessage,
                                     decryptAESKey
-                                )
+                                );
+                                console.log("Decrypted Message:", decryptedMessage);
 
                                 setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
-
                             } catch (err) {
                                 console.error("Error decrypting message with decrypted AES key: ", err);
                                 return;
@@ -111,11 +115,10 @@ export function Chat({
                         }
                     }
                 }
-
             } catch (err) {
                 console.error("Error on websocket's onmessage", err);
             }
-        }
+        };
 
         socket.onclose = () => {
             setConnectionState(0)
@@ -226,8 +229,14 @@ export function Chat({
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Bearer " + jwtToken);
 
+        console.log(formatedMessageForReceiver)
+        console.log(formatedMessageForSender)
+
         const formatedMessageForReceiverStringify = btoa(JSON.stringify(formatedMessageForReceiver))
         const formatedMessageForSenderStringify = btoa(JSON.stringify(formatedMessageForSender))
+
+        console.log(formatedMessageForReceiverStringify)
+        console.log(formatedMessageForSenderStringify)
 
         const raw = JSON.stringify([
             {
@@ -293,21 +302,25 @@ export function Chat({
                         const decryptedMessages: { from: string, message: string }[] = [];
 
                         for (const payloadString of result.messagesRegistered) {
-                            console.log(payloadString)
+                            console.log("Payload (Base64):", payloadString);
+                            console.log("Payload (Decoded):", atob(payloadString));
+
                             const payload = JSON.parse(atob(payloadString)) as MessagePayload;
-                            let decryptAESKey: string | null = null
-                            let decryptedMessage: string | null = null
+                            console.log("Parsed Payload:", payload);
+
+                            let decryptAESKey: string | null = null;
+                            let decryptedMessage: string | null = null;
 
                             try {
                                 decryptAESKey = await RsaLib.cryptedToText(
                                     payload.aesKeyCryptedRSA,
                                     atob(privateKey.privateKey)
                                 );
-                                console.log('Decrypted AES key:', decryptAESKey);
-                            } catch (err : any) {
-                                console.error('Error during decryption:', err.message);
-                                console.log('Encrypted text:', payload.aesKeyCryptedRSA);
-                                console.log('Private key (obfuscated):', privateKey.privateKey.substring(0, 50) + '...');
+                                console.log("Decrypted AES Key:", decryptAESKey);
+                            } catch (err: any) {
+                                console.error("Error during decryption:", err.message);
+                                console.log("Encrypted text:", payload.aesKeyCryptedRSA);
+                                console.log("Private key (obfuscated):", privateKey.privateKey.substring(0, 50) + "...");
                             }
 
                             if (decryptAESKey !== null) {
@@ -317,17 +330,16 @@ export function Chat({
                                         payload.aesInitialValue,
                                         decryptAESKey
                                     );
+                                    console.log("Decrypted Message:", decryptedMessage);
                                 } catch (err) {
                                     console.error("Error during decrypting AES crypted saved message:", err);
                                 }
-
                             }
 
                             if (decryptedMessage !== null) decryptedMessages.push({
                                 from: payload.fromUsername,
                                 message: decryptedMessage
                             });
-
                         }
 
                         if (!cancelled && decryptedMessages.length > 0) setMessages(prev => [...prev, ...decryptedMessages]);
