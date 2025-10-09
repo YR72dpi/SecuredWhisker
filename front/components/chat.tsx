@@ -267,7 +267,6 @@ export function Chat({
                     const jwtToken = await SwDb.getJwtToken();
                     const privateKey = await SwDb.getPrivateKey();
 
-
                     if (privateKey && privateKey.privateKey && jwtToken) {
 
                         const myHeaders = new Headers();
@@ -296,12 +295,16 @@ export function Chat({
                             let decryptedMessage: string | null = null
 
                             try {
+                                
                                 decryptAESKey = await RsaLib.cryptedToText(
                                     payload.aesKeyCryptedRSA,
                                     atob(privateKey.privateKey)
                                 );
-                            } catch (err) {
-                                console.error("Error during decrypting AES RSA crypted key:", err);
+                                console.log('Decrypted AES key:', decryptAESKey);
+                            } catch (err : any) {
+                                console.error('Error during decryption:', err.message);
+                                console.log('Encrypted text:', payload.aesKeyCryptedRSA);
+                                console.log('Private key (obfuscated):', privateKey.privateKey.substring(0, 50) + '...');
                             }
 
                             if (decryptAESKey !== null) {
@@ -317,7 +320,7 @@ export function Chat({
 
                             }
 
-                            if (decryptedMessage!== null ) decryptedMessages.push({
+                            if (decryptedMessage !== null) decryptedMessages.push({
                                 from: payload.fromUsername,
                                 message: decryptedMessage
                             });
