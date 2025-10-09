@@ -12,7 +12,7 @@ export class Buffer64 {
     try {
       const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
       return window.btoa(String.fromCharCode(...bytes));
-    } catch (error: any) {
+    } catch (error: Error) {
       throw new Error(`Failed to encode to Base64: ${error.message}`);
     }
   }
@@ -41,7 +41,7 @@ export class Buffer64 {
         bytes[i] = binaryString.charCodeAt(i);
       }
       return bytes;
-    } catch (error: any) {
+    } catch (error: Error) {
       throw new Error(`Failed to decode Base64 string: ${error.message}`);
     }
   }
