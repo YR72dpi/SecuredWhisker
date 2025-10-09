@@ -21,14 +21,19 @@ export class RsaLib {
   }
 
   static async cryptedToText(encryptedText: string, privateKeyPem: string): Promise<string> {
-    // Convertir PEM en ArrayBuffer
     const privateKey = await RsaLib.importPrivateKey(privateKeyPem);
-    const encryptedBuffer = Buffer64.base64ToArrayBuffer(encryptedText) as BufferSource;
+    const encryptedBytes = Buffer64.base64ToArrayBuffer(encryptedText);
+
+    // Utiliser .buffer pour obtenir l'ArrayBuffer sous-jacent
     const decrypted = await window.crypto.subtle.decrypt(
-      { name: "RSA-OAEP" },
+      {
+        name: "RSA-OAEP",
+        hash: { name: "SHA-256" }
+      } as RsaOaepParams,
       privateKey,
-      encryptedBuffer
+      encryptedBytes.buffer as ArrayBuffer
     );
+
     return new TextDecoder().decode(decrypted);
   }
 
@@ -85,13 +90,27 @@ export class RsaLib {
     );
   }
 
-  private static async importPrivateKey(pem: string): Promise<CryptoKey> {
-    const b64 = pem.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, '');
-    const binaryDer = Buffer64.base64ToArrayBuffer(b64) as BufferSource;
-    return window.crypto.subtle.importKey(
+  static async importPrivateKey(pem: string): Promise<CryptoKey> {
+    const pemContents = pem
+      .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+      .replace(/-----END PRIVATE KEY-----/g, '')
+      .replace(/-----BEGIN RSA PRIVATE KEY-----/g, '')
+      .replace(/-----END RSA PRIVATE KEY-----/g, '')
+      .replace(/\s/g, '');
+
+    const binaryDer = window.atob(pemContents);
+    const binaryArray = new Uint8Array(binaryDer.length);
+    for (let i = 0; i < binaryDer.length; i++) {
+      binaryArray[i] = binaryDer.charCodeAt(i);
+    }
+
+    return await window.crypto.subtle.importKey(
       'pkcs8',
-      binaryDer,
-      { name: 'RSA-OAEP', hash: 'SHA-256' },
+      binaryArray.buffer,
+      {
+        name: 'RSA-OAEP',
+        hash: 'SHA-256'
+      },
       true,
       ['decrypt']
     );
