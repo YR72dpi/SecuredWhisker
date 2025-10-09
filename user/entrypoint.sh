@@ -9,6 +9,7 @@ echo "Generating JWT keys..."
 php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
 echo "Generating RSA keys..."
 php bin/console app:generate-rsa-keys
+echo "Clear the symfony cache"
 php bin/console cache:clear --no-interaction
 
 exec "$@"
