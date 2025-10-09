@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
 import { CopyButton } from "../ui/shadcn-io/copy-button";
 import Image from "next/image"
+import { Spinner } from "../ui/spinner";
 
 export const RSAPrivateKeyTransmetter = () => {
     const [open, setOpen] = useState<boolean>(false)
@@ -112,7 +113,7 @@ export const RSAPrivateKeyTransmetter = () => {
                         <DialogTitle>Private key transfer</DialogTitle>
                     </DialogHeader>
 
-                    {qrCodeUrl === "" ? 'Generating...' : (
+                    {qrCodeUrl === "" ? (<div className="flex justify-center"><Spinner/></div>) : (
                         <>
                             <figure className="flex flex-col gap-5">
                                 <Image

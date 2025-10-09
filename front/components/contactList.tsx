@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 import { ContactDataForChat } from "./chat";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
+import { Spinner } from "./ui/spinner";
 
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;
@@ -48,7 +49,7 @@ export function ContactList({ onSelectContact, width }: ContactListProps) {
                 .catch((error) => {
                     console.error(error)
                     setIsLoading(false);
-                    setError("Failed to load contacts. Please try again later.");
+                    setError("It appears that the server is unavailable and failed to load contacts. Please try again later.");
                 });
         }
 
@@ -56,38 +57,45 @@ export function ContactList({ onSelectContact, width }: ContactListProps) {
         const intervalId = setInterval(() => { getContacts() }, 5000)
 
         return () => clearInterval(intervalId);
-        
+
     }, [])
 
     return (
         <>
-
             {error !== "" && <p className="text-red-500">{error}</p>}
-
-            <span className={classForOverrideForTitle}>{isLoading ? (<p>Loading....</p>) : "Contacts"} {contacts !== null && !isLoading && ("(" + contacts.length + ")")}</span>
-            <ul className="mt-2 space-y-2 flex flex-col items-center">
-                {contacts.map((contact, index) => (
-                    <li
-                        key={index}
-                        className={"border-b p break-all w-[300px] max-w-[90%]" + classForOverrideForList}
-                        onClick={() => {
-                            onSelectContact(
-                                {
-                                    id: contact.id,
-                                    username: contact.username,
-                                    uniqid: contact.uniqid,
-                                    publicKey: contact.publicKey
-                                }
-                            );
-                        }}
-                    >
-                        {contact.username ?? "Unnamed contact"}
-                        <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
-                    </li>
-                ))}
-            </ul>
-
-
+            {error === "" && isLoading && (<div className="flex justify-center"><Spinner/></div>) }
+            {error === "" && !isLoading && contacts && (
+                <>
+                    <span className={classForOverrideForTitle}>Contacts ({contacts.length})</span>
+                    <ul className="mt-2 space-y-2 flex flex-col items-center gap-2">
+                        {contacts.map((contact, index) => (
+                            <li
+                                key={index}
+                                className={"border-b break-all w-[300px] max-w-[90%] h-11 leading-10 " + classForOverrideForList}
+                                onClick={() => {
+                                    onSelectContact(
+                                        {
+                                            id: contact.id,
+                                            username: contact.username,
+                                            uniqid: contact.uniqid,
+                                            publicKey: contact.publicKey
+                                        }
+                                    );
+                                }}
+                            >
+                                {contact.username ?? "Unnamed contact"}
+                                <span className="text-sm text-gray-500 italic"> {contact.uniqid ? " (" + contact.uniqid + ")" : ""}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            )}
         </>
+
+
+
+
+
+
     )
 }
