@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { MenubarItem } from "../ui/menubar"
 import { SwDb } from "@/lib/SwDatabase";
@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
-import { BrowserQRCodeReader, IScannerControls } from "@zxing/browser";
+import { QrCode } from "../qrcode/QrCode";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -32,11 +32,8 @@ export const RSAPrivateKeyReceiver = () => {
 
     const [password, setPassword] = useState<string | null>(null)
     const [transfertCode, setTransfertCode] = useState<string | null>(null)
-
     const [transfertCodeMode, setTransfertCodeMode] = useState<TransfertMode.QRCODE | TransfertMode.MANUAL | null>()
-
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const controlsRef = useRef<IScannerControls | null>(null);
+    const [showQrCode, setShowQrCode] = useState<boolean>(true)
 
     const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
         resolver: zodResolver(passwordFormSchema),
@@ -62,67 +59,15 @@ export const RSAPrivateKeyReceiver = () => {
         setTransfertCode(transfertCodeFromForm);
     }
 
-    const startQRScanner = async () => {
-        if (!videoRef.current) return;
-
-        try {
-            const codeReader = new BrowserQRCodeReader();
-
-            const videoInputDevices = await BrowserQRCodeReader.listVideoInputDevices();
-
-            // Filtrer les caméras virtuelles et préférer les caméras physiques
-            const physicalCameras = videoInputDevices.filter(device =>
-                !device.label.toLowerCase().includes('obs') &&
-                !device.label.toLowerCase().includes('virtual') &&
-                !device.label.toLowerCase().includes('screen') &&
-                !device.label.toLowerCase().includes('snap')
-            );
-
-            // Préférer la caméra arrière (environment) ou la dernière caméra physique
-            let selectedDeviceId: string | undefined;
-            
-            if (physicalCameras.length > 0) {
-                // Chercher une caméra arrière
-                const backCamera = physicalCameras.find(device =>
-                    device.label.toLowerCase().includes('back') ||
-                    device.label.toLowerCase().includes('rear') ||
-                    device.label.toLowerCase().includes('environment')
-                );
-
-                selectedDeviceId = backCamera
-                    ? backCamera.deviceId
-                    : physicalCameras[physicalCameras.length - 1].deviceId;
-            } else if (videoInputDevices.length > 0) {
-                selectedDeviceId = videoInputDevices[0].deviceId;
-            }
-
-            const controls = await codeReader.decodeFromVideoDevice(
-                selectedDeviceId,
-                videoRef.current,
-                (result, error) => {
-                    if (result) {
-                        setTransfertCode(result.getText());
-                        stopQRScanner();
-                    }
-                    if (error && !(error.name === 'NotFoundException')) {
-                        console.error(error);
-                    }
-                }
-            );
-
-            controlsRef.current = controls;
-        } catch (error) {
-            console.error("Error starting QR scanner:", error);
-            alert("Unable to access the camera. Please check permissions.");
-        }
-    };
-
-    const stopQRScanner = () => {
-        if (controlsRef.current) {
-            controlsRef.current.stop();
-            controlsRef.current = null;
-        }
-    };
+    const handleCancelQrCode = () => {
+        // Démonter le composant QrCode d'abord
+        setShowQrCode(false);
+        // Puis réinitialiser après un délai
+        setTimeout(() => {
+            setTransfertCodeMode(null);
+            setShowQrCode(true);
+        }, 200);
+    }
 
     const fetchCryptedRSAKeyPayload = async (): Promise<{ message: string, privateKeyPayload: string, server_time: string }> => {
         const jwtToken = await SwDb.getJwtToken()
@@ -148,7 +93,6 @@ export const RSAPrivateKeyReceiver = () => {
 
     useEffect(() => {
         (async () => {
-            // get private key
             const privateKey = await SwDb.getPrivateKey()
             if (privateKey !== undefined) setPrivateKey(privateKey.privateKey)
         })()
@@ -158,23 +102,11 @@ export const RSAPrivateKeyReceiver = () => {
         if (open === false) {
             setPassword(null)
             setTransfertCodeMode(null)
+            setShowQrCode(true)
             passwordForm.reset()
             transfertCodeForm.reset()
-            stopQRScanner()
         }
     }, [open])
-
-    useEffect(() => {
-        if (transfertCodeMode === TransfertMode.QRCODE) {
-            startQRScanner();
-        } else {
-            stopQRScanner();
-        }
-
-        return () => {
-            stopQRScanner();
-        };
-    }, [transfertCodeMode]);
 
     useEffect(() => {
         (async () => {
@@ -243,25 +175,12 @@ export const RSAPrivateKeyReceiver = () => {
                         ) : (
                             transfertCodeMode === TransfertMode.QRCODE ? (
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className="relative w-full max-w-md aspect-square bg-black rounded-lg overflow-hidden">
-                                        <video
-                                            ref={videoRef}
-                                            className="w-full h-full object-cover"
+                                    {showQrCode && (
+                                        <QrCode
+                                            dataHandler={setTransfertCode}
+                                            onCancel={handleCancelQrCode}
                                         />
-                                        <div className="absolute inset-0 border-4 border-white   opacity-50 m-8"></div>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">
-                                        Position the QR code in front of the camera.
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                            stopQRScanner();
-                                            setTransfertCodeMode(null);
-                                        }}
-                                    >
-                                        Annuler
-                                    </Button>
+                                    )}
                                 </div>
                             ) : transfertCodeMode === TransfertMode.MANUAL ? (
                                 <Form {...transfertCodeForm}>
