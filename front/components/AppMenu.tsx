@@ -16,6 +16,7 @@ import { useEffect, useState } from "react"
 import { ThemeToggle } from "./theme-toggle"
 import { RSAPrivateKeyTransmetter } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyTransmetter"
 import { RSAPrivateKeyReceiver } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyReceiver"
+import { Button } from "./ui/button"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -43,8 +44,9 @@ export const AppMenu = ({
 
     return (
         <div>
-            <Menubar className={classForOverride}>
-                <MenubarMenu>
+            <Menubar className={ "flex justify-between " + classForOverride}>
+                <div className="flex">
+                    <MenubarMenu>
                     <MenubarTrigger>Secured Whisker</MenubarTrigger>
                     <MenubarContent>
                         <Link target="_blank" title="Secured Whisker's repository" href="https://github.com/YR72dpi/SecuredWhisker">
@@ -126,11 +128,20 @@ export const AppMenu = ({
 
                         <AddFriend />
                         <ContactRequest />
-
                     </MenubarContent>
                 </MenubarMenu>
 
                 <ThemeToggle />
+                </div>
+
+                <div>
+                    <Button
+                    variant="outline" 
+                    title="Disconnection" 
+                    onClick={() => { SwDb.saveJwtToken(""); window.location.replace("/") }}
+                    className="mr-[-3px] border-none h-8 rounded-sm"
+                    >Disconnection</Button>
+                </div>
             </Menubar>
         </div>
     )
