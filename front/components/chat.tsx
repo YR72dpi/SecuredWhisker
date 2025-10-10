@@ -9,6 +9,7 @@ import { AesLib } from "@/lib/AesLib";
 import { ChevronLeftIcon, Send } from "lucide-react";
 import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
 import { sha256 } from "@/lib/sha256";
+import { Switch } from "./ui/switch";
 
 export type ContactDataForChat = {
     id: string;
@@ -396,7 +397,8 @@ export function Chat({
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
     return (
-        <div className="flex flex-col h-[calc(90vh)] gap-3">
+        <div className="flex flex-col h-[90vh] gap-3">
+
             <div className="flex items-center justify-between">
                 <Button variant="secondary" size="icon" className="size-8" onClick={() => setContactData(null)}>
                     <ChevronLeftIcon />
@@ -415,60 +417,67 @@ export function Chat({
                 </h2>
             </div>
 
-            <div className="flex-1 justify-end overflow-y-auto border rounded-md p-2 flex flex-col">
+            <div className="flex-1 overflow-y-auto border rounded-md p-2 flex flex-col h-full">
+                <div className="flex-1"></div>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`
-                        mb-1 text-sm text-gray-800 p-3 
-                        ${msg.from === username ?
-                            "self-end text-right bg-gray-300 [border-radius:5px_5px_0_5px]" :
-                            "self-start text-left bg-blue-300 [border-radius:5px_5px_5px_0px]"
-                        }
-                    `}>
-                        <div className="flex flex-col items-start max-w-[75%]">
-                            <span className="font-semibold">{msg.from}: </span>
-                            {msg.message}
+                    <div key={index}
+                        className={`
+                            mb-2 flex
+                            ${msg.from === username ? "justify-end" : "justify-start"}
+                        `}
+                    >
+                        <div className={`
+                            text-gray-800 px-4 py-2 rounded-xl max-w-[66%] break-words shadow-sm
+                            ${msg.from === username ?
+                                "bg-gray-300 rounded-br-rounded-bl-sm" :
+                                "bg-blue-300 rounded-bl-sm"
+                            }
+                        `}>
+                            <p className="text-sm leading-relaxed">
+                                {msg.message}
+                            </p>
                         </div>
                     </div>
                 ))}
                 <div ref={bottomRef} />
             </div>
 
-            <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-2 h-11 items-center">
-                    <div className="flex items-center gap-2">
-                        <Input
-                            type="checkbox"
-                            id="checkBoxSaveMessage"
-                            className="h-11 w-11"
-                            checked={haveToSaveMessage}
-                            onChange={e => setHaveToSaveMessage(e.target.checked)}
-                        />
-                        <label htmlFor="checkBoxSaveMessage">Save Message</label>
-                    </div>
+            <div className="flex justify-between gap-2 items-center">
+                <div className="flex items-center">
+                    <Switch
+                        id="checkBoxSaveMessage"
+                        checked={haveToSaveMessage}
+                        onCheckedChange={setHaveToSaveMessage}
+                    />
+                    <label htmlFor="checkBoxSaveMessage" className="pl-2 h-11 leading-[43px]">Save Message</label>
+                </div>
 
-                    {showLanguageSelector && (
-                        <select
-                            value={selectedLanguage}
-                            onChange={e => setSelectedLanguage(e.target.value)}
-                            className="p-2 border h-11 rounded"
-                        >
-                            <option value="">Translate your messages</option>
-                            <option value="french">Français</option>
-                            <option value="english">English</option>
-                            <option value="spanish">Español</option>
-                            <option value="deutsch">Deutsch</option>
-                            <option value="portuguese">Português</option>
-                            <option value="italian">Italiano</option>
-                            {/* dont supported for some reason, maybe utf8 or something like that
+                {showLanguageSelector && (
+                    <select
+                        value={selectedLanguage}
+                        onChange={e => setSelectedLanguage(e.target.value)}
+                        className="p-2 border rounded"
+                    >
+                        <option value="">Translate your messages</option>
+                        <option value="french">Français</option>
+                        <option value="english">English</option>
+                        <option value="spanish">Español</option>
+                        <option value="deutsch">Deutsch</option>
+                        <option value="portuguese">Português</option>
+                        <option value="italian">Italiano</option>
+                        {/* dont supported for some reason, maybe utf8 or something like that
                         <option value="chinese">中文</option>
                         <option value="japanese">日本語</option>
                         <option value="korean">한국어</option>
                         <option value="russian">Русский</option>
                         <option value="arabic">العربية</option>
                         <option value="hindi">हिन्दी</option> */}
-                        </select>
-                    )}
-                </div>
+                    </select>
+                )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+
                 <div className="flex gap-2 h-11">
                     <Input
                         ref={inputRef}
