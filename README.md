@@ -307,6 +307,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
 - use shadcn toast instead of alert 
+- manage multiple display of recorded messages received
 
 ## Support me 😘
 
