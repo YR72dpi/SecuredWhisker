@@ -306,6 +306,7 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - Some vibration
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
+- use shadcn toast instead of alert 
 
 ## Support me 😘
 
