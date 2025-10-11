@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { SwDb } from "@/lib/SwDatabase";
 import { MenubarItem } from "../ui/menubar";
 import { QrCode } from "lucide-react";
 import Image from "next/image";
