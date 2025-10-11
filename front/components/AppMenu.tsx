@@ -17,6 +17,7 @@ import { ThemeToggle } from "./theme-toggle"
 import { RSAPrivateKeyTransmetter } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyTransmetter"
 import { RSAPrivateKeyReceiver } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyReceiver"
 import { Button } from "./ui/button"
+import { UserIndentifierQrCode } from "./Friendship/UserIdentifierQrCode"
 
 type AppMenuProps = {
     identifier: string | null,
@@ -44,102 +45,111 @@ export const AppMenu = ({
 
     return (
         <div>
-            <Menubar className={ "flex justify-between " + classForOverride}>
+            <Menubar className={"flex justify-between " + classForOverride}>
                 <div className="flex">
                     <MenubarMenu>
-                    <MenubarTrigger>Secured Whisker</MenubarTrigger>
-                    <MenubarContent>
-                        <Link target="_blank" title="Secured Whisker's repository" href="https://github.com/YR72dpi/SecuredWhisker">
-                            <MenubarItem>Repository</MenubarItem>
-                        </Link>
-                        <Link target="_blank" title="Secured Whisker's changelog" href="https://github.com/YR72dpi/SecuredWhisker/blob/main/docs/changelog.md">
-                            <MenubarItem>Changelog</MenubarItem>
-                        </Link>
-                        <MenubarSeparator />
-                        <MenubarItem>
-                            <span className="text-sm text-gray-500 italic">
-                                Version: {version ? version : "Development"}
-                            </span>
-                        </MenubarItem>
-                    </MenubarContent>
-                </MenubarMenu>
+                        <MenubarTrigger>Secured Whisker</MenubarTrigger>
+                        <MenubarContent>
+                            <Link target="_blank" title="Secured Whisker's repository" href="https://github.com/YR72dpi/SecuredWhisker">
+                                <MenubarItem>Repository</MenubarItem>
+                            </Link>
+                            <Link target="_blank" title="Secured Whisker's changelog" href="https://github.com/YR72dpi/SecuredWhisker/blob/main/docs/changelog.md">
+                                <MenubarItem>Changelog</MenubarItem>
+                            </Link>
+                            <MenubarSeparator />
+                            <MenubarItem>
+                                <span className="text-sm text-gray-500 italic">
+                                    Version: {version ? version : "Development"}
+                                </span>
+                            </MenubarItem>
+                        </MenubarContent>
+                    </MenubarMenu>
 
-                <MenubarMenu>
-                    <MenubarTrigger>Security</MenubarTrigger>
-                    <MenubarContent>
+                    <MenubarMenu>
+                        <MenubarTrigger>Security</MenubarTrigger>
+                        <MenubarContent>
 
-                        {privateKey && (
+                            {privateKey && (
+                                <MenubarItem>
+                                    <div className="flex gap-2 items-center">
+                                        <div>Copy my private key</div>
+                                        <CopyButton
+                                            onClick={(e) => e.preventDefault()}
+                                            size="sm"
+                                            variant="outline"
+                                            content={atob(privateKey)}
+                                            onCopy={() => console.log("Private Key copied!")}
+                                        />
+
+                                    </div>
+                                </MenubarItem>
+                            )}
                             <MenubarItem>
                                 <div className="flex gap-2 items-center">
-                                    <div>Copy my private key</div>
-                                    <CopyButton
-                                        onClick={(e) => e.preventDefault()}
-                                        size="sm"
-                                        variant="outline"
-                                        content={atob(privateKey)}
-                                        onCopy={() => console.log("Private Key copied!")}
-                                    />
-
+                                    <div>Copy my public key</div>
+                                    {publicKey && (
+                                        <CopyButton
+                                            onClick={(e) => e.preventDefault()}
+                                            size="sm"
+                                            variant="outline"
+                                            content={atob(publicKey)}
+                                            onCopy={() => console.log("Private Key copied!")}
+                                        />
+                                    )}
                                 </div>
                             </MenubarItem>
-                        )}
-                        <MenubarItem>
-                            <div className="flex gap-2 items-center">
-                                <div>Copy my public key</div>
-                                {publicKey && (
-                                    <CopyButton
-                                        onClick={(e) => e.preventDefault()}
-                                        size="sm"
-                                        variant="outline"
-                                        content={atob(publicKey)}
-                                        onCopy={() => console.log("Private Key copied!")}
-                                    />
-                                )}
-                            </div>
-                        </MenubarItem>
-                        <MenubarSeparator />
+                            <MenubarSeparator />
 
-                        <RSAPrivateKeyTransmetter /> 
-                        <RSAPrivateKeyReceiver />
+                            <RSAPrivateKeyTransmetter />
+                            <RSAPrivateKeyReceiver />
 
-                    </MenubarContent>
-                </MenubarMenu>
+                        </MenubarContent>
+                    </MenubarMenu>
 
-                <MenubarMenu>
-                    <MenubarTrigger>Relationship</MenubarTrigger>
-                    <MenubarContent>
-                        <MenubarItem>
+                    <MenubarMenu>
+                        <MenubarTrigger>Relationship</MenubarTrigger>
+                        <MenubarContent>
                             {identifier ? (
-                                <div className="flex gap-2 items-center">
-                                    <div>
-                                        Identifier: <span className="text-sm text-gray-500 italic">{identifier}</span>
-                                    </div>
-                                    <CopyButton
-                                        onClick={(e) => e.preventDefault()}
-                                        size="sm"
-                                        variant="outline"
-                                        content={identifier}
-                                        onCopy={() => console.log("Link copied!")}
-                                    />
-                                </div>
+                                <>
+                                    <MenubarItem>
+                                        <div className="flex gap-2 items-center">
+                                            <div>
+                                                Identifier: <span className="text-sm text-gray-500 italic">{identifier}</span>
+                                            </div>
+                                            <CopyButton
+                                                onClick={(e) => e.preventDefault()}
+                                                size="sm"
+                                                variant="outline"
+                                                content={identifier}
+                                                onCopy={() => console.log("Link copied!")}
+                                            />
+                                        </div>
+
+                                    </MenubarItem>
+
+                                    <UserIndentifierQrCode userIdentifier={identifier} />
+
+                                    <MenubarSeparator />
+
+                                </>
+
                             ) : "Loading your identifier..."}
-                        </MenubarItem>
-                        <MenubarSeparator />
 
-                        <AddFriend />
-                        <ContactRequest />
-                    </MenubarContent>
-                </MenubarMenu>
 
-                <ThemeToggle />
+                            <AddFriend />
+                            <ContactRequest />
+                        </MenubarContent>
+                    </MenubarMenu>
+
+                    <ThemeToggle />
                 </div>
 
                 <div>
                     <Button
-                    variant="outline" 
-                    title="Disconnection" 
-                    onClick={() => { SwDb.saveJwtToken(""); window.location.replace("/") }}
-                    className="mr-[-3px] border-none h-8 rounded-sm"
+                        variant="outline"
+                        title="Disconnection"
+                        onClick={() => { SwDb.saveJwtToken(""); window.location.replace("/") }}
+                        className="mr-[-3px] border-none h-8 rounded-sm"
                     >Disconnection</Button>
                 </div>
             </Menubar>
