@@ -20,9 +20,10 @@ import {
     AlertDescription,
     AlertTitle
 } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, QrCode } from "lucide-react"
 import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
+import { QrCodeScanner } from "../qrcode/QrCodeScanner";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {
@@ -36,6 +37,8 @@ export function AddFriend() {
     const [alertTitle, setAlertTitle] = useState<string>("")
     const [alertType, setAlertType] = useState<boolean>(false)
     const [open, setOpen] = useState(false)
+    const [qrcode, setQrCode] = useState<boolean>(false)
+    const [wantedFriend, setWantedFriend] = useState<string>("")
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,16 +48,17 @@ export function AddFriend() {
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        setWantedFriend(values.userIdentifier)
+    }
 
+    async function sendRequest() {
         const jwtToken = await SwDb.getJwtToken()
 
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Bearer " + jwtToken);
 
-        const raw = JSON.stringify({
-            "userIdentifier": values.userIdentifier
-        });
+        const raw = JSON.stringify({ "userIdentifier": wantedFriend });
 
         const requestOptions: RequestInit = {
             method: "POST",
@@ -63,7 +67,7 @@ export function AddFriend() {
             redirect: "follow"
         };
 
-        fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
+        await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/addFriend", requestOptions)
             .then(async (response) => {
                 const jsonResponse = await response.json()
                 if (!response.ok) {
@@ -84,14 +88,15 @@ export function AddFriend() {
                 setAlertType(false)
                 setOpen(false)
             });
-
     }
 
+    const handleCancelQrCode = () => { setQrCode(false) }
+    
     useEffect(() => {
-        setTimeout(() => {
-            setAlert("")
-        }, 5000)
-    }, [alert])
+        (async () => {
+            if(wantedFriend !== "")  await sendRequest()
+        })()
+    }, [wantedFriend])
 
     return (
         <>
@@ -105,35 +110,47 @@ export function AddFriend() {
                     <DialogHeader>
                         <DialogTitle>Add a mate</DialogTitle>
                         <DialogDescription>
-                            Enter the identifier of the user you want to add as a friend.
+                            Enter or scan the identifier of the user you want to add as a friend.
                         </DialogDescription>
                     </DialogHeader>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="userIdentifier"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input placeholder="user identifier" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div className="flex justify-end gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setOpen(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="submit">Submit</Button>
-                            </div>
-                        </form>
-                    </Form>
+
+                    {qrcode ? (
+                        <QrCodeScanner
+                            dataHandler={setWantedFriend}
+                            onCancel={handleCancelQrCode}
+                        />
+                    ) : (
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="userIdentifier"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input placeholder="user identifier" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="flex justify-between gap-2">
+                                    <Button type="button" onClick={() => { setQrCode(true) }}><QrCode /></Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit">Submit</Button>
+                                    </div>
+                                </div>
+                            </form>
+                        </Form>
+                    )}
+                    
                 </DialogContent>
             </Dialog>
 
