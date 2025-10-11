@@ -8,7 +8,7 @@ type QrCodeProps = {
     onCancel: () => void
 }
 
-export const QrCode = ({ dataHandler, onCancel }: QrCodeProps) => {
+export const QrCodeScanner = ({ dataHandler, onCancel }: QrCodeProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const controlsRef = useRef<IScannerControls | null>(null);
 
@@ -96,7 +96,6 @@ export const QrCode = ({ dataHandler, onCancel }: QrCodeProps) => {
 
         initScanner()
 
-
         return () => {
             stopQRScanner()
         }
@@ -118,7 +117,7 @@ export const QrCode = ({ dataHandler, onCancel }: QrCodeProps) => {
                 />
                 <div className="absolute inset-0 border-4 border-white opacity-50 m-8"></div>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground text-center">
                 Position the QR code in front of the camera.
             </p>
             <Button

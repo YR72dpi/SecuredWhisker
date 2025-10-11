@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
-import { QrCode } from "../qrcode/QrCodeScanner";
+import { QrCodeScanner } from "../qrcode/QrCodeScanner";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -176,7 +176,7 @@ export const RSAPrivateKeyReceiver = () => {
                             transfertCodeMode === TransfertMode.QRCODE ? (
                                 <div className="flex flex-col items-center gap-4">
                                     {showQrCode && (
-                                        <QrCode
+                                        <QrCodeScanner
                                             dataHandler={setTransfertCode}
                                             onCancel={handleCancelQrCode}
                                         />
