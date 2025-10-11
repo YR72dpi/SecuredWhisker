@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { SwDb } from "@/lib/SwDatabase";
 
-import { AlertCircle, QrCode } from "lucide-react"
+import { QrCode } from "lucide-react"
 import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
