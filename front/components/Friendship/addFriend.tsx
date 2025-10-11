@@ -15,15 +15,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { SwDb } from "@/lib/SwDatabase";
 
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle
-} from "@/components/ui/alert"
 import { AlertCircle, QrCode } from "lucide-react"
 import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {
@@ -33,9 +29,6 @@ const formSchema = z.object({
 });
 
 export function AddFriend() {
-    const [alert, setAlert] = useState<string>("")
-    const [alertTitle, setAlertTitle] = useState<string>("")
-    const [alertType, setAlertType] = useState<boolean>(false)
     const [open, setOpen] = useState(false)
     const [qrcode, setQrCode] = useState<boolean>(false)
     const [wantedFriend, setWantedFriend] = useState<string>("")
@@ -76,27 +69,39 @@ export function AddFriend() {
                 return jsonResponse
             })
             .then(() => {
-                setAlertTitle("Success")
-                setAlert("Request send")
-                setAlertType(true)
+                toast.success("Request send", { duration: 3000 })
+                // setAlertTitle("Success")
+                // setAlert("Request send")
+                // setAlertType(true)
                 setOpen(false)
             })
             .catch((error) => {
                 console.error(error)
-                setAlertTitle("Error")
-                setAlert(error.message)
-                setAlertType(false)
+                // setAlertTitle("Error")
+                // setAlert(error.message)
+                // setAlertType(false)
+                toast.error("Error", {
+                    duration: Infinity,
+                    closeButton: true,
+                    description: "Server return an error: " + error.message
+                })
                 setOpen(false)
             });
     }
 
     const handleCancelQrCode = () => { setQrCode(false) }
-    
+
     useEffect(() => {
         (async () => {
-            if(wantedFriend !== "")  await sendRequest()
+            if (wantedFriend !== "") await sendRequest()
         })()
     }, [wantedFriend])
+
+    useEffect(() => {
+        if(open === false) {
+            form.reset()
+        }
+    }, [open])
 
     return (
         <>
@@ -150,22 +155,9 @@ export function AddFriend() {
                             </form>
                         </Form>
                     )}
-                    
+
                 </DialogContent>
             </Dialog>
-
-            {alert !== "" && (
-                <Alert
-                    variant={alertType ? "default" : "destructive"}
-                    className="fixed bottom-[15px] left-1/2 -translate-x-1/2 w-[80%] max-w-md bg-[#fff] z-50 shadow-lg"
-                >
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>{alertTitle}</AlertTitle>
-                    <AlertDescription>
-                        {alert}
-                    </AlertDescription>
-                </Alert>
-            )}
         </>
     )
 }

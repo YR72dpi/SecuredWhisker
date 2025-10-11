@@ -121,7 +121,7 @@ export const AppMenu = ({
                                                 size="sm"
                                                 variant="outline"
                                                 content={identifier}
-                                                onCopy={() => console.log("Link copied!")}
+                                                onCopy={() => console.log("Identifier copied!")}
                                             />
                                         </div>
 
