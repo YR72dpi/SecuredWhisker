@@ -122,7 +122,7 @@ export function ContactList({ onSelectContact, width }: ContactListProps) {
                         {contacts.map((contact) => (
                             <li
                                 key={contact.id}
-                                className={"border-b break-all w-[300px] max-w-[90%] h-11 leading-10 cursor-pointer hover:bg-gray-50 transition-colors " + classForOverrideForList}
+                                className={"border-b break-all w-[300px] max-w-[90%] h-11 leading-10 cursor-pointer hover:bg-accent transition-colors " + classForOverrideForList}
                                 onClick={() => handleSelectContact(contact)}
                             >
                                 {contact.username ?? "Contact sans nom"}
