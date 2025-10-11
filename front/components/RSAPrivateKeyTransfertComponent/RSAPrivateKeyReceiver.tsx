@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
-import { QrCode } from "../qrcode/QrCode";
+import { QrCode } from "../qrcode/QrCodeScanner";
 
 enum TransfertMode {
     QRCODE = 1,

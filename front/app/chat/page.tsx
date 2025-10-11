@@ -1,6 +1,6 @@
 "use client"
 import { Chat, ContactDataForChat } from "@/components/chat";
-import { ContactList } from "@/components/contactList";
+import { ContactList } from "@/components/Friendship/contactList";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

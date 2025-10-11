@@ -8,8 +8,8 @@ import {
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { CopyButton } from "./ui/shadcn-io/copy-button"
-import { AddFriend } from "./addFriend"
-import { ContactRequest } from "./contactRequest"
+import { AddFriend } from "./Friendship/addFriend"
+import { ContactRequest } from "./Friendship/contactRequest"
 import Link from "next/link"
 import { SwDb } from "@/lib/SwDatabase"
 import { useEffect, useState } from "react"

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
-import { ContactDataForChat } from "./chat";
+import { ContactDataForChat } from "../chat";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 
 type ContactListProps = {
     onSelectContact: (contact: ContactDataForChat) => void;

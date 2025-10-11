@@ -21,7 +21,7 @@ import {
     AlertTitle
 } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { MenubarItem } from "./ui/menubar";
+import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 const formSchema = z.object({

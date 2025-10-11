@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 import { Badge } from "@/components/ui/badge"
-import { MenubarItem } from "./ui/menubar";
+import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
 type contactsRequestType = {
