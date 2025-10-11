@@ -303,7 +303,6 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - passing all of the stack in typescript (no php) (or in Go, who know ?)
 - add friends by QR Code
 - Notification
-- Some vibration
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
 - use shadcn toast instead of alert 
