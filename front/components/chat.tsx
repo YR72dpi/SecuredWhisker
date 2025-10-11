@@ -382,6 +382,7 @@ export function Chat({
         }
 
         if (connectionState === 1 && inputRef.current) {
+            setMessages([])
             showSavedMessage()
             inputRef.current.focus()
         } else {
