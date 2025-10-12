@@ -430,7 +430,7 @@ export function Chat({
                         <div className={`
                             text-gray-800 px-4 py-2 rounded-xl max-w-[66%] break-words shadow-sm
                             ${msg.from === username ?
-                                "bg-gray-300 rounded-br-rounded-bl-sm" :
+                                "bg-gray-300 rounded-br-sm" :
                                 "bg-blue-300 rounded-bl-sm"
                             }
                         `}>
