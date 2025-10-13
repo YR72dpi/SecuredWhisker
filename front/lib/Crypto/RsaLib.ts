@@ -27,7 +27,7 @@ export class RsaLib {
         encoded
       );
       return Buffer64.arrayBufferToBase64(encrypted);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error encrypting text: ${error.message}`);
     }
   }
@@ -52,7 +52,7 @@ export class RsaLib {
         encryptedBuffer
       );
       return new TextDecoder().decode(decrypted);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error decrypting text: ${error.message}`);
     }
   }
@@ -93,7 +93,7 @@ export class RsaLib {
         publicKey: publicKeyPem,
         privateKey: privateKeyPem
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error generating RSA key pair: ${error.message}`);
     }
   }
@@ -109,7 +109,7 @@ export class RsaLib {
     try {
       const lines = base64.match(/.{1,64}/g) || [];
       return `-----BEGIN ${type} KEY-----\n${lines.join('\n')}\n-----END ${type} KEY-----`;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error formatting PEM: ${error.message}`);
     }
   }
@@ -125,7 +125,7 @@ export class RsaLib {
         .replace(/-----END (PRIVATE|PUBLIC) KEY-----/, '')
         .replace(/\s+/g, '');
       return base64;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error unformatting PEM: ${error.message}`);
     }
   }
@@ -145,7 +145,7 @@ export class RsaLib {
         true,
         ['encrypt']
       );
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error importing public key: ${error.message}`);
     }
   }
@@ -165,7 +165,7 @@ export class RsaLib {
         true,
         ['decrypt']
       );
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Error importing private key: ${error.message}`);
     }
   }
