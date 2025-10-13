@@ -92,15 +92,11 @@ export function AddFriend() {
     const handleCancelQrCode = () => { setQrCode(false) }
 
     useEffect(() => {
-        (async () => {
-            if (wantedFriend !== "") await sendRequest()
-        })()
+        (async () => { if (wantedFriend !== "") await sendRequest() })()
     }, [wantedFriend])
 
     useEffect(() => {
-        if(open === false) {
-            form.reset()
-        }
+        if(open === false) form.reset()
     }, [open])
 
     return (
@@ -111,7 +107,7 @@ export function AddFriend() {
                         Add a mate
                     </SidebarMenuButton>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader>
                         <DialogTitle>Add a mate</DialogTitle>
                         <DialogDescription>

@@ -66,7 +66,7 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
 
   return (
     <Sidebar>
-      <SidebarHeader>
+      <SidebarHeader className="mt-1">
         <SidebarMenu>
           <SidebarMenuItem>
 
