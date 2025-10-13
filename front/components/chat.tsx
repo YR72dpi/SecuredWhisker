@@ -10,6 +10,7 @@ import { ChevronLeftIcon, Send } from "lucide-react";
 import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
 import { sha256 } from "@/lib/sha256";
 import { Switch } from "./ui/switch";
+import { toast } from "sonner";
 
 export type ContactDataForChat = {
     id: string;
@@ -294,7 +295,11 @@ export function Chat({
                             }
                         );
 
-                        if (!response.ok) throw new Error("Error during fetching saved messages");
+                        if (!response.ok) {
+                            throw new Error("Error during fetching saved messages")
+                            toast.error("Error during fetching saved messages")
+                            return;
+                        };
 
                         const result = await response.json() as RecoverRegisteredMessage;
                         console.log(result)
