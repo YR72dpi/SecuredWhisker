@@ -3,27 +3,12 @@ import { Chat, ContactDataForChat } from "@/components/chat";
 import { ContactList } from "@/components/Friendship/contactList";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useRef, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AppMenu } from "@/components/AppMenu";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
-
-function useWindowWidth() {
-    const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
-
-    useEffect(() => {
-        const width = window.innerWidth as number | undefined
-        const handleResize = () => setWindowWidth(width);
-
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    return windowWidth;
-}
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
@@ -35,8 +20,6 @@ export default function Home() {
     const hasPrivateKey = useRef<boolean>(false)
 
     const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
-
-    const width = useWindowWidth();
 
     useEffect(() => {
 
@@ -74,81 +57,17 @@ export default function Home() {
 
     return (
 
-        canShowPage && (
-            <div className="p-3 flex flex-col gap-3" >
+        canShowPage ? (
+            <SidebarProvider>
+                <AppSidebar
+                    username={username}
+                    identifier={identifier}
+                    publicKey={publicKey}
+                />
+                <main className="w-full border p-3">
+                    <SidebarTrigger />
 
-                {(width && width >= 400) ? (
-                    <>
-                        <AppMenu
-                            identifier={identifier}
-                            publicKey={publicKey}
-                            width={width}
-                        />
-
-                        {hasPrivateKey.current && identifier && !selectedContact && (
-                            <>
-                                <ContactList
-                                    onSelectContact={setSelectedContact}
-                                    width={width}
-                                />
-                            </>
-                        )}
-
-                        {publicKey && hasPrivateKey.current && username && selectedContact && userId && (
-                            <Chat
-                                username={username}
-                                userId={userId}
-                                userPublicKey={publicKey}
-                                contactData={selectedContact}
-                                setContactData={setSelectedContact}
-                            />
-                        )}
-                    </>
-                ) : (
-                    <>
-                        <Tabs defaultValue="chat">
-                            <TabsList>
-                                <TabsTrigger value="menu">Menu</TabsTrigger>
-                                <TabsTrigger value="chat">Chat</TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="menu">
-                                <AppMenu
-                                    identifier={identifier}
-                                    publicKey={publicKey}
-                                    width={width}
-                                />
-                            </TabsContent>
-                            <TabsContent value="chat">
-
-                                {hasPrivateKey.current && identifier && !selectedContact && (
-                                    <>
-                                        <ContactList
-                                            onSelectContact={setSelectedContact}
-                                            width={width}
-                                        />
-                                    </>
-                                )}
-
-                                {publicKey && hasPrivateKey.current && username && selectedContact && userId && (
-                                    <Chat
-                                        username={username}
-                                        userId={userId}
-                                        userPublicKey={publicKey}
-                                        contactData={selectedContact}
-                                        setContactData={setSelectedContact}
-                                    />
-                                )}
-
-                            </TabsContent>
-                        </Tabs>
-                    </>
-
-                )}
-
-                {
-                    !hasPrivateKey.current && (
-
+                    {!hasPrivateKey.current && (
                         <Alert variant="destructive">
                             <AlertCircleIcon />
                             <AlertTitle className="font-bold">No private key here 😥</AlertTitle>
@@ -164,13 +83,28 @@ export default function Home() {
                                 </ul>
                             </AlertDescription>
                         </Alert>
-                    )
-                }
+                    )}
 
-            </div >
-        )
-
-
+                    {hasPrivateKey.current && identifier && !selectedContact && (
+                        <>
+                            <ContactList
+                                onSelectContact={setSelectedContact}
+                            />
+                        </>
+                    )}
+                    
+                    {publicKey && hasPrivateKey.current && username && selectedContact && userId && (
+                        <Chat
+                            username={username}
+                            userId={userId}
+                            userPublicKey={publicKey}
+                            contactData={selectedContact}
+                            setContactData={setSelectedContact}
+                        />
+                    )}
+                </main>
+            </SidebarProvider>
+        ) : null
 
     );
 }

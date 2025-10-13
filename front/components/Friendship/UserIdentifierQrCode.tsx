@@ -5,13 +5,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { MenubarItem } from "../ui/menubar";
 import { QrCode } from "lucide-react";
 import Image from "next/image";
 import QRCode from 'qrcode';
 import { Spinner } from "../ui/spinner";
+import { SidebarMenuButton } from "../ui/sidebar";
+import { CopyButton } from "../ui/shadcn-io/copy-button";
 
 export function UserIndentifierQrCode({ userIdentifier }: { userIdentifier: string }) {
     const [qrCodeIdentifier, setQrCodeIdentifier] = useState<string>("");
@@ -41,18 +41,16 @@ export function UserIndentifierQrCode({ userIdentifier }: { userIdentifier: stri
         <>
             <Dialog>
                 <DialogTrigger asChild>
-                    <MenubarItem
+                    <SidebarMenuButton
                         onSelect={(e) => e.preventDefault()}
                         className="flex items-center justify-between gap-2"
                     >
-                        <Button className="w-full">
-                            QR Code <QrCode />
-                        </Button>
-                    </MenubarItem>
+                        Identifier <QrCode />
+                    </SidebarMenuButton>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>QR Code</DialogTitle>
+                        <DialogTitle>Identifier</DialogTitle>
 
                         {qrCodeIdentifier !== "" ? (
                             <figure className="flex flex-col gap-5">
@@ -65,6 +63,12 @@ export function UserIndentifierQrCode({ userIdentifier }: { userIdentifier: stri
                                 />
                                 <figcaption className="flex gap-3 justify-center">
                                     <span>Identifier: <strong>{userIdentifier}</strong></span>
+                                    <CopyButton
+                                        size="sm"
+                                        variant="ghost"
+                                        content={userIdentifier}
+                                        onCopy={() => console.log("Identifier copied!")}
+                                    />
                                 </figcaption>
                             </figure>
                         ) : (<><Spinner /></>)}

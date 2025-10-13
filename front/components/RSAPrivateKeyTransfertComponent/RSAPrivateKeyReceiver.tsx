@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { MenubarItem } from "../ui/menubar"
 import { SwDb } from "@/lib/SwDatabase";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Button } from "../ui/button";
@@ -11,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
+import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -126,94 +126,96 @@ export const RSAPrivateKeyReceiver = () => {
 
     return (
         !privateKey && (
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                    <MenubarItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="flex items-center justify-between gap-2"
-                    >
-                        Private key transfer (rx)
-                    </MenubarItem>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Private key transfer</DialogTitle>
-                    </DialogHeader>
+            <SidebarMenuItem>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <SidebarMenuButton
+                            onSelect={(e) => e.preventDefault()}
+                            className="flex items-center justify-between gap-2"
+                        >
+                            Private key transfer (rx)
+                        </SidebarMenuButton>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Private key transfer</DialogTitle>
+                        </DialogHeader>
 
-                    {password === null ? (
-                        <Form {...passwordForm}>
-                            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                <FormField
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Input type="password" placeholder="Password" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className="flex justify-end gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => setOpen(false)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button type="button" onClick={handlePassword}>Submit</Button>
-                                </div>
-                            </form>
-                        </Form>
-                    ) : (
-                        transfertCodeMode === null ? (
-                            <div className="flex gap-3 justify-center">
-                                <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.QRCODE)}>QRCODE</Button>
-                                <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.MANUAL)}>MANUAL</Button>
-                            </div>
+                        {password === null ? (
+                            <Form {...passwordForm}>
+                                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                                    <FormField
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input type="password" placeholder="Password" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <div className="flex justify-end gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button type="button" onClick={handlePassword}>Submit</Button>
+                                    </div>
+                                </form>
+                            </Form>
                         ) : (
-                            transfertCodeMode === TransfertMode.QRCODE ? (
-                                <div className="flex flex-col items-center gap-4">
-                                    {showQrCode && (
-                                        <QrCodeScanner
-                                            dataHandler={setTransfertCode}
-                                            onCancel={handleCancelQrCode}
-                                        />
-                                    )}
+                            transfertCodeMode === null ? (
+                                <div className="flex gap-3 justify-center">
+                                    <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.QRCODE)}>QRCODE</Button>
+                                    <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.MANUAL)}>MANUAL</Button>
                                 </div>
-                            ) : transfertCodeMode === TransfertMode.MANUAL ? (
-                                <Form {...transfertCodeForm}>
-                                    <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                        <FormField
-                                            name="transfertCode"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <Input placeholder="Transfert code" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <div className="flex justify-end gap-2">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={() => setOpen(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button type="button" onClick={handleTransfertCode}>Submit</Button>
-                                        </div>
-                                    </form>
-                                </Form>
-                            ) : null
-                        )
-                    )}
+                            ) : (
+                                transfertCodeMode === TransfertMode.QRCODE ? (
+                                    <div className="flex flex-col items-center gap-4">
+                                        {showQrCode && (
+                                            <QrCodeScanner
+                                                dataHandler={setTransfertCode}
+                                                onCancel={handleCancelQrCode}
+                                            />
+                                        )}
+                                    </div>
+                                ) : transfertCodeMode === TransfertMode.MANUAL ? (
+                                    <Form {...transfertCodeForm}>
+                                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                                            <FormField
+                                                name="transfertCode"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <Input placeholder="Transfert code" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <div className="flex justify-end gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() => setOpen(false)}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button type="button" onClick={handleTransfertCode}>Submit</Button>
+                                            </div>
+                                        </form>
+                                    </Form>
+                                ) : null
+                            )
+                        )}
 
-                </DialogContent>
-            </Dialog>
+                    </DialogContent>
+                </Dialog>
+            </SidebarMenuItem>
         )
     )
 }

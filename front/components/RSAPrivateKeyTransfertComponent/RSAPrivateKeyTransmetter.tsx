@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { MenubarItem } from "../ui/menubar"
 import { RSAKeyTransmission } from "@/lib/RsaPrivateKeyTransfert/TransfertEncryptionManager";
 import { SwDb } from "@/lib/SwDatabase";
 import QRCode from 'qrcode';
@@ -10,6 +9,7 @@ import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateK
 import { CopyButton } from "../ui/shadcn-io/copy-button";
 import Image from "next/image"
 import { Spinner } from "../ui/spinner";
+import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 export const RSAPrivateKeyTransmetter = () => {
     const [open, setOpen] = useState<boolean>(false)
@@ -98,66 +98,68 @@ export const RSAPrivateKeyTransmetter = () => {
 
     return (
         privateKey && (
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                    <MenubarItem
-                        onClick={() => generateQrCode()}
-                        onSelect={(e) => e.preventDefault()}
-                        className="flex items-center justify-between gap-2"
-                    >
-                        Private key transfer (tx)
-                    </MenubarItem>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Private key transfer</DialogTitle>
-                    </DialogHeader>
+            <SidebarMenuItem>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <SidebarMenuButton
+                            onClick={() => generateQrCode()}
+                            onSelect={(e) => e.preventDefault()}
+                            className="flex items-center justify-between gap-2"
+                        >
+                            Private key transfer (tx)
+                        </SidebarMenuButton>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Private key transfer</DialogTitle>
+                        </DialogHeader>
 
-                    {qrCodeUrl === "" ? (<div className="flex justify-center"><Spinner/></div>) : (
-                        <>
-                            <figure className="flex flex-col gap-5">
-                                <Image
-                                    src={qrCodeUrl}
-                                    alt="Qr code to scan to transfert private key"
-                                    width={300}
-                                    height={300}
-                                    className="mx-auto border-4 border-gray-200 rounded-lg"
-                                />
-                                <figcaption className="flex gap-3 justify-center">
-                                    <span>Transfert code: <strong>{qrCodeId}</strong></span>
+                        {qrCodeUrl === "" ? (<div className="flex justify-center"><Spinner /></div>) : (
+                            <>
+                                <figure className="flex flex-col gap-5">
+                                    <Image
+                                        src={qrCodeUrl}
+                                        alt="Qr code to scan to transfert private key"
+                                        width={300}
+                                        height={300}
+                                        className="mx-auto border-4 border-gray-200 rounded-lg"
+                                    />
+                                    <figcaption className="flex gap-3 justify-center">
+                                        <span>Transfert code: <strong>{qrCodeId}</strong></span>
+                                        <CopyButton
+                                            onClick={(e) => e.preventDefault()}
+                                            size="sm"
+                                            variant="outline"
+                                            content={qrCodeId}
+                                            onCopy={() => console.log("Transfert code Copied!")}
+                                        />
+                                    </figcaption>
+                                </figure>
+
+                                <div className="flex gap-3 justify-center items-center pr-[20px]">
+                                    <Button onClick={() => setShowPassword(showPassword ? false : true)}>
+                                        {showPassword ? "Hide" : "Show"} password
+                                    </Button>
                                     <CopyButton
                                         onClick={(e) => e.preventDefault()}
-                                        size="sm"
+                                        size="md"
                                         variant="outline"
-                                        content={qrCodeId}
-                                        onCopy={() => console.log("Transfert code Copied!")}
+                                        content={passwordRef.current}
+                                        onCopy={() => console.log("Password Copied!")}
                                     />
-                                </figcaption>
-                            </figure>
-
-                            <div className="flex gap-3 justify-center items-center pr-[20px]">
-                                <Button onClick={() => setShowPassword(showPassword ? false : true)}>
-                                    {showPassword ? "Hide" : "Show"} password
-                                </Button>
-                                <CopyButton
-                                    onClick={(e) => e.preventDefault()}
-                                    size="md"
-                                    variant="outline"
-                                    content={passwordRef.current}
-                                    onCopy={() => console.log("Password Copied!")}
-                                />
-                            </div>
-
-                            {showPassword && (
-                                <div className="flex gap-3 justify-center">
-                                    <strong className="text-center">{passwordRef.current ?? ""}</strong>
                                 </div>
-                            )}
-                        </>
-                    )}
 
-                </DialogContent>
-            </Dialog>
+                                {showPassword && (
+                                    <div className="flex gap-3 justify-center">
+                                        <strong className="text-center">{passwordRef.current ?? ""}</strong>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                    </DialogContent>
+                </Dialog>
+            </SidebarMenuItem>
         )
     )
 }

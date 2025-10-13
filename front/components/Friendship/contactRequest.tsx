@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { SwDb } from "@/lib/SwDatabase";
 import { Badge } from "@/components/ui/badge"
-import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
+import { SidebarMenuButton } from "../ui/sidebar";
 
 type contactsRequestType = {
     uniqid: string;
@@ -85,7 +85,7 @@ export function ContactRequest() {
         <>
             <Dialog>
                 <DialogTrigger asChild>
-                    <MenubarItem
+                    <SidebarMenuButton
                         onSelect={(e) => e.preventDefault()}
                         className="flex items-center justify-between gap-2"
                     >
@@ -95,7 +95,7 @@ export function ContactRequest() {
                                 {contactsRequest.length}
                             </Badge>
                         )}
-                    </MenubarItem>
+                    </SidebarMenuButton>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>

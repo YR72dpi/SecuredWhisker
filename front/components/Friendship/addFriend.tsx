@@ -16,10 +16,10 @@ import { z } from "zod"
 import { SwDb } from "@/lib/SwDatabase";
 
 import { QrCode } from "lucide-react"
-import { MenubarItem } from "../ui/menubar";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
 import { toast } from "sonner";
+import { SidebarMenuButton } from "../ui/sidebar";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {
@@ -107,9 +107,9 @@ export function AddFriend() {
         <>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <MenubarItem onSelect={(e) => e.preventDefault()}>
+                    <SidebarMenuButton onSelect={(e) => e.preventDefault()}>
                         Add a mate
-                    </MenubarItem>
+                    </SidebarMenuButton>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
