@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Make existing qr code scanner as componenet
 - Switch button instead of a checkbox to choose whether messages will be saved
 - Message box style
+- New menu
 
 ### Fixed
 
