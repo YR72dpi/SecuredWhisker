@@ -1,4 +1,4 @@
-import { AesLib } from "../AesLib";
+import { AesLib } from "../Crypto/AesLib";
 
 /**
  * Dérive une clé AES à partir d'un mot de passe en utilisant PBKDF2

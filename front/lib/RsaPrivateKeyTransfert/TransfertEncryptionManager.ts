@@ -1,4 +1,4 @@
-import { AesLib } from '../AesLib'; // Ajustez le chemin d'import
+import { AesLib } from '../Crypto/AesLib'; // Ajustez le chemin d'import
 import { Buffer64 } from '../Buffer64';
 import { PasswordKeyDerivation } from './PasswordKeyDerivation';
 

@@ -7,7 +7,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { SubscribeResponse, UserApi } from "@/lib/UserApi";
-import { RsaLib } from "@/lib/RsaLib";
+import { RsaLib } from "@/lib/Crypto/RsaLib";
 import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
