@@ -1,4 +1,4 @@
-import { Buffer64 } from "../Buffer64";
+import { Buffer64 } from "./Buffer64";
 
 export type KeyPair = {
   publicKey: string

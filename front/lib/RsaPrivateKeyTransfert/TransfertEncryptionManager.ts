@@ -1,5 +1,5 @@
 import { AesLib } from '../Crypto/AesLib'; // Ajustez le chemin d'import
-import { Buffer64 } from '../Buffer64';
+import { Buffer64 } from '../Crypto/Buffer64';
 import { PasswordKeyDerivation } from './PasswordKeyDerivation';
 
 export type QRCodeData = {

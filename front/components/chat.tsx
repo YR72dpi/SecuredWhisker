@@ -8,7 +8,7 @@ import { SwDb } from "@/lib/SwDatabase";
 import { AesLib } from "@/lib/Crypto/AesLib";
 import { ChevronLeftIcon, Send } from "lucide-react";
 import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
-import { sha256 } from "@/lib/sha256";
+import { sha256 } from "@/lib/Crypto/sha256";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
 
