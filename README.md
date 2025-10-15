@@ -269,21 +269,22 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.3.1] - 2025-10-10
+## [1.3.2] - 2025-10-15
 
 ### Added
 
-- (UI) Spinne loader
-- Disconnection button
+- Add friends by qr code
 
 ### Changed
 
-- Check JWT token by GET method
-- Contacts list line height (to 44px)
+- Make existing qr code scanner as componenet
+- Switch button instead of a checkbox to choose whether messages will be saved
+- Message box style
+- New menu
 
 ### Fixed
 
-- Decrypt saved message on all browser 
+-
 
 ---
 
