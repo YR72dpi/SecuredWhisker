@@ -53,7 +53,7 @@ export const QrCodeScanner = ({ dataHandler, onCancel }: QrCodeProps) => {
                     if (result) {
                         dataHandler(result.getText());
                         stopQRScanner();
-                        if ("vibrate" in navigator) navigator.vibrate([250])
+                        if ("vibrate" in navigator) navigator.vibrate([200])
                     }
                     if (error && !(error.name === 'NotFoundException')) {
                         console.error(error);
