@@ -343,17 +343,29 @@ export function Chat({
         }
     }
 
+    const disconnectWebSocket = useCallback(() => {
+        if (ws.current) {
+            ws.current.onopen = null;
+            ws.current.onmessage = null;
+            ws.current.onclose = null;
+            ws.current.onerror = null;
+            ws.current.close();
+            ws.current = null;
+            console.log("WebSocket disconnected cleanly.");
+        }
+    }, []);
+
     useEffect(() => {
         console.log("Connecting to room:", room);
         connectWebSocket();
 
         return () => {
-            ws.current?.close();
+            disconnectWebSocket();
             if (reconnectInterval.current) {
                 clearInterval(reconnectInterval.current);
             }
         };
-    }, [room, connectWebSocket]);
+    }, [room, connectWebSocket, disconnectWebSocket]);
 
     // Add new useEffect for reconnection logic
     useEffect(() => {
@@ -450,13 +462,6 @@ export function Chat({
                         <option value="deutsch">Deutsch</option>
                         <option value="portuguese">Português</option>
                         <option value="italian">Italiano</option>
-                        {/* dont supported for some reason, maybe utf8 or something like that
-                        <option value="chinese">中文</option>
-                        <option value="japanese">日本語</option>
-                        <option value="korean">한국어</option>
-                        <option value="russian">Русский</option>
-                        <option value="arabic">العربية</option>
-                        <option value="hindi">हिन्दी</option> */}
                     </select>
                 )}
             </div>
