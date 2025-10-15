@@ -28,7 +28,6 @@ export function UserIndentifierQrCode({ userIdentifier }: { userIdentifier: stri
                 },
                 errorCorrectionLevel: 'H' // Haute correction d'erreur
             });
-            console.log(qrcode)
             setQrCodeIdentifier(qrcode)
 
             return;
