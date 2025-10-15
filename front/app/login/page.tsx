@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert"
 import { HomeHeader } from "@/components/HomeHeader";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -33,7 +34,6 @@ const formSchema = z.object({
 
 export default function Home() {
 
-  const [loginError, setLoginError] = useState<string>("")
   const [canShowPage, setCanShowPage] = useState<boolean>(false)
 
   const router = useRouter()
@@ -57,12 +57,13 @@ export default function Home() {
     })
 
     if (login === undefined) {
-      setLoginError("Server error")
+      toast.error("The server is not responding")
+      form.reset()
     } else if (!login.ok) {
-      setLoginError(login.message)
+      toast.error(login.message)
+      form.reset()
     } else {
       await SwDb.saveJwtToken(login.token)
-      setLoginError("")
       router.push("/chat")
     }
 
@@ -113,16 +114,6 @@ export default function Home() {
             <Button type="submit">Submit</Button>
           </form>
         </Form>
-
-        {loginError !== "" && (
-          <Alert variant="destructive" className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              {loginError}
-            </AlertDescription>
-          </Alert>
-        )}
 
         <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
           Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
