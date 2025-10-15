@@ -9,15 +9,8 @@ import { Button } from "@/components/ui/button";
 import { UserApi } from "@/lib/UserApi";
 import { RsaLib } from "@/lib/Crypto/RsaLib";
 import { useEffect, useState } from "react";
-import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
 import { useRouter } from "next/navigation";
-
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
 import { HomeHeader } from "@/components/HomeHeader";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 import { toast } from "sonner";
