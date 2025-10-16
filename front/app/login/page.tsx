@@ -98,7 +98,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} />
+                    <Input type="password" current-password placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
