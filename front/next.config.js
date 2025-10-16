@@ -1,31 +1,5 @@
 /** @type {import('next').NextConfig} */
-import withPWAInit from 'next-pwa';
-
-const withPWA = withPWAInit({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-  // Stratégie de cache
-  runtimeCaching: [
-    {
-      urlPattern: /^https?.*/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'offlineCache',
-        expiration: {
-          maxEntries: 200,
-          maxAgeSeconds: 24 * 60 * 60 // 24 heures
-        },
-      },
-    },
-  ],
-  fallbacks: {
-    document: '/offline', // Page offline pour les documents
-  },
-});
-
-export default withPWA({
+const nextConfig = {
   // Votre config Next.js habituelle
   reactStrictMode: true,
   async headers() {
@@ -66,4 +40,6 @@ export default withPWA({
       },
     ]
   },
-});
+}
+
+export default nextConfig;
