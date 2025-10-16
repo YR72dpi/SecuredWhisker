@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
-import { useEffect } from "react";
 
 const APP_NAME = "Secure Whisker";
 const APP_DEFAULT_TITLE = "Secured Whisker";
