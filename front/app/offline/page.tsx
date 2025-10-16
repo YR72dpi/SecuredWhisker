@@ -1,14 +1,4 @@
-"use client"
-import { useEffect } from "react";
-
-export default function Home() {
-
-  useEffect(() => {
-    setInterval(() => {
-      window.location.replace("/")
-    }, 1000)
-  }, [])
-
+export default function OfflinePage() {
   return (
       <>
         <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)] gap-4">
@@ -21,3 +11,8 @@ export default function Home() {
       </>
     )
 }
+
+export const metadata = {
+  title: 'Offline',
+  description: "You're offline, see you later ?",
+};
