@@ -5,8 +5,8 @@ import type { NextRequest } from 'next/server'
 const ALLOWED_IPS = process.env.NEXT_PUBLIC_IP_WHITELIST ?? ""
 
 export function middleware(request: NextRequest) {
-    const ip = request.ip ||
-        request.headers.get('x-real-ip') ||
+
+    const ip = request.headers.get('x-real-ip') ||
         request.headers.get('x-forwarded-for')?.split(',')[0] ||
         'unknown'
 
