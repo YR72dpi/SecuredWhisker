@@ -1,4 +1,5 @@
 'use client'
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 type HomeHeaderProps = {
@@ -15,11 +16,11 @@ export const HomeHeader = ({title}: HomeHeaderProps) => {
                     <ul className="tw-nav">
                         {pathname !== '/' && (
                             <>
-                                <li><a href="/" className="p-3">Home</a></li> |
+                                <li><Link href="/" className="p-3">Home</Link></li> |
                             </>
                         )}
-                        <li><a href="/login" className="p-3">Login</a></li> |
-                        <li><a href="/signin" className=" p-3">Sign in</a></li>
+                        <li><Link href="/login" className="p-3">Login</Link></li> |
+                        <li><Link href="/signin" className=" p-3">Sign in</Link></li>
                     </ul>
                 </nav>
             </header>
