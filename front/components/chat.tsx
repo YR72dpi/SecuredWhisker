@@ -40,7 +40,7 @@ export function Chat({
     contactData,
     setContactData
 }: ChatProps) {
-    const [messages, setMessages] = useState<{ from: string; message: string; }[]>([])
+    const [messages, setMessages] = useState<{ from: string; message: string; dateTime: string }[]>([])
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -54,6 +54,26 @@ export function Chat({
 
     const room = ChatLib.getRoomName(userId, contactData.id)
     const reconnectInterval = useRef<NodeJS.Timeout>();
+
+    const dateTimeFormat = (dateTimeIso: string): string => {
+        const date = new Date(dateTimeIso);
+
+        let day = date.getDate().toString().padStart(2, '0');
+        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+        let year = date.getFullYear();
+
+        let hours = date.getHours();
+        let minutes = date.getMinutes().toString().padStart(2, '0');
+
+        // Convertir en format 12h avec am/pm
+        const ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 → 12
+
+        const formatted = `${day}/${month}/${year} ${hours}:${minutes}${ampm}`;
+
+        return formatted
+    }
 
     const connectWebSocket = useCallback(() => {
         if (!room) return;
@@ -103,7 +123,11 @@ export function Chat({
                                     decryptAESKey
                                 );
 
-                                setMessages(prev => [...prev, { from: parsedMessage.fromUsername, message: decryptedMessage }]);
+                                setMessages(prev => [...prev, {
+                                    from: parsedMessage.fromUsername,
+                                    message: decryptedMessage,
+                                    dateTime: parsedMessage.dateTime
+                                }]);
                             } catch (err) {
                                 console.error("Error decrypting message with decrypted AES key: ", err);
                                 return;
@@ -206,7 +230,11 @@ export function Chat({
 
                 ws.current?.send(JSON.stringify(formatedMessageReceiver));
 
-                setMessages(prev => [...prev, { from: username, message: messageToSend }]);
+                setMessages(prev => [...prev, {
+                    from: username,
+                    message: messageToSend,
+                    dateTime: (new Date)
+                }]);
                 setInput("");
             } catch (e) {
                 console.error("Encryption error:", e);
@@ -292,7 +320,7 @@ export function Chat({
                         const result = await response.json() as RecoverRegisteredMessage;
                         if (cancelled) return;
 
-                        const decryptedMessages: { from: string, message: string }[] = [];
+                        const decryptedMessages: { from: string, message: string, dateTime: string }[] = [];
 
                         for (const payloadString of result.messagesRegistered) {
                             const payload = JSON.parse(atob(payloadString)) as MessagePayload;
@@ -323,7 +351,8 @@ export function Chat({
 
                             if (decryptedMessage !== null) decryptedMessages.push({
                                 from: payload.fromUsername,
-                                message: decryptedMessage
+                                message: decryptedMessage,
+                                dateTime: new Date(payload.dateTime).toISOString()
                             });
                         }
 
@@ -430,8 +459,11 @@ export function Chat({
                                 "bg-blue-300 rounded-bl-sm"
                             }
                         `}>
-                            <p className="text-sm leading-relaxed">
+                            <p className="text-sm leading-relaxed mb-1">
                                 {msg.message}
+                            </p>
+                            <p className="text-xs text-gray-600 opacity-70 text-right">
+                                {dateTimeFormat(msg.dateTime)}
                             </p>
                         </div>
                     </div>
