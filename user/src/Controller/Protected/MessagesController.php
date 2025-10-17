@@ -12,13 +12,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api/messages', name: 'api_messages_')]
 class MessagesController extends AbstractController
 {
 
-    public function __construct(private string $appSecret) {}
+    public function __construct(
+        private string $appSecret,
+        private ParameterBagInterface $params
+        ) {}
 
     #[Route('', name: 'saveMessage', methods: ["POST"])]
     public function saveMessage(
@@ -68,6 +72,11 @@ class MessagesController extends AbstractController
         Security $security
     ): JsonResponse {
         try {
+
+
+            // here we delete old messages
+            $limitMessagesAge = $_ENV["LIMIT_MESSAGES_AGE"] ?? "-1 week";
+            $messageRegisterRepository->deleteOlderThanOneWeek($limitMessagesAge);
 
             $user = $security->getUser();
             $userId = (string) $user->getId();

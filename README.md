@@ -75,6 +75,7 @@ DATABASE_URL="pgsql://root:securedwhisker@localhost:5432/securedwhisker?serverVe
 CORS_ALLOW_ORIGIN='^.*$'
 SYMFONY_PORT=5000
 SERVER_HOST=swapi.your-domain-example.com
+LIMIT_MESSAGES_AGE="-1 week"
 ###> nelmio/cors-bundle ###
 
 # message service (Fiber, GO)

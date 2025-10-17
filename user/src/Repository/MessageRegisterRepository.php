@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\MessageRegister;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Error;
 
 /**
  * @extends ServiceEntityRepository<MessageRegister>
@@ -37,6 +39,36 @@ class MessageRegisterRepository extends ServiceEntityRepository
 
         return $result->fetchAllAssociative();
 
+    }
+
+    /**
+     * Supprime tous les messages dont la date de création est d'un jour ou plus.
+     *
+     * Renvoie le nombre de lignes supprimées.
+     *
+     * Note: adapte 'created_at' si ta colonne a un autre nom.
+     */
+    public function deleteOlderThanOneWeek(string $limiMessagesAge): int
+    {
+        $cutoff = (new \DateTimeImmutable())->modify($limiMessagesAge)->format('Y-m-d H:i:s');
+
+        if($cutoff >= (new DateTimeImmutable("now"))) throw new Error(
+            "You have set a message deletion date in the future: for example,
+            this means that you are trying to delete messages that were posted before tomorrow..."
+        );
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        $sql = <<<SQL
+            DELETE FROM message_register
+            WHERE date_time IS NOT NULL
+              AND date_time <= :cutoff
+        SQL;
+
+        // executeStatement retourne le nombre de lignes affectées (DBAL 3+)
+        return $connection->executeStatement($sql, [
+            'cutoff' => $cutoff,
+        ]);
     }
 
     //    /**
