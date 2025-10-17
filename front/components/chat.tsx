@@ -126,7 +126,7 @@ export function Chat({
                                 setMessages(prev => [...prev, {
                                     from: parsedMessage.fromUsername,
                                     message: decryptedMessage,
-                                    dateTime: parsedMessage.dateTime
+                                    dateTime: (new Date(parsedMessage.dateTime)).toISOString()
                                 }]);
                             } catch (err) {
                                 console.error("Error decrypting message with decrypted AES key: ", err);
