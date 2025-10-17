@@ -90,7 +90,7 @@ export function ContactRequest() {
                         className="flex items-center justify-between gap-2"
                     >
                         <span>Contacts Request</span>
-                        {contactsRequest.length > 0 && (
+                        {contactsRequest && contactsRequest.length > 0 && (
                             <Badge variant="destructive" className="ml-auto">
                                 {contactsRequest.length}
                             </Badge>
