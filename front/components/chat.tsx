@@ -58,12 +58,12 @@ export function Chat({
     const dateTimeFormat = (dateTimeIso: string): string => {
         const date = new Date(dateTimeIso);
 
-        let day = date.getDate().toString().padStart(2, '0');
-        let month = (date.getMonth() + 1).toString().padStart(2, '0');
-        let year = date.getFullYear();
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
 
         let hours = date.getHours();
-        let minutes = date.getMinutes().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
 
         // Convertir en format 12h avec am/pm
         const ampm = hours >= 12 ? 'pm' : 'am';
