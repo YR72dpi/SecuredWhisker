@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
+## [1.3.3] - 2025-10-xx
+
+### Added
+
+- Deletion of messages after a specified period of time
+    - using php's ```DateTime::modify``` string
+    - By default : _-1 week_
+
+### Changed
+
+- Migrate from Netjs 14 to NextJS 15
+- Migrating from next lint to eslint
+
+### Fixed
+
+-
+
+---
+
 ## [1.3.2] - 2025-10-15
 
 ### Added
