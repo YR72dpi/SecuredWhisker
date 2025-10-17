@@ -233,7 +233,7 @@ export function Chat({
                 setMessages(prev => [...prev, {
                     from: username,
                     message: messageToSend,
-                    dateTime: (new Date)
+                    dateTime: (new Date()).toISOString()
                 }]);
                 setInput("");
             } catch (e) {
