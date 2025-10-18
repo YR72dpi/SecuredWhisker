@@ -270,18 +270,20 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.3.2] - 2025-10-15
+## [1.3.3] - 2025-10-18
 
 ### Added
 
-- Add friends by qr code
+- Deletion of messages after a specified period of time
+    - using php's ```DateTime::modify``` string
+    - By default : _-1 week_
 
 ### Changed
 
-- Make existing qr code scanner as componenet
-- Switch button instead of a checkbox to choose whether messages will be saved
-- Message box style
-- New menu
+- Migrate from Netjs 14 to NextJS 15
+- Migrating from next lint to eslint
+- Show date & time on messages
+- Shadcn's otp input for the password of private key
 
 ### Fixed
 
