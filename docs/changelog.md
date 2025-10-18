@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Migrate from Netjs 14 to NextJS 15
 - Migrating from next lint to eslint
 - Show date & time on messages
+- Shadcn's otp input for the password of private key
 
 ### Fixed
 
