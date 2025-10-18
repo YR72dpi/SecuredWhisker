@@ -25,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dexie": "^4.0.11",
+    "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
     "motion": "^12.23.22",
     "next": "^15.5.5",

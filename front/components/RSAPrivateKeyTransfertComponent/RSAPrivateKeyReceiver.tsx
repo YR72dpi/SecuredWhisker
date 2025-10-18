@@ -11,6 +11,7 @@ import { z } from "zod"
 import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateKeyTransfert";
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../ui/input-otp";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -149,7 +150,21 @@ export const RSAPrivateKeyReceiver = () => {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
-                                                    <Input type="password" placeholder="Password" {...field} />
+                                                    <InputOTP maxLength={8} {...field} >
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot index={0} />
+                                                            <InputOTPSlot index={1} />
+                                                            <InputOTPSlot index={2} />
+                                                            <InputOTPSlot index={3} />
+                                                        </InputOTPGroup>
+                                                        <InputOTPSeparator />
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot index={4} />
+                                                            <InputOTPSlot index={5} />
+                                                            <InputOTPSlot index={6} />
+                                                            <InputOTPSlot index={7} />
+                                                        </InputOTPGroup>
+                                                    </InputOTP>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

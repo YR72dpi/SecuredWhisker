@@ -9,20 +9,44 @@ export type QRCodeData = {
   version: string; // Pour la compatibilité future
 };
 
+export type StringKeyToCrypt = {
+  choosenLetters: string,
+  choosenNumbers: string,
+  keyToUseToCrypt: string,
+  keyToShow: string
+};
+
 export class RSAKeyTransmission {
 
-  static randomString(length: number = 5): string {
-    let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  static randomString(length: number = 4): StringKeyToCrypt {
     const charsToExclude = "o,0,i,l,1,3,e"; // put a "," between each letters "
-    const regex = new RegExp(`[${charsToExclude}]`, 'gi');
-    chars = chars.replace(regex, '');
 
-    let result = "";
+    let chars = "abcdefghijklmnopqrstuvwxyz";
+    const regexForChars = new RegExp(`[${charsToExclude}]`, 'gi');
+    chars = chars.replace(regexForChars, '');
+
+    let number = "0123456789";
+    const regex = new RegExp(`[${charsToExclude}]`, 'gi');
+    number = number.replace(regex, '');
+
+    let choosenLetters = "";
     for (let i = 0; i < length; i++) {
       const randomIndex = Math.floor(Math.random() * chars.length);
-      result += chars[randomIndex];
+      choosenLetters += chars[randomIndex];
     }
-    return result;
+
+    let choosenNumbers = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * number.length);
+      choosenNumbers += number[randomIndex];
+    }
+
+    return {
+      choosenLetters: choosenLetters,
+      choosenNumbers: choosenNumbers,
+      keyToUseToCrypt: choosenLetters + choosenNumbers,
+      keyToShow: choosenLetters + '-' + choosenNumbers
+    }
   }
 
   static async encryptPrivateKeyWithPassword(

@@ -75,7 +75,7 @@ export default function Home() {
                                 <p>To decode your message, you need to have your private key on this browser</p>
                                 <ul className="list-inside list-disc text-sm">
                                     <li>
-                                        On the browser where you subscribe: Menu bar {">"} Security {">"} Private key transfert (tx)
+                                        On the browser where you subscribe: Side bar {">"} Security {">"} Private key transfert (tx)
                                     </li>
                                     <li>
                                         On the this browser: Menu bar {">"} Security {">"} Private key transfert (rx)

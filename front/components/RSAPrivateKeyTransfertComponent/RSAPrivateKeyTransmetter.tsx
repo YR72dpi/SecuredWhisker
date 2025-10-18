@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { RSAKeyTransmission } from "@/lib/RsaPrivateKeyTransfert/TransfertEncryptionManager";
+import { RSAKeyTransmission, StringKeyToCrypt } from "@/lib/RsaPrivateKeyTransfert/TransfertEncryptionManager";
 import { SwDb } from "@/lib/SwDatabase";
 import QRCode from 'qrcode';
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
@@ -20,7 +20,7 @@ export const RSAPrivateKeyTransmetter = () => {
     const [showPassword, setShowPassword] = useState<boolean | null>(null)
 
     const [qrCodeId, setQrCodeId] = useState<string>("");
-    const passwordRef = useRef<string>("")
+    const passwordRef = useRef<StringKeyToCrypt|null>()
 
     const generateQrCode = async () => {
         (async () => {
@@ -33,7 +33,7 @@ export const RSAPrivateKeyTransmetter = () => {
                 if (passwordRef.current !== null) {
                     const qrCodeData = await RsaPrivateKeyTransfert.generatePayload(
                         privateKey,
-                        passwordRef.current
+                        passwordRef.current.keyToUseToCrypt
                     )
 
                     const jwtToken = await SwDb.getJwtToken()
@@ -89,7 +89,7 @@ export const RSAPrivateKeyTransmetter = () => {
         if (open === false) {
             setQrCodeUrl("")
             setShowPassword(false)
-            passwordRef.current = ""
+            passwordRef.current = null
             setQrCodeId("")
         }
     }, [open])
@@ -114,7 +114,7 @@ export const RSAPrivateKeyTransmetter = () => {
                             <DialogTitle>Private key transfer</DialogTitle>
                         </DialogHeader>
 
-                        {qrCodeUrl === "" ? (<div className="flex justify-center"><Spinner /></div>) : (
+                        {passwordRef.current && qrCodeUrl ? (
                             <>
                                 <figure className="flex flex-col gap-5">
                                     <Image
@@ -144,18 +144,18 @@ export const RSAPrivateKeyTransmetter = () => {
                                         onClick={(e) => e.preventDefault()}
                                         size="md"
                                         variant="outline"
-                                        content={passwordRef.current}
+                                        content={passwordRef.current?.keyToUseToCrypt}
                                         onCopy={() => console.log("Password Copied!")}
                                     />
                                 </div>
 
-                                {showPassword && (
+                                {passwordRef.current && showPassword && (
                                     <div className="flex gap-3 justify-center">
-                                        <strong className="text-center">{passwordRef.current ?? ""}</strong>
+                                        <strong className="text-center">{passwordRef.current.keyToShow ?? ""}</strong>
                                     </div>
                                 )}
                             </>
-                        )}
+                        ) : (<div className="flex justify-center"><Spinner /></div>)}
 
                     </DialogContent>
                 </Dialog>
