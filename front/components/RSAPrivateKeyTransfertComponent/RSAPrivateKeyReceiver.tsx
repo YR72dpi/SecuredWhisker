@@ -150,7 +150,7 @@ export const RSAPrivateKeyReceiver = () => {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
-                                                    <InputOTP maxLength={8} {...field} >
+                                                    <InputOTP maxLength={8} inputMode="text" pattern="^[a-z]{4}-[0-9]{4}$" {...field} >
                                                         <InputOTPGroup>
                                                             <InputOTPSlot index={0} />
                                                             <InputOTPSlot index={1} />
