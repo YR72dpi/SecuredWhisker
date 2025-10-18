@@ -308,7 +308,6 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - Versionning (de)crypting message mode
 - manage multiple display of recorded messages received
 - Delete friends 
-- delete message after x time
 
 ## Support me 😘
 
