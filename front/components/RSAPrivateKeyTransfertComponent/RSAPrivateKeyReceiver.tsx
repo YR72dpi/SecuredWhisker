@@ -12,6 +12,7 @@ import { RsaPrivateKeyTransfert } from "@/lib/RsaPrivateKeyTransfert/RsaPrivateK
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../ui/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 
 enum TransfertMode {
     QRCODE = 1,
@@ -150,7 +151,7 @@ export const RSAPrivateKeyReceiver = () => {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
-                                                    <InputOTP maxLength={8} inputMode="text" pattern="^[a-z]{4}-[0-9]{4}$" {...field} >
+                                                    <InputOTP maxLength={8} inputMode="text" pattern={REGEXP_ONLY_DIGITS_AND_CHARS} {...field} >
                                                         <InputOTPGroup>
                                                             <InputOTPSlot index={0} />
                                                             <InputOTPSlot index={1} />
