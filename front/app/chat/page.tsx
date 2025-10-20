@@ -1,5 +1,5 @@
 "use client"
-import { Chat, ContactDataForChat } from "@/components/chat";
+import { Chat, SenderDataForChat, ReceiverDataForChat } from "@/components/chat";
 import { ContactList } from "@/components/Friendship/contactList";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useRef, useState } from "react";
@@ -9,17 +9,17 @@ import { AlertCircleIcon } from "lucide-react";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
+import { PushNotificationManager } from "@/components/Notification/PushNotificationManager";
+import { InstallPrompt } from "@/components/Notification/InstallPrompt";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
 
     const [identifier, setIdentifier] = useState<string | null>(null)
-    const [userId, setUserId] = useState<string | null>(null)
-    const [username, setUsername] = useState<string | null>(null)
-    const [publicKey, setPublicKey] = useState<string | null>(null)
     const hasPrivateKey = useRef<boolean>(false)
 
-    const [selectedContact, setSelectedContact] = useState<ContactDataForChat | null>(null);
+    const [senderData, setSenderData] = useState<SenderDataForChat>(); // you
+    const [selectedContact, setSelectedContact] = useState<ReceiverDataForChat | null>(null); // the choosen friend
 
     useEffect(() => {
 
@@ -45,27 +45,31 @@ export default function Home() {
                 .then((response) => response.json())
                 .then((result) => {
                     setIdentifier(result.identifier)
-                    setUsername(result.username)
-                    setUserId(result.id)
-                    setPublicKey(result.publicKey)
-                    setCanShowPage(true)
+                    setSenderData({
+                        id: result.id,
+                        username: result.username,
+                        publicKey: result.publicKey
+                    });
 
+                    setCanShowPage(true)
                 })
                 .catch((error) => console.error(error));
         })()
     }, [])
 
     return (
-
-        canShowPage ? (
+        canShowPage && senderData ? (
             <SidebarProvider>
                 <AppSidebar
-                    username={username}
+                    username={senderData.username}
                     identifier={identifier}
-                    publicKey={publicKey}
+                    publicKey={senderData.publicKey}
                 />
-                <main className="w-full border p-3">
+                <main className="w-full border p-3 flex flex-col gap-3">
                     <SidebarTrigger />
+
+                    <PushNotificationManager />
+                    <InstallPrompt />
 
                     {!hasPrivateKey.current && (
                         <Alert variant="destructive">
@@ -92,13 +96,14 @@ export default function Home() {
                             />
                         </>
                     )}
-                    
-                    {publicKey && hasPrivateKey.current && username && selectedContact && userId && (
+
+                    { hasPrivateKey.current 
+                    && senderData
+                    && selectedContact 
+                    && (
                         <Chat
-                            username={username}
-                            userId={userId}
-                            userPublicKey={publicKey}
-                            contactData={selectedContact}
+                            senderDataForChat={senderData}
+                            receiverDataForChat={selectedContact}
                             setContactData={setSelectedContact}
                         />
                     )}

@@ -11,20 +11,26 @@ import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
 import { sha256 } from "@/lib/Crypto/sha256";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
+import { sendNotification } from "./Notification/NotificationActions"
 
-export type ContactDataForChat = {
+export type ReceiverDataForChat = {
     id: string;
     username: string;
     uniqid: string;
     publicKey: string;
+    notificationPayload: string[]
+}
+
+export type SenderDataForChat = {
+    id: string;
+    username: string;
+    publicKey: string
 }
 
 type ChatProps = {
-    username: string;
-    userId: string;
-    userPublicKey: string
-    contactData: ContactDataForChat;
-    setContactData: (newContactData: ContactDataForChat | null) => void
+    senderDataForChat: SenderDataForChat
+    receiverDataForChat: ReceiverDataForChat;
+    setContactData: (newContactData: ReceiverDataForChat | null) => void
 };
 
 type RecoverRegisteredMessage = {
@@ -34,10 +40,8 @@ type RecoverRegisteredMessage = {
 }
 
 export function Chat({
-    username,
-    userId,
-    userPublicKey,
-    contactData,
+    senderDataForChat, // the one who send the message (you)
+    receiverDataForChat, // the one who receive the message (your friend)
     setContactData
 }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; dateTime: string }[]>([])
@@ -52,7 +56,7 @@ export function Chat({
     const [isSavedMessagesPrinted, setIsSavedMessagePrint] = useState<boolean>(false)
     const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
 
-    const room = ChatLib.getRoomName(userId, contactData.id)
+    const room = ChatLib.getRoomName(senderDataForChat.id, receiverDataForChat.id)
     const reconnectInterval = useRef<NodeJS.Timeout>();
 
     const dateTimeFormat = (dateTimeIso: string): string => {
@@ -96,7 +100,7 @@ export function Chat({
             try {
                 const parsedMessage: MessagePayload = JSON.parse(event.data);
 
-                if (parsedMessage.fromUsername !== username) {
+                if (parsedMessage.fromUsername !== senderDataForChat.username) {
                     const ivMessage = parsedMessage.aesInitialValue;
                     const privateKey = await SwDb.getPrivateKey();
                     const cryptedAESKey = parsedMessage.aesKeyCryptedRSA;
@@ -154,7 +158,7 @@ export function Chat({
 
     const sendMessage = async () => {
 
-        if (input.trim() !== "" && contactData.publicKey && userPublicKey) {
+        if (input.trim() !== "" && receiverDataForChat.publicKey && senderDataForChat.publicKey) {
             try {
                 let messageToSend = input;
 
@@ -186,7 +190,7 @@ export function Chat({
                 const messageHash = await sha256(messageToSend)
 
                 // recup la clé public
-                const contactPublicKeyPem = atob(contactData.publicKey);
+                const contactPublicKeyPem = atob(receiverDataForChat.publicKey);
                 // recup la clé aes
                 const contactAESKey = await AesLib.generateAESKey()
                 // chiffrer le message en aes
@@ -196,7 +200,7 @@ export function Chat({
                 // formater le payload
 
                 const formatedMessageReceiver = ChatLib.format({
-                    fromUsername: username,
+                    fromUsername: senderDataForChat.username,
                     messageHash: messageHash,
                     messageCryptedAES: aesCryptedMessageForContact.encryptedData,
                     aesInitialValue: aesCryptedMessageForContact.iv,
@@ -205,7 +209,7 @@ export function Chat({
 
                 if (haveToSaveMessage) {
                     // recup la clé public
-                    const currentUserPublicKeyPem = atob(userPublicKey);
+                    const currentUserPublicKeyPem = atob(senderDataForChat.publicKey);
                     // recup la clé aes
                     const currentUserAESKey = await AesLib.generateAESKey()
                     // chiffrer le message en aes
@@ -215,7 +219,7 @@ export function Chat({
                     // formater le payload
 
                     const formatedMessageSender = ChatLib.format({
-                        fromUsername: username,
+                        fromUsername: senderDataForChat.username,
                         messageHash: messageHash,
                         messageCryptedAES: aesCryptedMessageForCurrentUser.encryptedData,
                         aesInitialValue: aesCryptedMessageForCurrentUser.iv,
@@ -231,7 +235,7 @@ export function Chat({
                 ws.current?.send(JSON.stringify(formatedMessageReceiver));
 
                 setMessages(prev => [...prev, {
-                    from: username,
+                    from: senderDataForChat.username,
                     message: messageToSend,
                     dateTime: (new Date()).toISOString()
                 }]);
@@ -260,12 +264,12 @@ export function Chat({
             {
                 room: room,
                 payload: formatedMessageForReceiverStringify,
-                forWhom: contactData.id
+                forWhom: receiverDataForChat.id
             },
             {
                 room: room,
                 payload: formatedMessageForSenderStringify,
-                forWhom: userId
+                forWhom: senderDataForChat.id
             }
         ]);
 
@@ -282,7 +286,14 @@ export function Chat({
                 if (!response.ok) throw new Error(jsonResponse.message || "Erreur inconnue");
                 return jsonResponse
             })
-            .then(() => { })
+            .then(() => {
+
+            receiverDataForChat.notificationPayload.forEach((notificationPayload) => {
+                sendNotification(atob(notificationPayload), senderDataForChat.username)
+            })
+            
+
+            })
             .catch((error) => {
                 console.error(error)
             });
@@ -431,7 +442,7 @@ export function Chat({
                 </Button>
                 <h2 className="flex-auto flex flex-col text-xl font-semibold pl-3">
                     <div className="flex items-center gap-1">
-                        {contactData.username}
+                        {receiverDataForChat.username}
                         <span className="text-xs">
                             {connectionState === 0 && " 🟠"}
                             {connectionState === 1 && ""}
@@ -439,7 +450,7 @@ export function Chat({
                             {connectionState === -1 && " 🔴"}
                         </span>
                     </div>
-                    <span className="text-xs text-gray-500 italic">({contactData.uniqid})</span>
+                    <span className="text-xs text-gray-500 italic">({receiverDataForChat.uniqid})</span>
                 </h2>
             </div>
 
@@ -449,12 +460,12 @@ export function Chat({
                     <div key={index}
                         className={`
                             mb-2 flex
-                            ${msg.from === username ? "justify-end" : "justify-start"}
+                            ${msg.from === senderDataForChat.username ? "justify-end" : "justify-start"}
                         `}
                     >
                         <div className={`
                             text-gray-800 px-4 py-2 rounded-xl max-w-[66%] break-words shadow-sm
-                            ${msg.from === username ?
+                            ${msg.from === senderDataForChat.username ?
                                 "bg-gray-300 rounded-br-sm" :
                                 "bg-blue-300 rounded-bl-sm"
                             }

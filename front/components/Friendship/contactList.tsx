@@ -1,22 +1,15 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { SwDb } from "@/lib/SwDatabase";
-import { ContactDataForChat } from "../chat";
+import { ReceiverDataForChat } from "../chat";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Spinner } from "../ui/spinner";
 
 type ContactListProps = {
-    onSelectContact: (contact: ContactDataForChat) => void;
-};
-
-type Contact = {
-    id: string;
-    username: string;
-    uniqid: string;
-    publicKey: string;
+    onSelectContact: (contact: ReceiverDataForChat) => void;
 };
 
 export function ContactList({ onSelectContact }: ContactListProps) {
-    const [contacts, setContacts] = useState<Contact[]>([]);
+    const [contacts, setContacts] = useState<ReceiverDataForChat[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
@@ -98,12 +91,13 @@ export function ContactList({ onSelectContact }: ContactListProps) {
     }, [getContacts]);
 
     // Optimisation : mémoriser le handler de sélection
-    const handleSelectContact = useCallback((contact: Contact) => {
+    const handleSelectContact = useCallback((contact: ReceiverDataForChat) => {
         onSelectContact({
             id: contact.id,
             username: contact.username,
             uniqid: contact.uniqid,
-            publicKey: contact.publicKey
+            publicKey: contact.publicKey,
+            notificationPayload: contact.notificationPayload
         });
     }, [onSelectContact]);
 
