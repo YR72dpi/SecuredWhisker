@@ -305,11 +305,11 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - everything that passes through the web socket in TLV
 - make it https less
 - passing all of the stack in typescript (no php) (or in Go, who know ?)
-- Notification
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
 - manage multiple display of recorded messages received
 - Delete friends 
+- show how many unseen message by contact
 
 ## Support me 😘
 
