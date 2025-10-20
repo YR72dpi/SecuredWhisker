@@ -104,7 +104,7 @@ class ApiProtectedController extends AbstractController
             $requestData[] = [
                 "id" => $request->getRequestFrom()->getId(),
                 "username" => $request->getRequestFrom()->getUsername(),
-                "uniqid" => $request->getRequestFrom()->getUniqid()
+                "uniqid" => $request->getRequestFrom()->getUniqid(),
             ];
         }
 
@@ -165,20 +165,32 @@ class ApiProtectedController extends AbstractController
             $contactToAdd = [];
 
             if ($contact->getRequestTo() === $user) {
+
+                $notificationPayload = [];
+                foreach($contact->getRequestFrom()->getUserNotificationSubscriptions()->toArray() as $payload)
+                    $notificationPayload[] = $payload->getSubscription();
+
                 $contactToAdd = [
                     "id" => $contact->getRequestFrom()->getId(),
                     "username" => $contact->getRequestFrom()->getUsername(),
                     "uniqid" => $contact->getRequestFrom()->getUniqid(),
-                    "publicKey" => $contact->getRequestFrom()->getPublicKey()
+                    "publicKey" => $contact->getRequestFrom()->getPublicKey(),
+                    "notificationPayload" => $notificationPayload
                 ];
             }
 
             if ($contact->getRequestFrom() === $user) {
+                
+                $notificationPayload = [];
+                foreach($contact->getRequestTo()->getUserNotificationSubscriptions()->toArray() as $payload)
+                    $notificationPayload[] = $payload->getSubscription();
+
                 $contactToAdd = [
                     "id" => $contact->getRequestTo()->getId(),
                     "username" => $contact->getRequestTo()->getUsername(),
                     "uniqid" => $contact->getRequestTo()->getUniqid(),
-                    "publicKey" => $contact->getRequestTo()->getPublicKey()
+                    "publicKey" => $contact->getRequestTo()->getPublicKey(),
+                    "notificationPayload" => $notificationPayload
                 ];
             }
 
