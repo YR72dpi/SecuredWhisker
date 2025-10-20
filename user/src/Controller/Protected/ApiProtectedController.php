@@ -3,6 +3,7 @@
 namespace App\Controller\Protected;
 
 use App\Entity\Friendship;
+use App\Entity\User;
 use App\Repository\FriendshipRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[Route('/api/protected', name: 'api_protected_')]
 class ApiProtectedController extends AbstractController
@@ -27,9 +29,8 @@ class ApiProtectedController extends AbstractController
 
     #[Route('/selfUserData', name: '_selfUserData',)]
     public function selfUserData(
-        Security $security
+        #[CurrentUser()] ?User $user
     ): JsonResponse {
-        $user = $security->getUser();
 
         if (!$user) return $this->json([
             'message' => 'not ok',
@@ -89,10 +90,9 @@ class ApiProtectedController extends AbstractController
 
     #[Route('/contactRequest', name: '_contactRequest')]
     public function contactRequest(
-        Security $security,
+        #[CurrentUser()] User $user,
         FriendshipRepository $friendshipRepository
     ): JsonResponse {
-        $user = $security->getUser();
 
         $requestList = $friendshipRepository->findby([
             "isAccepted" => false,
