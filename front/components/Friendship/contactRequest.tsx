@@ -101,7 +101,7 @@ export function ContactRequest() {
                     <DialogHeader>
                         <DialogTitle>Contacts Request</DialogTitle>
                         {isLoading ? (<p>Loading....</p>) : ""}
-                        {!isLoading && contactsRequest.length === 0 ? (
+                        {!isLoading &&  contactsRequest && contactsRequest.length === 0 ? (
                             <p>No contact requests</p>
                         ) : (
                             <ul className="mt-2 space-y-2">
