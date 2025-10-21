@@ -45,12 +45,37 @@ export async function subscribeUser(
   
 }
 
-// export async function unsubscribeUser() {
-//   let sub = null
-//   // In a production environment, you would want to remove the subscription from the database
-//   // For example: await db.subscriptions.delete({ where: { ... } })
-//   return { success: true }
-// }
+export async function unsubscribeUser(
+  sub: PushSubscription|globalThis.PushSubscription, 
+  jwtToken: string
+) {
+  const subscriptionPayload = btoa(JSON.stringify(sub))
+
+  const data = JSON.stringify({
+    subsciption: subscriptionPayload
+  })
+
+  const myHeaders = new Headers();
+  myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    headers: myHeaders,
+    body: data,
+    redirect: "follow"
+  };
+
+  return await fetch(
+    API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/notification/removeSubscription",
+    requestOptions
+  )
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result)
+      return { success: true }
+    })
+    .catch((error) => console.error(error));
+}
 
 export async function sendNotification(sub: string, from: string) {
   const subsciption = JSON.parse(sub) as PushSubscription

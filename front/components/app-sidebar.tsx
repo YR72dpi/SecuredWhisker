@@ -209,6 +209,20 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
           </SidebarGroupContent>
         </SidebarGroup>
 
+        <SidebarSeparator />
+
+        {/* Parameter Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Parameters</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              
+                <SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>
+
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
       </SidebarContent>
 
       <SidebarFooter>

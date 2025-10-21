@@ -167,7 +167,7 @@ class ApiProtectedController extends AbstractController
             if ($contact->getRequestTo() === $user) {
 
                 $notificationPayload = [];
-                foreach($contact->getRequestFrom()->getUserNotificationSubscriptions()->toArray() as $payload)
+                foreach ($contact->getRequestFrom()->getUserNotificationSubscriptions()->toArray() as $payload)
                     $notificationPayload[] = $payload->getSubscription();
 
                 $contactToAdd = [
@@ -180,9 +180,9 @@ class ApiProtectedController extends AbstractController
             }
 
             if ($contact->getRequestFrom() === $user) {
-                
+
                 $notificationPayload = [];
-                foreach($contact->getRequestTo()->getUserNotificationSubscriptions()->toArray() as $payload)
+                foreach ($contact->getRequestTo()->getUserNotificationSubscriptions()->toArray() as $payload)
                     $notificationPayload[] = $payload->getSubscription();
 
                 $contactToAdd = [
@@ -200,6 +200,24 @@ class ApiProtectedController extends AbstractController
         return $this->json([
             'message' => 'ok',
             "data" => $contactList
+        ]);
+    }
+
+    #[Route('/selfNotificationSubscription', name: 'selfNotificationSubscription')]
+    public function selfNotificationSubscription(
+        #[CurrentUser()] User $user
+    ): JsonResponse {
+
+        $notificationPayload = [];
+        foreach ($user->getUserNotificationSubscriptions() as $payload) $notificationPayload[] = [
+            "getDeviceName" => $payload->getDeviceName(),
+            "getId" => $payload->getId(),
+            "getSubscription" => $payload->getSubscription()
+        ];
+
+        return $this->json([
+            'message' => 'ok',
+            "data" => $notificationPayload
         ]);
     }
 
