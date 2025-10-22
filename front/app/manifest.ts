@@ -7,9 +7,9 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'The secured and open source chat',
     start_url: '/',
     display: 'standalone',
-    background_color: '#000000',
+    background_color: '#ffffff',
     orientation: 'portrait',
-    theme_color: '#000000',
+    theme_color: '#ffffff',
     categories: ['social', 'chat'],
     icons: [
       {
