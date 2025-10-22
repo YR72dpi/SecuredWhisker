@@ -33,6 +33,7 @@ export default [
       'react/no-unescaped-entities': 'off',
       '@typescript-eslint/no-explicit-any' : "off",
       'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-unused-vars' : 'error',
     //   'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-console': 'off',
       'prefer-const': 'error',
