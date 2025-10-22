@@ -11,7 +11,7 @@ import { API_PROTOCOL, WS_PROTOCOL } from "@/lib/NetworkProtocol";
 import { sha256 } from "@/lib/Crypto/sha256";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
-import { sendNotification } from "./Notification/NotificationActions"
+import { sendNotification } from "../lib/ServerAction/NotificationActions"
 
 export type ReceiverDataForChat = {
     id: string;

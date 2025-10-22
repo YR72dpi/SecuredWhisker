@@ -1,27 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import * as NotificationActions from './NotificationActions'
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 import { Bell } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { JwtTokenLib } from '@/lib/JwtTokenLib'
 import { type PushSubscription } from 'web-push'
-
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-
-  const rawData = window.atob(base64)
-  const outputArray = new Uint8Array(rawData.length)
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i)
-  }
-  return outputArray
-}
-
+import { getSubscription, isPushNotificationSupported, subscribeToPush, unsubscribeFromPush, sendTestNotification } from '@/lib/Notification'
+import { toast } from 'sonner'
+ 
 export function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<globalThis.PushSubscription | PushSubscription | null>(null)
@@ -30,46 +18,24 @@ export function PushNotificationManager() {
   const [jwtToken, setJwtToken] = useState<string>("")
   const [canShowComponent, setCanShowComponent] = useState<boolean>(false)
 
-
-  const getSubscription = async (): Promise<globalThis.PushSubscription | null> => {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-      updateViaCache: 'none',
-    })
-    const sub = await registration.pushManager.getSubscription() as globalThis.PushSubscription | null
-    return sub
-  }
-
-  const subscribeToPush = async () => {
-
-    const registration = await navigator.serviceWorker.ready
-    const sub = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
-      ),
-    }) as unknown as PushSubscription
-
-    setSubscription(sub)
-    const serializedSub = JSON.parse(JSON.stringify(sub))
-
-    await NotificationActions.subscribeUser(serializedSub, deviceName, jwtToken)
-  }
-
-  const unsubscribeFromPush = async () => {
-    const sub = await getSubscription()
-    if (sub !== null) {
-      await NotificationActions.unsubscribeUser(sub, jwtToken)
-      await sub?.unsubscribe()
-      setSubscription(null)
+  const subscribeToPushHandler = async () => {
+    const sub = await subscribeToPush(deviceName, jwtToken) as globalThis.PushSubscription | PushSubscription | null
+    if (sub) {
+      setSubscription(sub)
+      toast.success("Your device will notify you.")
+    } else {
+      toast.error("Error during saving your subscription");
     }
   }
 
-  const sendTestNotification = async () => {
-    if (subscription) {
-      await NotificationActions.sendNotification(JSON.stringify(subscription), message)
-      setMessage('')
-    }
+  const unsubscribeFromPushHandler = async () => {
+    await unsubscribeFromPush(jwtToken)
+    setSubscription(null)
+  }
+
+  const sendTestNotificationHandler = async () => {
+    const sub = subscription as globalThis.PushSubscription | null
+    if (sub) await sendTestNotification(sub, message)
   }
 
   useEffect(() => {
@@ -78,8 +44,7 @@ export function PushNotificationManager() {
       const jwtToken = await JwtTokenLib.isValidJwtToken()
       if (jwtToken && typeof jwtToken === "string") setJwtToken(jwtToken)
 
-      if ('serviceWorker' in navigator && 'PushManager' in window) {
-        console.log("isSupported")
+      if (isPushNotificationSupported) {
         setIsSupported(true)
         const sub = await getSubscription()
         setSubscription(sub)
@@ -112,7 +77,7 @@ export function PushNotificationManager() {
               </div>
 
               <button
-                onClick={unsubscribeFromPush}
+                onClick={unsubscribeFromPushHandler}
                 className="w-full sm:w-auto px-4 py-2 border border-green-600 text-green-700 rounded-lg hover:bg-green-50 font-medium transition-colors"
               >
                 Unsubscribe
@@ -127,7 +92,7 @@ export function PushNotificationManager() {
                   className="flex-1 px-4 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                 />
                 <button
-                  onClick={sendTestNotification}
+                  onClick={sendTestNotificationHandler}
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
                 >
                   Send Test
@@ -137,24 +102,23 @@ export function PushNotificationManager() {
           </>
         )}
 
-        {!subscription && (
+        {!subscription && isSupported && (
           <>
 
-            <Alert className="border-blue-200 bg-gradient-to-r from-blue-50 dark:from-blue-950 to-indigo-50 dark:to-indigo-950 shadow-md">
-              <Bell className="h-5 w-5" />
-              <AlertTitle className="text-blue-900 dark:text-blue-100 font-semibold">
+            <Alert>
+              <Bell/>
+              <AlertTitle className="font-semibold">
                 Notification !
               </AlertTitle>
-              <AlertDescription className="flex flex-col gap-3 mt-2">
-                <p className="text-blue-800 dark:text-blue-100">
+              <AlertDescription className="flex flex-col gap-3">
+                <p>
                   You are not subscribed to push notifications.
                 </p>
                 <label htmlFor="deviceName">Device Name :</label>
                 <Input type="text" id="deviceName" placeholder='Device Name' onChange={(e) => setDeviceName(e.target.value)} />
                 <Button
-                  onClick={subscribeToPush}
+                  onClick={subscribeToPushHandler}
                   disabled={deviceName.length <= 3}
-                  className="w-full sm:w-auto text-white font-medium bg-blue-600 hover:bg-blue-700  shadow-sm"
                 >
                   Subscribe to Notifications
                 </Button>

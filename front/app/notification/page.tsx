@@ -5,10 +5,10 @@ import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon, ChevronLeftIcon } from "lucide-react";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import * as NotificationActions from '../../components/Notification/NotificationActions'
+import { deleteSubscription } from "@/lib/Notification";
 
 type NotificationSubscriptionResponse = {
     getId: number
@@ -25,15 +25,6 @@ export default function Home() {
     const [subscriptionToDelete, setSubscriptionToDelete] = useState<NotificationSubscriptionResponse | null>(null)
     const [jwtTokenForDelete, setJwtTokenForDelete] = useState<string | null>(null)
     const [isDeleting, setIsDeleting] = useState<boolean>(false)
-
-    const getSubscription = async (): Promise<globalThis.PushSubscription | null> => {
-        const registration = await navigator.serviceWorker.register('/sw.js', {
-            scope: '/',
-            updateViaCache: 'none',
-        })
-        const sub = await registration.pushManager.getSubscription() as globalThis.PushSubscription | null
-        return sub
-    }
 
     useEffect(() => {
 
@@ -71,20 +62,9 @@ export default function Home() {
         setSubscriptionToDelete(subscriptionId)
     }
 
-    const deleteSubscription = async (subscriptionToDelete: string) => {
+    const deleteSubscriptionHander = async (subscriptionToDelete: string) => {
         setIsDeleting(true)
-        const subscriptonDecode = JSON.parse(atob(subscriptionToDelete)) as PushSubscription
-        const thisBrowserSubscription = await getSubscription()
-
-        if(
-            thisBrowserSubscription &&
-            subscriptonDecode.endpoint === thisBrowserSubscription.endpoint
-        ) {
-          await thisBrowserSubscription.unsubscribe()
-        }
-
-
-        if (jwtTokenForDelete !== null) await NotificationActions.unsubscribeUser(subscriptonDecode, jwtTokenForDelete)
+        if(jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
         setSubscriptionToDelete(null)
         setIsDeleting(false)
     }
@@ -108,7 +88,7 @@ export default function Home() {
                                 <AlertDescription>
                                     <p>Are you sure you want to delete notifications for the device "{subscriptionToDelete.getDeviceName}"?</p>
                                     <div className="p-3 flex gap-3 justify-end">
-                                        <Button variant="destructive" onClick={() => deleteSubscription(subscriptionToDelete.getSubscription)}>
+                                        <Button variant="destructive" onClick={() => deleteSubscriptionHander(subscriptionToDelete.getSubscription)}>
                                             {isDeleting ? "Deleting..." : "Yes, delete it !"}
                                         </Button>
                                         <Button variant="secondary" onClick={() => setSubscriptionToDelete(null)} >Nop</Button>

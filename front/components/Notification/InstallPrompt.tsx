@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { PushNotificationManager } from "./PushNotificationManager"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Smartphone } from "lucide-react"
 

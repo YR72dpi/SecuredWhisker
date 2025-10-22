@@ -37,7 +37,7 @@ export async function subscribeUser(
     requestOptions
   )
     .then((response) => response.json())
-    .then((result) => {
+    .then(() => {
       return { success: true }
     })
     .catch((error) => console.error(error));
@@ -46,13 +46,12 @@ export async function subscribeUser(
 }
 
 export async function unsubscribeUser(
-  sub: PushSubscription|globalThis.PushSubscription, 
+  sub: string, 
   jwtToken: string
 ) {
-  const subscriptionPayload = btoa(JSON.stringify(sub))
 
   const data = JSON.stringify({
-    subsciption: subscriptionPayload
+    subsciption: sub
   })
 
   const myHeaders = new Headers();
