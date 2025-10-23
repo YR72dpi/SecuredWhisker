@@ -1,10 +1,10 @@
 'use client'
 import * as NotificationActions from "./ServerAction/NotificationActions"
 
-export const isPushNotificationSupported = () : boolean => { 
+export const isPushNotificationSupported = (): boolean => {
     return 'serviceWorker' in navigator && 'PushManager' in window
 }
-export const isPushNotificationDenied = () : boolean => {
+export const isPushNotificationDenied = (): boolean => {
     return typeof window !== 'undefined' && Notification.permission === 'denied'
 }
 
@@ -18,7 +18,7 @@ export const getSubscription = async (): Promise<globalThis.PushSubscription | n
     return sub
 }
 
-export const subscribeToPush = async (deviceName: string, userAgent: string, jwtToken: string): Promise<PushSubscription|null> => {
+export const subscribeToPush = async (deviceName: string, userAgent: string, jwtToken: string): Promise<PushSubscription | null> => {
     let sub = null
     try {
         const registration = await navigator.serviceWorker.ready
@@ -29,7 +29,26 @@ export const subscribeToPush = async (deviceName: string, userAgent: string, jwt
             ),
         }) as unknown as PushSubscription
     } catch (err: any) {
-        throw new Error("Error during generating the Push Subscription", err)
+        // Log détaillé pour le debugging
+        console.error("Push subscription failed:", {
+            name: err.name,
+            message: err.message,
+            code: err.code,
+            stack: err.stack
+        })
+
+        // Map des erreurs communes
+        const errorMessages: Record<string, string> = {
+            'NotAllowedError': 'Permission refusée. Autorisez les notifications dans votre navigateur.',
+            'NotSupportedError': 'Notifications non supportées sur ce navigateur.',
+            'AbortError': 'Souscription annulée par l\'utilisateur.',
+            'InvalidStateError': 'Service worker dans un état invalide. Rechargez la page.',
+        }
+
+        const userMessage = errorMessages[err.name] ||
+            `Erreur lors de l'inscription aux notifications: ${err.message}`
+
+        throw new Error(userMessage)
     }
 
     if (sub !== null) {
