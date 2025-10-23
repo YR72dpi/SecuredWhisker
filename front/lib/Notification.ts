@@ -1,8 +1,12 @@
 'use client'
 import * as NotificationActions from "./ServerAction/NotificationActions"
 
-export const isPushNotificationSupported = 'serviceWorker' in navigator && 'PushManager' in window;
-export const isPushNotificationDenied = typeof window !== 'undefined' && Notification.permission === 'denied'
+export const isPushNotificationSupported = () : boolean => { 
+    return 'serviceWorker' in navigator && 'PushManager' in window
+}
+export const isPushNotificationDenied = () : boolean => {
+    return typeof window !== 'undefined' && Notification.permission === 'denied'
+}
 
 
 export const getSubscription = async (): Promise<globalThis.PushSubscription | null> => {

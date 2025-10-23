@@ -218,7 +218,7 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
           <SidebarGroupContent>
             <SidebarMenu>
               
-                {isPushNotificationSupported && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
+                {isPushNotificationSupported() && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
 
             </SidebarMenu>
           </SidebarGroupContent>

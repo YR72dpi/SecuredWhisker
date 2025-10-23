@@ -69,7 +69,7 @@ export default function Home() {
                 <main className="w-full border p-3 flex flex-col gap-3">
                     <SidebarTrigger />
 
-                    {isPushNotificationSupported && (<PushNotificationManager />)}
+                    {isPushNotificationSupported() && (<PushNotificationManager />)}
                     <InstallPrompt />
 
                     {!hasPrivateKey.current && (

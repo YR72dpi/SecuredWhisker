@@ -50,7 +50,7 @@ export function PushNotificationManager() {
       
       setUserAgent(navigator.userAgent )
 
-      if (isPushNotificationSupported) {
+      if (isPushNotificationSupported()) {
         setIsSupported(true)
         const sub = await getSubscription()
         setSubscription(sub)
