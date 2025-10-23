@@ -9,6 +9,10 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!
 )
 
+export async function isVapIdOk () {
+  return !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && !!process.env.VAPID_PRIVATE_KEY
+}
+
 export async function subscribeUser(
   sub: PushSubscription, 
   deviceName: string,

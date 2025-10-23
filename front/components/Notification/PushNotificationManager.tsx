@@ -10,6 +10,7 @@ import { type PushSubscription } from 'web-push'
 import { getSubscription, isPushNotificationSupported, subscribeToPush, unsubscribeFromPush, sendTestNotification } from '@/lib/Notification'
 import { toast } from 'sonner'
 import { Spinner } from '../ui/spinner'
+import { isVapIdOk } from '@/lib/ServerAction/NotificationActions'
  
 export function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false)
@@ -50,7 +51,8 @@ export function PushNotificationManager() {
       
       setUserAgent(navigator.userAgent )
 
-      if (isPushNotificationSupported()) {
+      const vapidOk = await isVapIdOk()
+      if (isPushNotificationSupported() && vapidOk) {
         setIsSupported(true)
         const sub = await getSubscription()
         setSubscription(sub)
@@ -110,7 +112,6 @@ export function PushNotificationManager() {
 
         {!subscription && isSupported && (
           <>
-
             <Alert>
               <Bell/>
               <AlertTitle className="font-semibold">
@@ -124,7 +125,7 @@ export function PushNotificationManager() {
                 <Input type="text" id="deviceName" placeholder='Device Name' onChange={(e) => setDeviceName(e.target.value)} />
                 <Button
                   onClick={subscribeToPushHandler}
-                  disabled={deviceName.length <= 3 || isLoadingSubscription}
+                  disabled={(deviceName !== null && (deviceName.length + 1) <= 3) || isLoadingSubscription}
                 >
                   {isLoadingSubscription ? <Spinner /> : ("Subscribe to Notifications")}
                 </Button>
