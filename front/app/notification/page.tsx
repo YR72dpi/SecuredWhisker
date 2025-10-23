@@ -156,7 +156,7 @@ export default function Home() {
                             <ul className="w-[50%] w-min-[250px] w-max-[400px] my-0 mx-auto flex flex-wrap justify-center gap-3">
                                 {selfNotificationDataPayload.map(payload => (
                                     <li key={payload.getId} className="w-52 h-32 border rounded-xl p-3 flex flex-col justify-between">
-                                        <div className="border h-full flex items-center justify-center">
+                                        <div className="h-full flex items-center justify-center">
                                             {DeviceIcons(parseUserAgent(payload.getUserAgent))}
                                         </div>
                                         <div className="h-[44px] flex items-center justify-between">
