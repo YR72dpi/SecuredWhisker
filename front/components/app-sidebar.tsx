@@ -39,6 +39,7 @@ import { RSAPrivateKeyTransmetter } from "./RSAPrivateKeyTransfertComponent/RSAP
 import { RSAPrivateKeyReceiver } from "./RSAPrivateKeyTransfertComponent/RSAPrivateKeyReceiver"
 import { UserIndentifierQrCode } from "./Friendship/UserIdentifierQrCode"
 import { useTheme } from "next-themes"
+import { isPushNotificationSupported } from "@/lib/Notification"
 
 type AppSidebarProps = {
   identifier: string | null
@@ -217,7 +218,7 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
           <SidebarGroupContent>
             <SidebarMenu>
               
-                <SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>
+                {isPushNotificationSupported && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
 
             </SidebarMenu>
           </SidebarGroupContent>

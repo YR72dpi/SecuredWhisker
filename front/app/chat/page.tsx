@@ -11,6 +11,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
 import { PushNotificationManager } from "@/components/Notification/PushNotificationManager";
 import { InstallPrompt } from "@/components/Notification/InstallPrompt";
+import { isPushNotificationSupported } from "@/lib/Notification";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
@@ -68,7 +69,7 @@ export default function Home() {
                 <main className="w-full border p-3 flex flex-col gap-3">
                     <SidebarTrigger />
 
-                    <PushNotificationManager />
+                    {isPushNotificationSupported && (<PushNotificationManager />)}
                     <InstallPrompt />
 
                     {!hasPrivateKey.current && (
@@ -97,16 +98,16 @@ export default function Home() {
                         </>
                     )}
 
-                    { hasPrivateKey.current 
-                    && senderData
-                    && selectedContact 
-                    && (
-                        <Chat
-                            senderDataForChat={senderData}
-                            receiverDataForChat={selectedContact}
-                            setContactData={setSelectedContact}
-                        />
-                    )}
+                    {hasPrivateKey.current
+                        && senderData
+                        && selectedContact
+                        && (
+                            <Chat
+                                senderDataForChat={senderData}
+                                receiverDataForChat={selectedContact}
+                                setContactData={setSelectedContact}
+                            />
+                        )}
                 </main>
             </SidebarProvider>
         ) : null
