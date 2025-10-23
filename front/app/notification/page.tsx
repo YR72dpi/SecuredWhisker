@@ -9,6 +9,7 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { deleteSubscription } from "@/lib/Notification";
+import { Spinner } from "@/components/ui/spinner";
 
 type NotificationSubscriptionResponse = {
     getId: number
@@ -64,7 +65,7 @@ export default function Home() {
 
     const deleteSubscriptionHander = async (subscriptionToDelete: string) => {
         setIsDeleting(true)
-        if(jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
+        if (jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
         setSubscriptionToDelete(null)
         setIsDeleting(false)
     }
@@ -88,10 +89,22 @@ export default function Home() {
                                 <AlertDescription>
                                     <p>Are you sure you want to delete notifications for the device "{subscriptionToDelete.getDeviceName}"?</p>
                                     <div className="p-3 flex gap-3 justify-end">
-                                        <Button variant="destructive" onClick={() => deleteSubscriptionHander(subscriptionToDelete.getSubscription)}>
-                                            {isDeleting ? "Deleting..." : "Yes, delete it !"}
+                                        <Button 
+                                        variant="destructive" 
+                                        onClick={() => deleteSubscriptionHander(subscriptionToDelete.getSubscription)}
+                                        disabled={isDeleting}
+                                        >
+                                            {isDeleting ? (
+                                                <>
+                                                <Spinner/> Deleting...
+                                                </>
+                                            ) : "Yes, delete it !"}
                                         </Button>
-                                        <Button variant="secondary" onClick={() => setSubscriptionToDelete(null)} >Nop</Button>
+                                        <Button
+                                            variant="secondary"
+                                            disabled={isDeleting}
+                                            onClick={() => setSubscriptionToDelete(null)}
+                                        >Nop</Button>
                                     </div>
                                 </AlertDescription>
                             </Alert>
@@ -102,7 +115,10 @@ export default function Home() {
                                 {selfNotificationDataPayload.map(payload => (
                                     <li key={payload.getId} className="flex justify-center gap-3 items-center border-b p-3">
                                         <p className="w-[100px]">{payload.getDeviceName}</p>
-                                        <Button disabled={!!subscriptionToDelete} onClick={() => confirmBeforeDelete(payload)}>Delete</Button>
+                                        <Button
+                                            disabled={!!subscriptionToDelete}
+                                            onClick={() => confirmBeforeDelete(payload)}
+                                        >Delete</Button>
                                     </li>
                                 ))}
                             </ul>

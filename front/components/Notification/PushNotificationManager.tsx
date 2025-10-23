@@ -9,6 +9,7 @@ import { JwtTokenLib } from '@/lib/JwtTokenLib'
 import { type PushSubscription } from 'web-push'
 import { getSubscription, isPushNotificationSupported, subscribeToPush, unsubscribeFromPush, sendTestNotification } from '@/lib/Notification'
 import { toast } from 'sonner'
+import { Spinner } from '../ui/spinner'
  
 export function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false)
@@ -17,8 +18,10 @@ export function PushNotificationManager() {
   const [deviceName, setDeviceName] = useState<string>("")
   const [jwtToken, setJwtToken] = useState<string>("")
   const [canShowComponent, setCanShowComponent] = useState<boolean>(false)
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState<boolean>(false)
 
   const subscribeToPushHandler = async () => {
+    setIsLoadingSubscription(true)
     const sub = await subscribeToPush(deviceName, jwtToken) as globalThis.PushSubscription | PushSubscription | null
     if (sub) {
       setSubscription(sub)
@@ -118,9 +121,9 @@ export function PushNotificationManager() {
                 <Input type="text" id="deviceName" placeholder='Device Name' onChange={(e) => setDeviceName(e.target.value)} />
                 <Button
                   onClick={subscribeToPushHandler}
-                  disabled={deviceName.length <= 3}
+                  disabled={deviceName.length <= 3 || isLoadingSubscription}
                 >
-                  Subscribe to Notifications
+                  {isLoadingSubscription ? <Spinner /> : ("Subscribe to Notifications")}
                 </Button>
               </AlertDescription>
             </Alert>
