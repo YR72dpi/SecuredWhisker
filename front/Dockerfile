@@ -6,12 +6,10 @@ FROM node:18-alpine AS base
 FROM base AS builder
 
 WORKDIR /app
-COPY . ./
-RUN npm install
-RUN npm run build
 
-# Step 2. Production image, copy all the files and run next
-FROM base AS runner
+COPY . ./
+
+RUN npm install
 
 ARG NEXT_PUBLIC_GPT_API_KEY
 ARG NEXT_PUBLIC_USER_HOST
@@ -30,6 +28,11 @@ ENV NEXT_PUBLIC_APP_VERSION=$NEXT_PUBLIC_APP_VERSION
 ENV NEXT_PUBLIC_IP_WHITELIST=$NEXT_PUBLIC_IP_WHITELIST
 ENV NEXT_PUBLIC_VAPID_PUBLIC_KEY=$NEXT_PUBLIC_VAPID_PUBLIC_KEY
 ENV VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY
+
+RUN npm run build
+
+# Step 2. Production image, copy all the files and run next
+FROM base AS runner
 
 WORKDIR /app
 
