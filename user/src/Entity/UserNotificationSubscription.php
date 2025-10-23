@@ -24,6 +24,9 @@ class UserNotificationSubscription
     #[ORM\Column(type: Types::TEXT)]
     private ?string $subscription = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $userAgent = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +64,18 @@ class UserNotificationSubscription
     public function setSubscription(string $subscription): static
     {
         $this->subscription = $subscription;
+
+        return $this;
+    }
+
+    public function getUserAgent(): ?string
+    {
+        return $this->userAgent;
+    }
+
+    public function setUserAgent(string $userAgent): static
+    {
+        $this->userAgent = $userAgent;
 
         return $this;
     }

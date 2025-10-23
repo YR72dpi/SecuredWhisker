@@ -19,10 +19,11 @@ export function PushNotificationManager() {
   const [jwtToken, setJwtToken] = useState<string>("")
   const [canShowComponent, setCanShowComponent] = useState<boolean>(false)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState<boolean>(false)
+  const [userAgent, setUserAgent] = useState<string>("");
 
   const subscribeToPushHandler = async () => {
     setIsLoadingSubscription(true)
-    const sub = await subscribeToPush(deviceName, jwtToken) as globalThis.PushSubscription | PushSubscription | null
+    const sub = await subscribeToPush(deviceName, userAgent, jwtToken) as globalThis.PushSubscription | PushSubscription | null
     if (sub) {
       setSubscription(sub)
       toast.success("Your device will notify you.")
@@ -46,6 +47,8 @@ export function PushNotificationManager() {
     (async () => {
       const jwtToken = await JwtTokenLib.isValidJwtToken()
       if (jwtToken && typeof jwtToken === "string") setJwtToken(jwtToken)
+      
+      setUserAgent(navigator.userAgent )
 
       if (isPushNotificationSupported) {
         setIsSupported(true)

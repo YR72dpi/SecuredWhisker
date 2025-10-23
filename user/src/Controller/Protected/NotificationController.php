@@ -36,7 +36,9 @@ class NotificationController extends AbstractController
             $subscription = (new UserNotificationSubscription())
                 ->setUserId($security->getUser())
                 ->setSubscription($data["subsciption"])
-                ->setDeviceName($data["deviceName"]);
+                ->setDeviceName($data["deviceName"])
+                ->setUserAgent($data["userAgent"])
+                ;
 
             $em->persist($subscription);
             $em->flush();

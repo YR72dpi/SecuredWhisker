@@ -14,7 +14,7 @@ export const getSubscription = async (): Promise<globalThis.PushSubscription | n
     return sub
 }
 
-export const subscribeToPush = async (deviceName: string, jwtToken: string): Promise<PushSubscription|null> => {
+export const subscribeToPush = async (deviceName: string, userAgent: string, jwtToken: string): Promise<PushSubscription|null> => {
     let sub = null
     try {
         const registration = await navigator.serviceWorker.ready
@@ -30,7 +30,7 @@ export const subscribeToPush = async (deviceName: string, jwtToken: string): Pro
 
     if (sub !== null) {
         const serializedSub = JSON.parse(JSON.stringify(sub))
-        await NotificationActions.subscribeUser(serializedSub, deviceName, jwtToken)
+        await NotificationActions.subscribeUser(serializedSub, deviceName, userAgent, jwtToken)
         return sub
     }
     return null

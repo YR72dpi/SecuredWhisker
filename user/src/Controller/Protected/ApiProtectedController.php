@@ -212,6 +212,7 @@ class ApiProtectedController extends AbstractController
         foreach ($user->getUserNotificationSubscriptions() as $payload) $notificationPayload[] = [
             "getDeviceName" => $payload->getDeviceName(),
             "getId" => $payload->getId(),
+            "getUserAgent" =>  $payload->getUserAgent(),
             "getSubscription" => $payload->getSubscription()
         ];
 

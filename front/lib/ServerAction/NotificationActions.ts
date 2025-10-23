@@ -12,6 +12,7 @@ webpush.setVapidDetails(
 export async function subscribeUser(
   sub: PushSubscription, 
   deviceName: string,
+  userAgent: string,
   jwtToken: string
 ) {
   
@@ -19,6 +20,7 @@ export async function subscribeUser(
 
   const data = JSON.stringify({
     deviceName: deviceName,
+    userAgent:userAgent,
     subsciption: subscriptionPayload
   })
 

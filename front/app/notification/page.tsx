@@ -3,17 +3,22 @@ import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useRef, useState } from "react";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon, ChevronLeftIcon } from "lucide-react";
+import { AlertCircleIcon, ChevronLeftIcon, Trash2 } from "lucide-react";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { deleteSubscription } from "@/lib/Notification";
 import { Spinner } from "@/components/ui/spinner";
+import { parseUserAgent, UserAgentInfo } from "@/lib/UserAgentInfo";
+
+import { LuSmartphone, LuTablet, LuMonitor, LuBot } from "react-icons/lu";
+import { FaWindows, FaApple, FaLinux, FaAndroid, FaChrome, FaFirefoxBrowser, FaSafari } from "react-icons/fa";
 
 type NotificationSubscriptionResponse = {
     getId: number
     getDeviceName: string
+    getUserAgent: string
     getSubscription: string
 }
 
@@ -57,7 +62,7 @@ export default function Home() {
                 })
                 .catch((error) => console.error(error));
         })()
-    }, [selfNotificationDataPayload])
+    }, [])
 
     const confirmBeforeDelete = async (subscriptionId: NotificationSubscriptionResponse) => {
         setSubscriptionToDelete(subscriptionId)
@@ -68,6 +73,43 @@ export default function Home() {
         if (jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
         setSubscriptionToDelete(null)
         setIsDeleting(false)
+    }
+
+    const DeviceIcons = (uaInfo: UserAgentInfo) => {
+        const getDeviceIcon = () => {
+            switch (uaInfo.deviceType) {
+                case 'mobile': return <LuSmartphone  size={24} />;
+                case 'tablet': return <LuTablet size={24} />;
+                case 'desktop': return <LuMonitor size={24} />;
+                case 'bot': return <LuBot size={24} />;
+                default: return "";
+            }
+        };
+
+        const getOSIcon = () => {
+            const os = uaInfo.os.toLowerCase();
+            if (os.includes('windows')) return <FaWindows  size={24} />;
+            if (os.includes('mac') || os.includes('ios')) return <FaApple  size={24} />;
+            if (os.includes('linux')) return <FaLinux size={24} />;
+            if (os.includes('android')) return <FaAndroid  size={24} />;
+            return "";
+        };
+
+        const getBrowserIcon = () => {
+            const browser = uaInfo.browser.toLowerCase();
+            if (browser.includes('chrome')) return <FaChrome  size={24} />;
+            if (browser.includes('firefox')) return <FaFirefoxBrowser  size={24} />;
+            if (browser.includes('safari')) return <FaSafari  size={24} />;
+            return "";
+        };
+
+        return (
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                {getDeviceIcon()}
+                {getOSIcon()}
+                {getBrowserIcon()}
+            </div>
+        );
     }
 
     return (
@@ -89,14 +131,14 @@ export default function Home() {
                                 <AlertDescription>
                                     <p>Are you sure you want to delete notifications for the device "{subscriptionToDelete.getDeviceName}"?</p>
                                     <div className="p-3 flex gap-3 justify-end">
-                                        <Button 
-                                        variant="destructive" 
-                                        onClick={() => deleteSubscriptionHander(subscriptionToDelete.getSubscription)}
-                                        disabled={isDeleting}
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() => deleteSubscriptionHander(subscriptionToDelete.getSubscription)}
+                                            disabled={isDeleting}
                                         >
                                             {isDeleting ? (
                                                 <>
-                                                <Spinner/> Deleting...
+                                                    <Spinner /> Deleting...
                                                 </>
                                             ) : "Yes, delete it !"}
                                         </Button>
@@ -111,14 +153,22 @@ export default function Home() {
                         )}
 
                         {selfNotificationDataPayload.length > 0 ? (
-                            <ul className="w-[50%] w-min-[250px] w-max-[400px] my-0 mx-auto flex flex-col gap-3">
+                            <ul className="w-[50%] w-min-[250px] w-max-[400px] my-0 mx-auto flex flex-wrap justify-center gap-3">
                                 {selfNotificationDataPayload.map(payload => (
-                                    <li key={payload.getId} className="flex justify-center gap-3 items-center border-b p-3">
-                                        <p className="w-[100px]">{payload.getDeviceName}</p>
-                                        <Button
-                                            disabled={!!subscriptionToDelete}
-                                            onClick={() => confirmBeforeDelete(payload)}
-                                        >Delete</Button>
+                                    <li key={payload.getId} className="w-52 h-32 border rounded-xl p-3 flex flex-col justify-between">
+                                        <div className="border h-full flex items-center justify-center">
+                                            {DeviceIcons(parseUserAgent(payload.getUserAgent))}
+                                        </div>
+                                        <div className="h-[44px] flex items-center justify-between">
+                                            <p className="w-full truncate pr-1">{payload.getDeviceName}</p>
+                                            <Button
+                                                className="w-[44px] h-[44px]"
+                                                disabled={!!subscriptionToDelete}
+                                                onClick={() => confirmBeforeDelete(payload)}
+                                            >
+                                                <Trash2 />
+                                            </Button>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
