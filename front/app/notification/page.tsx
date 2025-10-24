@@ -185,7 +185,7 @@ export default function Home() {
 
 
 								{selfNotificationDataPayload.length > 0 ? (
-									<ul className="border w-full my-0 mx-auto flex gap-3 box-border">
+									<ul className="border w-full my-0 mx-auto flex flex-wrap gap-3 box-border">
 										{selfNotificationDataPayload.map(payload => (
 											<li key={payload.getId} className="w-[50%] h-32 border rounded-xl p-3 flex flex-col justify-between">
 												<div className="h-full flex items-center justify-center">
@@ -204,25 +204,6 @@ export default function Home() {
 											</li>
 											
 										))}
-										{selfNotificationDataPayload.map(payload => (
-											<li key={payload.getId} className="w-[50%] h-32 border rounded-xl p-3 flex flex-col justify-between">
-												<div className="h-full flex items-center justify-center">
-													{DeviceIcons(parseUserAgent(payload.getUserAgent))}
-												</div>
-												<div className="h-[44px] flex items-center justify-between">
-													<p className="w-full truncate pr-1">{payload.getDeviceName}</p>
-													<Button
-														className="w-[44px] h-[44px]"
-														disabled={!!subscriptionToDelete}
-														onClick={() => confirmBeforeDelete(payload)}
-													>
-														<Trash2 />
-													</Button>
-												</div>
-											</li>
-											
-										))}
-										
 									</ul>
 								) : (
 									<p className="px-3 text-center">You didn't subscribe on any device ! 🤷‍♂️</p>
