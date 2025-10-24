@@ -1,6 +1,6 @@
 "use client"
 import { SwDb } from "@/lib/SwDatabase";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon, ChevronLeftIcon, Trash2 } from "lucide-react";
@@ -22,8 +22,6 @@ type NotificationSubscriptionResponse = {
 	getUserAgent: string
 	getSubscription: string
 }
-
-type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function Home() {
 	const [canShowPage, setCanShowPage] = useState(false)
