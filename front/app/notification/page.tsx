@@ -37,8 +37,6 @@ export default function Home() {
 	const [jwtTokenForDelete, setJwtTokenForDelete] = useState<string | null>(null)
 	const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
-
-
 	const deleteBrowserSubscriptionIfNotFindOnDb = async () => {
 		const thisBrowserSubscription = await getSubscription()
 
