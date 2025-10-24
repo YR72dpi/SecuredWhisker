@@ -1,11 +1,11 @@
-const CACHE_VERSION = 'v1.0.0';
-const CACHE_NAME = 'offline-v1';
+const CACHE_VERSION = 'v2.0.0';
+const CACHE_NAME = 'offline-v2';
 
 // Installation : mettre en cache la page offline
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.add('/offline');
+      return cache.add('/offline.html');
     })
   );
   self.skipWaiting();
