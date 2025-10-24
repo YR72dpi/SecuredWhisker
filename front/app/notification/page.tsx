@@ -1,6 +1,6 @@
 "use client"
 import { SwDb } from "@/lib/SwDatabase";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon, ChevronLeftIcon, Trash2 } from "lucide-react";
@@ -9,11 +9,13 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { deleteSubscription, getSubscription } from "@/lib/Notification";
+import { deleteSubscription, getSubscription } from "@/lib/Notification";
 import { Spinner } from "@/components/ui/spinner";
 import { parseUserAgent, UserAgentInfo } from "@/lib/UserAgentInfo";
 
 import { LuSmartphone, LuTablet, LuMonitor, LuBot } from "react-icons/lu";
 import { FaWindows, FaApple, FaLinux, FaAndroid, FaChrome, FaFirefoxBrowser, FaSafari } from "react-icons/fa";
+import { PushSubscription } from "web-push";
 import { PushSubscription } from "web-push";
 
 type NotificationSubscriptionResponse = {
@@ -22,6 +24,8 @@ type NotificationSubscriptionResponse = {
 	getUserAgent: string
 	getSubscription: string
 }
+
+type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function Home() {
 	const [canShowPage, setCanShowPage] = useState(false)
@@ -222,4 +226,3 @@ export default function Home() {
 		</SidebarProvider>
 	);
 }
-
