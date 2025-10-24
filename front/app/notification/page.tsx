@@ -9,13 +9,11 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { deleteSubscription, getSubscription } from "@/lib/Notification";
-import { deleteSubscription, getSubscription } from "@/lib/Notification";
 import { Spinner } from "@/components/ui/spinner";
 import { parseUserAgent, UserAgentInfo } from "@/lib/UserAgentInfo";
 
 import { LuSmartphone, LuTablet, LuMonitor, LuBot } from "react-icons/lu";
 import { FaWindows, FaApple, FaLinux, FaAndroid, FaChrome, FaFirefoxBrowser, FaSafari } from "react-icons/fa";
-import { PushSubscription } from "web-push";
 import { PushSubscription } from "web-push";
 
 type NotificationSubscriptionResponse = {
