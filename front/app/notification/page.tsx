@@ -35,10 +35,12 @@ export default function Home() {
 
 	const deleteBrowserSubscriptionIfNotFindOnDb = async () => {
 		const thisBrowserSubscription = await getSubscription()
-		console.log(thisBrowserSubscription)
-		console.log(selfNotificationDataPayload)
+
+		if(selfNotificationDataPayload === null ) return
+		if(selfNotificationDataPayload.length === 0 ) return
+
 		let thisBrowserSubScriptionFind = false
-		if(selfNotificationDataPayload !== null) selfNotificationDataPayload.forEach((payload) => {
+		if (selfNotificationDataPayload !== null) selfNotificationDataPayload.forEach((payload) => {
 			const decodedSubscription = JSON.parse(atob(payload.getSubscription)) as PushSubscription
 			if (
 				!thisBrowserSubScriptionFind
@@ -49,45 +51,49 @@ export default function Home() {
 		})
 
 		console.log(thisBrowserSubScriptionFind)
-		// if (!thisBrowserSubScriptionFind) await thisBrowserSubscription?.unsubscribe()
+		if (!thisBrowserSubScriptionFind) {
+			await thisBrowserSubscription?.unsubscribe()
+			await fetchSubscription()
+		}
+
+	}
+
+	const fetchSubscription = async () => {
+		const jwtToken = await JwtTokenLib.isValidJwtToken()
+		if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtToken)
+		if (!jwtToken) window.location.replace("/");
+		if (typeof jwtToken === "string") setJwtTokenForDelete(jwtToken)
+
+		const myHeaders = new Headers();
+		myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+		const requestOptions: RequestInit = {
+			method: "GET",
+			headers: myHeaders,
+			redirect: "follow"
+		};
+
+		await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfNotificationSubscription", requestOptions)
+			.then((response) => response.json())
+			.then(async (result) => {
+				const data = result.data as NotificationSubscriptionResponse[]
+				setSelfNotificationDataPayload(data)
+			})
+			.catch((error) => console.error(error));
 	}
 
 	useEffect(() => {
-
 		(async () => {
-
-			const jwtToken = await JwtTokenLib.isValidJwtToken()
-			if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtToken)
-			if (!jwtToken) window.location.replace("/");
-			if (typeof jwtToken === "string") setJwtTokenForDelete(jwtToken)
-
 			const privateKeyInterface = await SwDb.getPrivateKey()
 			hasPrivateKey.current = privateKeyInterface ? true : false
 
-			const myHeaders = new Headers();
-			myHeaders.append("Authorization", "Bearer " + jwtToken);
-
-			const requestOptions: RequestInit = {
-				method: "GET",
-				headers: myHeaders,
-				redirect: "follow"
-			};
-
-			await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfNotificationSubscription", requestOptions)
-				.then((response) => response.json())
-				.then(async (result) => {
-					const data = result.data as NotificationSubscriptionResponse[]
-					setSelfNotificationDataPayload(data)
-					setCanShowPage(true)
-				})
-				.catch((error) => console.error(error));
-
-
+			await fetchSubscription()
+			setCanShowPage(true)
 		})()
 	}, [])
 
 	useEffect(() => {
-		if(selfNotificationDataPayload !== null) deleteBrowserSubscriptionIfNotFindOnDb()
+		if (selfNotificationDataPayload !== null) deleteBrowserSubscriptionIfNotFindOnDb()
 	}, [selfNotificationDataPayload])
 
 	const confirmBeforeDelete = async (subscriptionId: NotificationSubscriptionResponse) => {
@@ -101,6 +107,8 @@ export default function Home() {
 		if (jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
 		setSubscriptionToDelete(null)
 		setIsDeleting(false)
+		setSelfNotificationDataPayload(null)
+		await fetchSubscription()
 	}
 
 	const DeviceIcons = (uaInfo: UserAgentInfo) => {
@@ -152,7 +160,7 @@ export default function Home() {
 				</Link>
 				<>
 
-					<div className="w-full max-w-[428px] mx-auto">
+					<div className="w-full max-w-[428px] mx-auto flex flex-col gap-3">
 						<h1 className="font-bold text-xl mb-3">Notification receiving device</h1>
 
 						{canShowPage ? (
