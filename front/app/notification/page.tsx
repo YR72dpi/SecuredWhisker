@@ -186,7 +186,7 @@ export default function Home() {
 								)}
 
 
-								{selfNotificationDataPayload.length > 0 ? (
+								{selfNotificationDataPayload && selfNotificationDataPayload.length > 0 ? (
 									<ul className="w-full my-0 mx-auto flex flex-wrap gap-3 box-border">
 										{selfNotificationDataPayload.map(payload => (
 											<li key={payload.getId} className="w-[48%] h-32 border rounded-xl p-3 flex flex-col justify-between">
