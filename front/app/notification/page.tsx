@@ -8,20 +8,13 @@ import { JwtTokenLib } from "@/lib/JwtTokenLib";
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { deleteSubscription, getSubscription } from "@/lib/Notification";
 import { Spinner } from "@/components/ui/spinner";
 import { parseUserAgent, UserAgentInfo } from "@/lib/UserAgentInfo";
 
 import { LuSmartphone, LuTablet, LuMonitor, LuBot } from "react-icons/lu";
 import { FaWindows, FaApple, FaLinux, FaAndroid, FaChrome, FaFirefoxBrowser, FaSafari } from "react-icons/fa";
-import { PushSubscription } from "web-push";
-
-type NotificationSubscriptionResponse = {
-	getId: number
-	getDeviceName: string
-	getUserAgent: string
-	getSubscription: string
-}
+import { deleteBrowserSubscriptionIfNotFindOnDb, deleteSubscription, fetchSubscriptionFromDb, NotificationSubscriptionResponse } from "@/lib/Notification";
+import { toast } from "sonner";
 
 export default function Home() {
 	const [canShowPage, setCanShowPage] = useState(false)
@@ -30,71 +23,30 @@ export default function Home() {
 	const [selfNotificationDataPayload, setSelfNotificationDataPayload] = useState<NotificationSubscriptionResponse[] | null>(null)
 
 	const [subscriptionToDelete, setSubscriptionToDelete] = useState<NotificationSubscriptionResponse | null>(null)
-	const [jwtTokenForDelete, setJwtTokenForDelete] = useState<string | null>(null)
+	const [jwtToken, setJwtToken] = useState<string | null>(null)
 	const [isDeleting, setIsDeleting] = useState<boolean>(false)
-
-	const deleteBrowserSubscriptionIfNotFindOnDb = async () => {
-		const thisBrowserSubscription = await getSubscription()
-
-		if(selfNotificationDataPayload === null ) return
-		if(selfNotificationDataPayload.length === 0 ) return
-
-		let thisBrowserSubScriptionFind = false
-		if (selfNotificationDataPayload !== null) selfNotificationDataPayload.forEach((payload) => {
-			const decodedSubscription = JSON.parse(atob(payload.getSubscription)) as PushSubscription
-			if (
-				!thisBrowserSubScriptionFind
-				&& thisBrowserSubscription?.endpoint === decodedSubscription.endpoint
-			) {
-				thisBrowserSubScriptionFind = true
-			}
-		})
-
-		console.log(thisBrowserSubScriptionFind)
-		if (!thisBrowserSubScriptionFind) {
-			await thisBrowserSubscription?.unsubscribe()
-			await fetchSubscription()
-		}
-
-	}
-
-	const fetchSubscription = async () => {
-		const jwtToken = await JwtTokenLib.isValidJwtToken()
-		if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtToken)
-		if (!jwtToken) window.location.replace("/");
-		if (typeof jwtToken === "string") setJwtTokenForDelete(jwtToken)
-
-		const myHeaders = new Headers();
-		myHeaders.append("Authorization", "Bearer " + jwtToken);
-
-		const requestOptions: RequestInit = {
-			method: "GET",
-			headers: myHeaders,
-			redirect: "follow"
-		};
-
-		await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfNotificationSubscription", requestOptions)
-			.then((response) => response.json())
-			.then(async (result) => {
-				const data = result.data as NotificationSubscriptionResponse[]
-				setSelfNotificationDataPayload(data)
-			})
-			.catch((error) => console.error(error));
-	}
 
 	useEffect(() => {
 		(async () => {
-			const privateKeyInterface = await SwDb.getPrivateKey()
-			hasPrivateKey.current = privateKeyInterface ? true : false
 
-			await fetchSubscription()
-			setCanShowPage(true)
+			const jwtTokenValid = await JwtTokenLib.isValidJwtToken()
+			if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtTokenValid)
+			if (!jwtTokenValid) window.location.replace("/")
+
+			setJwtToken(jwtTokenValid)
+
+			const userSubscriptionFromDb = await fetchSubscriptionFromDb(jwtTokenValid as string)
+			console.log(userSubscriptionFromDb)
+
+			if (userSubscriptionFromDb) {
+				await deleteBrowserSubscriptionIfNotFindOnDb(jwtTokenValid as string)
+				setSelfNotificationDataPayload(userSubscriptionFromDb)
+				setCanShowPage(true)
+			}
+
+
 		})()
 	}, [])
-
-	useEffect(() => {
-		if (selfNotificationDataPayload !== null) deleteBrowserSubscriptionIfNotFindOnDb()
-	}, [selfNotificationDataPayload])
 
 	const confirmBeforeDelete = async (subscriptionId: NotificationSubscriptionResponse) => {
 		setSubscriptionToDelete(subscriptionId)
@@ -104,11 +56,26 @@ export default function Home() {
 	// delete the browser subscription if it's in this browser
 	const deleteSubscriptionHandler = async (subscriptionToDelete: string) => {
 		setIsDeleting(true)
-		if (jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
+		if (jwtToken) {
+			try {
+				await deleteSubscription(subscriptionToDelete, jwtToken)
+				toast.success("The device has been successfully deleted.")
+			} catch(err: any) {
+				console.error(err)
+				toast.error("The device could not be deleted.")
+			}
+		}
 		setSubscriptionToDelete(null)
 		setIsDeleting(false)
 		setSelfNotificationDataPayload(null)
-		await fetchSubscription()
+
+		if (typeof jwtToken === "string") {
+			setJwtToken(jwtToken)
+			if (jwtToken !== null) {
+				const userSubscriptionFromDb = await fetchSubscriptionFromDb(jwtToken)
+				if (userSubscriptionFromDb) setSelfNotificationDataPayload(userSubscriptionFromDb)
+			}
+		}
 	}
 
 	const DeviceIcons = (uaInfo: UserAgentInfo) => {

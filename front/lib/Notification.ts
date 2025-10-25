@@ -1,5 +1,13 @@
 'use client'
+import { API_PROTOCOL } from "./NetworkProtocol"
 import * as NotificationActions from "./ServerAction/NotificationActions"
+
+export type NotificationSubscriptionResponse = {
+    getId: number
+    getDeviceName: string
+    getUserAgent: string
+    getSubscription: string
+}
 
 export const isPushNotificationSupported = (): boolean => {
     return 'serviceWorker' in navigator && 'PushManager' in window
@@ -11,15 +19,15 @@ export const isPushNotificationDenied = (): boolean => {
 
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
     if (!isPushNotificationSupported()) return null
-    
+
     try {
         const registration = await navigator.serviceWorker.register('/sw.js', {
             scope: '/',
             updateViaCache: 'none',
         })
-        
+
         await navigator.serviceWorker.ready
-        
+
         return registration
     } catch (error) {
         console.error('Service Worker registration failed:', error)
@@ -29,7 +37,7 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
 
 export const getSubscription = async (): Promise<globalThis.PushSubscription | null> => {
     if (!isPushNotificationSupported()) return null
-    
+
     try {
         const registration = await navigator.serviceWorker.ready
         const sub = await registration.pushManager.getSubscription() as globalThis.PushSubscription | null
@@ -102,6 +110,54 @@ export const deleteSubscription = async (subscriptionToDelete: string, jwtToken:
 
 export const sendTestNotification = async (subscription: PushSubscription, message: string) => {
     if (subscription && message !== "") await NotificationActions.sendNotification(JSON.stringify(subscription), message)
+}
+
+export const fetchSubscriptionFromDb = async (jwtToken: string): Promise<null | NotificationSubscriptionResponse[]> => {
+
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwtToken);
+
+    const requestOptions: RequestInit = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
+
+    return await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfNotificationSubscription", requestOptions)
+        .then((response) => response.json())
+        .then(async (result) => {
+            const data = result.data as NotificationSubscriptionResponse[]
+            console.log(data)
+            return data
+        })
+        .catch((error: any) => {
+            console.error(error)
+            throw new Error(error)
+        });
+}
+
+export const deleteBrowserSubscriptionIfNotFindOnDb = async (jwtToken: string) => {
+    const thisBrowserSubscription = await getSubscription()
+    const selfNotificationDataPayload = await fetchSubscriptionFromDb(jwtToken)
+    if (selfNotificationDataPayload === null) return
+    if (selfNotificationDataPayload.length === 0) return
+
+    let thisBrowserSubScriptionFind = false
+    if (selfNotificationDataPayload !== null) selfNotificationDataPayload.forEach((payload) => {
+        const decodedSubscription = JSON.parse(atob(payload.getSubscription)) as PushSubscription
+        if (
+            !thisBrowserSubScriptionFind
+            && thisBrowserSubscription?.endpoint === decodedSubscription.endpoint
+        ) {
+            thisBrowserSubScriptionFind = true
+        }
+    })
+
+    console.log(thisBrowserSubScriptionFind)
+    if (!thisBrowserSubScriptionFind) {
+        await thisBrowserSubscription?.unsubscribe()
+    }
+
 }
 
 function urlBase64ToUint8Array(base64String: string) {
