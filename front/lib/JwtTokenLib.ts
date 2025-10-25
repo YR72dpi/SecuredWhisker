@@ -6,7 +6,7 @@ export class JwtTokenLib {
     static async isValidJwtToken(): Promise<string | null> {
 
         const jwtToken = await SwDb.getJwtToken()
-        if (!jwtToken) { return null }ù
+        if (!jwtToken) { return null }
 
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + jwtToken);
