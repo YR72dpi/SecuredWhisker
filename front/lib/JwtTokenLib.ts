@@ -3,7 +3,7 @@ import { SwDb } from "./SwDatabase";
 
 export class JwtTokenLib {
 
-    static async isValidJwtToken(): Promise<string | boolean> {
+    static async isValidJwtToken(): Promise<string | null> {
 
         const jwtToken = await SwDb.getJwtToken()
         if (!jwtToken) { return false }
@@ -21,19 +21,19 @@ export class JwtTokenLib {
 
         return await fetch(link, requestOptions)
             .then((response) => {
-                if (!response.ok) return false
+                if (!response.ok) return null
                 return response.json();
             })
             .then((result) => {
                 if (result?.isConnectable) {
                     return jwtToken
                 } else {
-                    return false;
+                    return null;
                 }
             })
             .catch((error) => {
                 console.error("Error during fetching jwt token" + error);
-                return false;
+                return null;
             });
     }
 }
