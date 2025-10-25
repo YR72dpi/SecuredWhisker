@@ -202,27 +202,6 @@ export default function Home() {
 													</Button>
 												</div>
 											</li>
-											
-											
-										))}
-										{selfNotificationDataPayload.map(payload => (
-											<li key={payload.getId} className="w-[48%] h-32 border rounded-xl p-3 flex flex-col justify-between">
-												<div className="h-full flex items-center justify-center">
-													{DeviceIcons(parseUserAgent(payload.getUserAgent))}
-												</div>
-												<div className="h-[44px] flex items-center justify-between">
-													<p className="w-full truncate pr-1">{payload.getDeviceName}</p>
-													<Button
-														className="w-[44px] h-[44px]"
-														disabled={!!subscriptionToDelete}
-														onClick={() => confirmBeforeDelete(payload)}
-													>
-														<Trash2 />
-													</Button>
-												</div>
-											</li>
-											
-											
 										))}
 									</ul>
 								) : (
