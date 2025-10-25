@@ -7,11 +7,11 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { JwtTokenLib } from '@/lib/JwtTokenLib'
 import { type PushSubscription } from 'web-push'
-import { getSubscription, isPushNotificationSupported, subscribeToPush, unsubscribeFromPush, sendTestNotification } from '@/lib/Notification'
+import { getSubscription, isPushNotificationSupported, subscribeToPush, unsubscribeFromPush, sendTestNotification, registerServiceWorker } from '@/lib/Notification'
 import { toast } from 'sonner'
 import { Spinner } from '../ui/spinner'
 import { isVapIdOk } from '@/lib/ServerAction/NotificationActions'
- 
+
 export function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<globalThis.PushSubscription | PushSubscription | null>(null)
@@ -44,16 +44,18 @@ export function PushNotificationManager() {
   }
 
   useEffect(() => {
-
     (async () => {
       const jwtToken = await JwtTokenLib.isValidJwtToken()
       if (jwtToken && typeof jwtToken === "string") setJwtToken(jwtToken)
-      
-      setUserAgent(navigator.userAgent )
+
+      setUserAgent(navigator.userAgent)
 
       const vapidOk = await isVapIdOk()
       if (isPushNotificationSupported() && vapidOk) {
         setIsSupported(true)
+
+        await registerServiceWorker()
+
         const sub = await getSubscription()
         setSubscription(sub)
         setCanShowComponent(true)
@@ -61,7 +63,6 @@ export function PushNotificationManager() {
         setCanShowComponent(true)
       }
     })()
-
   }, [])
 
   return (
@@ -113,7 +114,7 @@ export function PushNotificationManager() {
         {!subscription && isSupported && (
           <>
             <Alert>
-              <Bell/>
+              <Bell />
               <AlertTitle className="font-semibold">
                 Notification !
               </AlertTitle>
