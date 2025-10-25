@@ -11,7 +11,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
 import { PushNotificationManager } from "@/components/Notification/PushNotificationManager";
 import { InstallPrompt } from "@/components/Notification/InstallPrompt";
-import { isPushNotificationSupported } from "@/lib/Notification";
+import { deleteBrowserSubscriptionIfNotFindOnDb, isPushNotificationSupported } from "@/lib/Notification";
+import { toast } from "sonner";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
@@ -24,6 +25,8 @@ export default function Home() {
 
     useEffect(() => {
 
+
+
         (async () => {
 
             const jwtToken = await JwtTokenLib.isValidJwtToken()
@@ -32,6 +35,12 @@ export default function Home() {
 
             const privateKeyInterface = await SwDb.getPrivateKey()
             hasPrivateKey.current = privateKeyInterface ? true : false
+
+            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string) 
+            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
+                "The registration for push notifications for this browser was not found in the database and has been deleted.",
+                {duration: 5000}
+            )
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);

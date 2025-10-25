@@ -39,7 +39,12 @@ export default function Home() {
 			console.log(userSubscriptionFromDb)
 
 			if (userSubscriptionFromDb) {
-				await deleteBrowserSubscriptionIfNotFindOnDb(jwtTokenValid as string)
+				const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string) 
+            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
+                "The registration for push notifications for this browser was not found in the database and has been deleted.",
+                {duration: 5000}
+            )
+				
 				setSelfNotificationDataPayload(userSubscriptionFromDb)
 				setCanShowPage(true)
 			}
