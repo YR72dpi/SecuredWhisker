@@ -1,7 +1,5 @@
 "use client"
-import { SwDb } from "@/lib/SwDatabase";
-import { useEffect, useRef, useState } from "react";
-import { API_PROTOCOL } from "@/lib/NetworkProtocol";
+import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon, ChevronLeftIcon, Trash2 } from "lucide-react";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
@@ -19,7 +17,6 @@ import { toast } from "sonner";
 export default function Home() {
 	const [canShowPage, setCanShowPage] = useState(false)
 
-	const hasPrivateKey = useRef<boolean>(false)
 	const [selfNotificationDataPayload, setSelfNotificationDataPayload] = useState<NotificationSubscriptionResponse[] | null>(null)
 
 	const [subscriptionToDelete, setSubscriptionToDelete] = useState<NotificationSubscriptionResponse | null>(null)
