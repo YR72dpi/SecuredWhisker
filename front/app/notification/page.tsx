@@ -27,7 +27,7 @@ export default function Home() {
 	const [canShowPage, setCanShowPage] = useState(false)
 
 	const hasPrivateKey = useRef<boolean>(false)
-	const [selfNotificationDataPayload, setSelfNotificationDataPayload] = useState<NotificationSubscriptionResponse[]>([])
+	const [selfNotificationDataPayload, setSelfNotificationDataPayload] = useState<NotificationSubscriptionResponse[] | null>(null)
 
 	const [subscriptionToDelete, setSubscriptionToDelete] = useState<NotificationSubscriptionResponse | null>(null)
 	const [jwtTokenForDelete, setJwtTokenForDelete] = useState<string | null>(null)
@@ -35,9 +35,10 @@ export default function Home() {
 
 	const deleteBrowserSubscriptionIfNotFindOnDb = async () => {
 		const thisBrowserSubscription = await getSubscription()
-
+		console.log(thisBrowserSubscription)
+		console.log(selfNotificationDataPayload)
 		let thisBrowserSubScriptionFind = false
-		selfNotificationDataPayload.forEach((payload) => {
+		if(selfNotificationDataPayload !== null) selfNotificationDataPayload.forEach((payload) => {
 			const decodedSubscription = JSON.parse(atob(payload.getSubscription)) as PushSubscription
 			if (
 				!thisBrowserSubScriptionFind
@@ -47,7 +48,8 @@ export default function Home() {
 			}
 		})
 
-		if (!thisBrowserSubScriptionFind) await thisBrowserSubscription?.unsubscribe()
+		console.log(thisBrowserSubScriptionFind)
+		// if (!thisBrowserSubScriptionFind) await thisBrowserSubscription?.unsubscribe()
 	}
 
 	useEffect(() => {
@@ -85,7 +87,7 @@ export default function Home() {
 	}, [])
 
 	useEffect(() => {
-		deleteBrowserSubscriptionIfNotFindOnDb()
+		if(selfNotificationDataPayload !== null) deleteBrowserSubscriptionIfNotFindOnDb()
 	}, [selfNotificationDataPayload])
 
 	const confirmBeforeDelete = async (subscriptionId: NotificationSubscriptionResponse) => {
@@ -94,7 +96,7 @@ export default function Home() {
 
 	// delete the subscription choosen by user on database
 	// delete the browser subscription if it's in this browser
-	const deleteSubscriptionHander = async (subscriptionToDelete: string) => {
+	const deleteSubscriptionHandler = async (subscriptionToDelete: string) => {
 		setIsDeleting(true)
 		if (jwtTokenForDelete) await deleteSubscription(subscriptionToDelete, jwtTokenForDelete)
 		setSubscriptionToDelete(null)
@@ -164,7 +166,7 @@ export default function Home() {
 											<div className="p-3 flex gap-3 justify-end">
 												<Button
 													variant="destructive"
-													onClick={() => deleteSubscriptionHander(subscriptionToDelete.getSubscription)}
+													onClick={() => deleteSubscriptionHandler(subscriptionToDelete.getSubscription)}
 													disabled={isDeleting}
 												>
 													{isDeleting ? (
