@@ -127,7 +127,6 @@ export const fetchSubscriptionFromDb = async (jwtToken: string): Promise<null | 
         .then((response) => response.json())
         .then(async (result) => {
             const data = result.data as NotificationSubscriptionResponse[]
-            console.log(data)
             return data
         })
         .catch((error: any) => {
@@ -136,14 +135,23 @@ export const fetchSubscriptionFromDb = async (jwtToken: string): Promise<null | 
         });
 }
 
-export const deleteBrowserSubscriptionIfNotFindOnDb = async (jwtToken: string) => {
+export const deleteBrowserSubscriptionIfNotFindOnDb = async (jwtToken: string): Promise<boolean> => {
     const thisBrowserSubscription = await getSubscription()
     const selfNotificationDataPayload = await fetchSubscriptionFromDb(jwtToken)
-    if (selfNotificationDataPayload === null) return
-    if (selfNotificationDataPayload.length === 0) return
-
     let thisBrowserSubScriptionFind = false
-    if (selfNotificationDataPayload !== null) selfNotificationDataPayload.forEach((payload) => {
+
+    console.log(selfNotificationDataPayload)
+
+    if (selfNotificationDataPayload === null) return false;
+    if (thisBrowserSubscription === null) return false;
+
+    console.log(thisBrowserSubscription)
+    if (selfNotificationDataPayload.length === 0) {
+        await thisBrowserSubscription?.unsubscribe()
+        return true;
+    }
+
+    if (selfNotificationDataPayload.length > 0) selfNotificationDataPayload.forEach((payload) => {
         const decodedSubscription = JSON.parse(atob(payload.getSubscription)) as PushSubscription
         if (
             !thisBrowserSubScriptionFind
@@ -153,11 +161,12 @@ export const deleteBrowserSubscriptionIfNotFindOnDb = async (jwtToken: string) =
         }
     })
 
-    console.log(thisBrowserSubScriptionFind)
     if (!thisBrowserSubScriptionFind) {
         await thisBrowserSubscription?.unsubscribe()
+        return true
     }
 
+    return false;
 }
 
 function urlBase64ToUint8Array(base64String: string) {
