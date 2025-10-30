@@ -68,7 +68,7 @@ You mainly need to modify :
 
 ```env
 # SecuredWhisker
-VERSION=1.3.3
+VERSION=1.3.4
 
 # User manager (Symfony, PHP) 
 APP_ENV=dev
@@ -275,20 +275,18 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.3.3] - 2025-10-18
+## [1.3.4] - 2025-10-30
 
 ### Added
 
-- Deletion of messages after a specified period of time
-    - using php's ```DateTime::modify``` string
-    - By default : _-1 week_
+- Display an invitation to install the pwa on iOS
+- Notification Web push
+    - Subscribe a device
+    - page to remove notifications for each device linked to the account
 
 ### Changed
 
-- Migrate from Netjs 14 to NextJS 15
-- Migrating from next lint to eslint
-- Show date & time on messages
-- Shadcn's otp input for the password of private key
+-
 
 ### Fixed
 
