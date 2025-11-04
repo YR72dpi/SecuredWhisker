@@ -34,12 +34,6 @@ export default function Home() {
             const privateKeyInterface = await SwDb.getPrivateKey()
             hasPrivateKey.current = privateKeyInterface ? true : false
 
-            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string)
-            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
-                "The registration for push notifications for this browser was not found in the database and has been deleted.",
-                { duration: 5000 }
-            )
-
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);
 
@@ -63,7 +57,14 @@ export default function Home() {
                     setCanShowPage(true)
                 })
                 .catch((error) => console.error(error));
-                
+
+
+            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string)
+            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
+                "The registration for push notifications for this browser was not found in the database and has been deleted.",
+                { duration: 5000 }
+            )
+            
             return;
         })()
     }, [])
