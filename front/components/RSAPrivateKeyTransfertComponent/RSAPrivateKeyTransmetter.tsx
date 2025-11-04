@@ -106,7 +106,7 @@ export const RSAPrivateKeyTransmetter = () => {
                             onSelect={(e) => e.preventDefault()}
                             className="flex items-center justify-between gap-2"
                         >
-                            Private key transfer (tx)
+                            Private key transfer (send)
                         </SidebarMenuButton>
                     </DialogTrigger>
                     <DialogContent>
