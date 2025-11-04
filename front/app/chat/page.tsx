@@ -46,7 +46,6 @@ export default function Home() {
             await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
-                    console.log(result)
                     setIdentifier(result.identifier)
                     setSenderData({
                         id: result.id,
@@ -69,11 +68,6 @@ export default function Home() {
         })()
     }, [])
 
-    useEffect(() => {
-        console.log(canShowPage)
-        console.log(senderData)
-    }, [senderData, canShowPage])
-
     return (
         canShowPage && senderData ? (
             <SidebarProvider>
@@ -85,7 +79,7 @@ export default function Home() {
                 <main className="w-full border p-3 flex flex-col gap-3">
                     <SidebarTrigger />
 
-                    {isPushNotificationSupported() && (<PushNotificationManager />)}
+                    {isPushNotificationSupported() && !selectedContact && (<PushNotificationManager />)}
                     <InstallPrompt />
 
                     {!hasPrivateKey.current && (
