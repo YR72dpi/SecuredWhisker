@@ -25,8 +25,6 @@ export default function Home() {
 
     useEffect(() => {
 
-
-
         (async () => {
 
             const jwtToken = await JwtTokenLib.isValidJwtToken()
@@ -36,10 +34,10 @@ export default function Home() {
             const privateKeyInterface = await SwDb.getPrivateKey()
             hasPrivateKey.current = privateKeyInterface ? true : false
 
-            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string) 
+            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string)
             if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
                 "The registration for push notifications for this browser was not found in the database and has been deleted.",
-                {duration: 5000}
+                { duration: 5000 }
             )
 
             const myHeaders = new Headers();
@@ -51,9 +49,10 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+            await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
+                    console.log(result)
                     setIdentifier(result.identifier)
                     setSenderData({
                         id: result.id,
@@ -64,8 +63,15 @@ export default function Home() {
                     setCanShowPage(true)
                 })
                 .catch((error) => console.error(error));
+                
+            return;
         })()
     }, [])
+
+    useEffect(() => {
+        console.log(canShowPage)
+        console.log(senderData)
+    }, [senderData, canShowPage])
 
     return (
         canShowPage && senderData ? (
