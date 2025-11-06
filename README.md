@@ -13,7 +13,7 @@ AI-Generated and photoshopped logo
 [![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/security-check-nextjs.yml/badge.svg?branch=main "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/security-check-front.yml?query=branch%3Amain)
 [![CI Status](https://github.com/YR72dpi/SecuredWhisker/actions/workflows/lint-nextjs.yml/badge.svg?branch=dev "CI Status")](https://github.com/yr72dpi/SecuredWhisker/actions/workflows/lint-nextjs.yml?query=branch%3Adev)
 
-This is a secure messaging application that allows users to send encrypted messages to each other, using RSA encryption on message. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
+This is a secure messaging application that allows users to send encrypted messages to each other, using RSA and AES encryption on message. The application ensures the security and privacy of communication by encrypting messages before transmission and decrypting them upon reception.
 
 ## 📚 Documentation
 
@@ -25,20 +25,22 @@ This is a secure messaging application that allows users to send encrypted messa
 
 ## Security 🔐
 
-The will of this project is to allow user to exchange messages securely even if there is no https.
+The will of this project is to allow user to exchange messages securely.
 
 All messages are encrypted with the recipient's public rsa key before being sent and stored on the server. And the recipient decrypts it with his private key stored in his browser.
 
 ## ⚠ Warning ⚠
 
-The __RSA private key is stored in your browser__. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, will be lost.
+The __RSA private key is stored in your browser__. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, will be lost. You can transmet private key to another device and get it back with the other device.
 
+You can copy the key pair too and save it yourself.
 
 ## Features 📜
 
 - Signin
 - Login
 - Add someone
+- Delete someone
 - Send / receive message
 - Translate messages (with chatGPT)
 - Copy Rsa key pair if needed
@@ -68,7 +70,7 @@ You mainly need to modify :
 
 ```env
 # SecuredWhisker
-VERSION=1.3.4
+VERSION=1.3.5
 
 # User manager (Symfony, PHP) 
 APP_ENV=dev
@@ -230,33 +232,33 @@ When I release version 1.0.0, Git Flow should look like this.
 ```mermaid
 gitGraph
    commit id: "Initial Commit" tag: "v1.0.0"
-   branch dev
-   checkout dev
-   commit id: "Set up dev environment"
+   branch beta
+   checkout beta
+   commit id: "Set up beta environment"
 
    branch feature1
    checkout feature1
    commit id: "Develop Feature 1 part 1"
    commit id: "Develop Feature 1 part 2"
-   checkout dev
-   merge feature1 id: "Merge feature1 into dev"
+   checkout beta
+   merge feature1 id: "Merge feature1 into beta"
 
    branch feature2
    checkout feature2
    commit id: "Develop Feature 2 part 1"
    commit id: "Develop Feature 2 part 2"
-   checkout dev
-   merge feature2 id: "Merge feature2 into dev"
+   checkout beta
+   merge feature2 id: "Merge feature2 into beta"
 
    branch feature3
    checkout feature3
    commit id: "Develop Feature 3 part 1"
    commit id: "Develop Feature 3 part 2"
-   checkout dev
-   merge feature3 id: "Merge feature3 into dev" tag: "2.1.0"
+   checkout beta
+   merge feature3 id: "Merge feature3 into beta" tag: "2.1.0"
 
    checkout main
-   merge dev id: "Merge dev into main" tag: "v2.1.0"
+   merge beta id: "Merge beta into main" tag: "v2.1.0"
    commit id: "Release v2.1.0"
 
 ```
@@ -275,14 +277,12 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## ChangeLog
 
-## [1.3.4] - 2025-10-30
+## [1.3.5] - 2025-11-06
 
 ### Added
 
-- Display an invitation to install the pwa on iOS
-- Notification Web push
-    - Subscribe a device
-    - page to remove notifications for each device linked to the account
+- Page to delete contact
+- Loader on saved messages loading
 
 ### Changed
 
@@ -309,7 +309,6 @@ Contributions are welcome! Feel free to open issues or submit pull requests to c
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
 - Manage multiple display of recorded messages received
-- Friendship management
 - Show how many unseen message by contact
 - Save private key on the serveur, crypted by a password defined by the user
 
