@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { ChatLib, MessagePayload } from "@/lib/ChatLib";
+import { ChatLib, ChatProps, MessagePayload, RecoverRegisteredMessage } from "@/lib/ChatLib";
 import { RsaLib } from "@/lib/Crypto/RsaLib";
 import { SwDb } from "@/lib/SwDatabase";
 import { AesLib } from "@/lib/Crypto/AesLib";
@@ -12,32 +12,6 @@ import { sha256 } from "@/lib/Crypto/sha256";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
 import { sendNotification } from "../lib/ServerAction/NotificationActions"
-
-export type ReceiverDataForChat = {
-    id: string;
-    username: string;
-    uniqid: string;
-    publicKey: string;
-    notificationPayload: string[]
-}
-
-export type SenderDataForChat = {
-    id: string;
-    username: string;
-    publicKey: string
-}
-
-type ChatProps = {
-    senderDataForChat: SenderDataForChat
-    receiverDataForChat: ReceiverDataForChat;
-    setContactData: (newContactData: ReceiverDataForChat | null) => void
-};
-
-type RecoverRegisteredMessage = {
-    message: string
-    messagesRegistered: string[]
-    server_time: string
-}
 
 export function Chat({
     senderDataForChat, // the one who send the message (you)
@@ -58,26 +32,6 @@ export function Chat({
 
     const room = ChatLib.getRoomName(senderDataForChat.id, receiverDataForChat.id)
     const reconnectInterval = useRef<NodeJS.Timeout>();
-
-    const dateTimeFormat = (dateTimeIso: string): string => {
-        const date = new Date(dateTimeIso);
-
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-
-        let hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-
-        // Convertir en format 12h avec am/pm
-        const ampm = hours >= 12 ? 'pm' : 'am';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // 0 → 12
-
-        const formatted = `${day}/${month}/${year} ${hours}:${minutes}${ampm}`;
-
-        return formatted
-    }
 
     const connectWebSocket = useCallback(() => {
         if (!room) return;
@@ -474,7 +428,7 @@ export function Chat({
                                 {msg.message}
                             </p>
                             <p className="text-xs text-gray-600 opacity-70 text-right">
-                                {dateTimeFormat(msg.dateTime)}
+                                {ChatLib.dateTimeFormat(msg.dateTime)}
                             </p>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 "use client"
-import { Chat, SenderDataForChat, ReceiverDataForChat } from "@/components/chat";
+import { Chat } from "@/components/chat";
 import { ContactList } from "@/components/Friendship/contactList";
 import { SwDb } from "@/lib/SwDatabase";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +13,7 @@ import { PushNotificationManager } from "@/components/Notification/PushNotificat
 import { InstallPrompt } from "@/components/Notification/InstallPrompt";
 import { deleteBrowserSubscriptionIfNotFindOnDb, isPushNotificationSupported } from "@/lib/Notification";
 import { toast } from "sonner";
+import { ReceiverDataForChat, SenderDataForChat } from "@/lib/ChatLib";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
