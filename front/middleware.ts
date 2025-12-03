@@ -10,18 +10,18 @@ export function middleware(request: NextRequest) {
         request.headers.get('x-forwarded-for')?.split(',')[0] ||
         'unknown'
 
-    const isAllowedIp = ALLOWED_IPS.split(',').includes(ip)
+    const isAllowedIp = ALLOWED_IPS === "\"\"" ? true : ALLOWED_IPS.split(',').includes(ip)
 
     console.log("\n")
     console.log("========== White List Middleware ==========")
     console.log("Date time: \t\t" + (new Date()).toISOString())
     console.log("Authorised IP address: \t" + (ALLOWED_IPS === "" ? "All" : ALLOWED_IPS))
     console.log("Incoming IP: \t\t" + ip)
-    console.log("Is authorised: \t\t" + (isAllowedIp || ALLOWED_IPS == "" ? "Yes" : "No"))
+    console.log("Is authorised: \t\t" + (isAllowedIp ? "Yes" : "No"))
     console.log("===========================================")
     console.log("\n")
 
-    if (ALLOWED_IPS === "") return NextResponse.next()
+    if (isAllowedIp) return NextResponse.next()
     if (!isAllowedIp) return NextResponse.rewrite(new URL('/accessDenied', request.url))
     // access denied, contact the administrator to obtain access
 
