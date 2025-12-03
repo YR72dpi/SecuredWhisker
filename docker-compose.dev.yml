@@ -1,17 +1,100 @@
 services:
+  database:
+    container_name: user-database
+    restart: always
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: securedwhisker
+      POSTGRES_PASSWORD: securedwhisker
+      POSTGRES_USER: root
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "securedwhisker", "-U", "root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports: 
+      - "5432:5432"
+    volumes:
+      - ./docker/db/data:/var/lib/postgresql/data:rw
+    networks:
+      - app-network-dev
+
+  user:
+    container_name: user-microservice
+    build:
+      context: ./user
+      dockerfile: Dockerfile.dev
+    ports:
+      - '8000:8000'
+    volumes:
+    # Uncomment the following lines if you want to use volumes for local development
+      - './user/:/app'
+      - './env:/.env'
+    environment:
+      - CORS_ALLOW_ORIGIN='^.*$'
+      - TRANSLATE_API_URL=http://text-manager-gpt:3000
+      - SYMFONY_PROJECT_NAME=securedWhisker
+      - DATABASE_URL=pgsql://root:securedwhisker@database:5432/securedwhisker?serverVersion=16&charset=utf8
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - app-network-dev
+
+  front:
+    depends_on:
+      - user
+    container_name: front-nextjs-dev
+    image: node:18-bullseye
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app:rw
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - BROWSERSLIST_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - NEXTJS_PORT=3000
+      - NEXTJS_DOMAIN=localhost:3000
+      - NEXT_PUBLIC_NEXTJS_DOMAIN=localhost:3000
+      - NEXT_PUBLIC_GPT_API_KEY=
+      - NEXT_PUBLIC_USER_HOST=localhost:8000
+      - NEXT_PUBLIC_MESSAGE_HOST=localhost:5050
+      - NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST=localhost:5020
+      - NEXT_PUBLIC_APP_VERSION=1.3.4
+      - NEXT_PUBLIC_IP_WHITELIST=""
+      - NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+      - IP_WHITELIST=""
+      - VAPID_PUBLIC_KEY=
+      - VAPID_PRIVATE_KEY=
+    networks:
+      - app-network-dev
+    command: >
+      sh -c "
+      npm install --no-audit --no-fund &&
+      npm run dev
+      "
   message:
+    depends_on:
+      - front
     container_name: message-microservice-dev
     image: golang:1.23
     working_dir: /app
     ports:
-      - "${SOCKET_PORT}:8080"
+      - "5050:8080"
     volumes:
       - ./message:/app:rw
     environment:
       - ENV=development
       - GO_ENV=development
-      - SHOW_ONLY_ERROR=${SHOW_ONLY_ERROR}
+      - SHOW_ONLY_ERROR=false
       - GOTOOLCHAIN=auto
+      - SOCKET_PORT=5050
+      - SOCKET_HOST=localhost:5050
     networks:
       - app-network-dev
     command: >
