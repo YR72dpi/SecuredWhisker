@@ -1,4 +1,5 @@
-FROM php:8.2-cli
+# ...existing code...
+FROM php:8.2-cli AS base
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,23 +16,39 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY . .
+# ---- Builder stage: install composer deps and save vendor to /opt/vendor ----
+FROM base AS builder
+
+COPY . ./
 
 RUN mv .env.example .env
 
 # Install PHP dependencies
-RUN composer install
-    
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Keep a copy of vendor for runtime copy to host-mounted volume
+RUN mkdir -p /opt/vendor && cp -a /app/vendor /opt/vendor
+
 # Générer un APP_SECRET aléatoire et l'injecter dans .env
 RUN APP_SECRET=$(head -c 32 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 64) && \
     sed -i "s/^APP_SECRET=.*/APP_SECRET=${APP_SECRET}/" .env
 
+# ---- Final/runtime image ----
+FROM base AS runner
+
+WORKDIR /app
+
+# Copy project files (source) and the saved vendor snapshot
+COPY --from=builder /app /app
+COPY --from=builder /opt/vendor /opt/vendor
 
 # Expose port 8000 and start the server
 EXPOSE 8000
 
+# Keep original entrypoint, add a small wrapper to copy vendor to host if missing
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+# ...existing code...
