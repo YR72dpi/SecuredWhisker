@@ -1,0 +1,25 @@
+services:
+  message:
+    container_name: message-microservice-dev
+    image: golang:1.23
+    working_dir: /app
+    ports:
+      - "${SOCKET_PORT}:8080"
+    volumes:
+      - ./message:/app:rw
+    environment:
+      - ENV=development
+      - GO_ENV=development
+      - SHOW_ONLY_ERROR=${SHOW_ONLY_ERROR}
+      - GOTOOLCHAIN=auto
+    networks:
+      - app-network-dev
+    command: >
+      sh -c "
+      go install github.com/air-verse/air@v1.52.3 &&
+      air -c .air.toml
+      "
+
+networks:
+  app-network-dev:
+    driver: bridge
