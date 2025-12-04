@@ -1,14 +1,14 @@
-# Politique de sécurité
+# Security Policy
 
-Si vous découvrez une vulnérabilité affectant Secured Whisker, merci de la signaler de manière responsable.
+If you discover a vulnerability affecting Secured Whisker, please report it responsibly.
 
-Processus de divulgation
+Responsible disclosure process
 
-1. Ne publiez pas de détail public sur la vulnérabilité.
-2. Ouvrez une issue privée ou contactez le mainteneur via GitHub (ou email si fourni) avec :
-   - description du problème
-   - étapes pour reproduire
-   - impact estimé
-3. Les mainteneurs répondront dans les meilleurs délais et coordonneront un fix.
+1. Do not publish details of the vulnerability publicly.
+2. Open a private issue or contact a project maintainer via GitHub (or by email if provided) including:
+   - a description of the issue
+   - steps to reproduce
+   - the estimated impact
+3. Maintainers will respond as soon as possible and will coordinate a fix.
 
-Pour les contributions de sécurité, privilégiez une communication privée jusqu'à publication d'un correctif.
+For security-related contributions, prefer private communication until a patch has been released.

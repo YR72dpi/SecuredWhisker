@@ -1,42 +1,44 @@
-# Architecture & structure du dépôt
+# Architecture & Repository Structure
 
-Ce fichier décrit la structure du dépôt et l'architecture générale pour aider les nouveaux contributeurs.
+This file describes the repository structure and the overall architecture to help new contributors get started.
 
-## Architecture globale
+## High-level architecture
 
-Secured Whisker est organisé en microservices :
+SecuredWhisker is organized as microservices:
 
-- `user/` : service Symfony (gestion des utilisateurs, API REST)
-- `message/` : microservice Go (WebSocket, envoi/stockage des messages)
-- `front/` : application Next.js (interface client)
-- `TextManagerGPT/` : service de traduction
+- `user/`: Symfony service (user management, REST API)
+- `message/`: Go microservice (WebSocket, message delivery/storage)
+- `front/`: Next.js application (client UI)
+- `TextManagerGPT/`: translation service
 
-Chaque service dispose d'un `Dockerfile` et des configurations nécessaires pour le démarrage via `docker-compose`.
+Each service contains a `Dockerfile` and the necessary configuration to run with `docker-compose`.
 
-## Arborescence principale
+## Top-level tree
 
 ```
 /
 ├─ front/                # Next.js (UI)
-├─ user/                 # Symfony (API REST)
+├─ user/                 # Symfony (REST API)
 ├─ message/              # Go (WebSocket)
-├─ TextManagerGPT/       # Service de traduction
+├─ TextManagerGPT/       # Translation service
 ├─ docker-compose.yml
 ├─ docker-compose.dev.yml
-├─ docs/                 # Politique, changelog, RGPD
+├─ docs/                 # policies, changelog, GDPR
 └─ README.md
 ```
 
-## Démarrage local (dev)
+## Local development (dev)
 
-Utiliser le `docker-compose.dev.yml` fourni :
+Use the provided `docker-compose.dev.yml`:
 
-```
+```bash
 docker compose -f docker-compose.dev.yml up --build -d
 ```
 
-## Où regarder en priorité
+## Where to look first
 
-- Pour le front : `front/` (scripts npm, Dockerfile)
-- Pour l'API utilisateur : `user/` (routes, controllers, config)
-- Pour WebSocket : `message/` (point d'entrée du serveur, protocoles)
+- Frontend: `front/` (npm scripts, Dockerfile)
+- User API: `user/` (routes, controllers, config)
+- WebSocket: `message/` (server entrypoint, protocols)
+
+---

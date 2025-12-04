@@ -1,41 +1,34 @@
-## 🔐 GDPR Clause – Personal Data Protection
+# GDPR Statement — Personal Data Protection
 
-Our service enables clients to deploy an encrypted, anonymous, and self-hosted messaging system. In this context, responsibilities under the General Data Protection Regulation (GDPR – Regulation (EU) 2016/679) are defined as follows:
+This software enables clients to deploy an encrypted, anonymous, self-hosted messaging platform. The allocation of responsibilities under the European General Data Protection Regulation (GDPR — Regulation (EU) 2016/679) is described below.
 
-### 1. Roles and Responsibilities
+## 1. Roles and Responsibilities
 
-- **Data Controller**: The client who deploys and manages their own instance of the chat platform is solely responsible for the processing of personal data.
-- **Software Provider**: We act only as the provider of a software tool. We do not determine the purposes or means of data processing and do not process any personal data on behalf of our clients.
+- **Data Controller**: The client who deploys and operates their own instance of the chat platform is the Data Controller and is solely responsible for the purposes and means of processing any personal data.
+- **Software Provider**: We provide the software only and do not determine the purposes or means of data processing. We do not process personal data on behalf of our clients unless expressly agreed in a separate written contract.
 
-### 2. Personal Data
+## 2. Personal Data
 
-Our solution:
-- does not collect or store any personal data;
-- encrypts all communications end-to-end between users;
-- does not grant us access to user messages, identifiers, or metadata.
+- The software itself does not collect or store personal data by default.
+- Communications are designed to be end-to-end encrypted between users; the provider has no access to message contents.
+- Any personal data that users deliberately enter into the application (for example, nicknames, profile information or message content) is controlled and processed by the client who hosts the instance.
 
-Any personal data entered by users in the application (e.g., nickname, message content) is the sole responsibility of the client who deployed the instance.
+## 3. Hosting
 
-### 3. Hosting
+The solution is intended for self-hosting. The client is responsible for:
+- Deploying and operating the application on their chosen infrastructure.
+- Ensuring the confidentiality, integrity and availability of data processed by their instance.
+- Complying with applicable data protection laws, including any obligations to inform data subjects and to implement appropriate technical and organizational measures.
 
-Our solution is designed to be **self-hosted**. The client is responsible for:
-- deploying the application on their own infrastructure;
-- ensuring the security, confidentiality, and compliance of data processing performed using the tool.
+We do not host, access or manage customer data for hosted instances unless explicitly contracted to provide hosting or managed services in a separate agreement.
 
-We do not host any data related to deployed instances, unless expli
+## 4. Security
 
-### 4. Security
+The software includes mechanisms to support secure communications (for example, end-to-end encryption). Nevertheless, the client remains responsible to:
+- Keep the software and dependencies up to date;
+- Configure infrastructure securely (network, TLS, access controls, backups);
+- Manage user access, retention and lawful processing of any personal data entered into the system.
 
-The provided software includes end-to-end encryption mechanisms, preventing unauthorized access to exchanged content. However, it is the client’s responsibility to:
-- keep the tool up to date;
-- properly configure the hosting infrastructure;
-- train users in the correct and lawful use of the messaging system.
+## 5. Contact
 
-<!-- ### 6. Contact
-
-For any questions regarding the GDPR compliance of our solution, please contact us at:
-
-**Email**: [contact@your-saas.com]  
-**Data Protection Officer (DPO)**: [Name Surname] -->
-
----
+For questions about privacy or GDPR compliance related to this software, please contact the project maintainers or consult the hosting provider if you have contracted managed hosting.
