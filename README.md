@@ -139,9 +139,9 @@ POSTGRES_VERSION=
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
 - Manage multiple display of recorded messages received
-- Friendship management
 - Show how many unseen message by contact
 - Save private key on the serveur, crypted by a password defined by the user
+- Create a encrypted notebook (a memo system so you don't have to send it to someone)
 
 ## Support me 😘
 
