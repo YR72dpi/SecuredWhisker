@@ -32,10 +32,10 @@ services:
       - './user/:/app'
       - './env:/.env'
     environment:
-      - CORS_ALLOW_ORIGIN='^.*$'
-      - TRANSLATE_API_URL=http://text-manager-gpt:3000
-      - SYMFONY_PROJECT_NAME=securedWhisker
-      - DATABASE_URL=pgsql://root:securedwhisker@database:5432/securedwhisker?serverVersion=16&charset=utf8
+      CORS_ALLOW_ORIGIN: '^.*$'
+      TRANSLATE_API_URL: http://text-manager-gpt:3000
+      SYMFONY_PROJECT_NAME: securedWhisker
+      DATABASE_URL: 'pgsql://root:securedwhisker@database:5432/securedwhisker?serverVersion=16&charset=utf8'
     depends_on:
       database:
         condition: service_healthy
