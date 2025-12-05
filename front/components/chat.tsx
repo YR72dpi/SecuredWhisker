@@ -12,6 +12,7 @@ import { sha256 } from "@/lib/Crypto/sha256";
 import { Switch } from "./ui/switch";
 import { toast } from "sonner";
 import { sendNotification } from "../lib/ServerAction/NotificationActions"
+import { Spinner } from "./ui/spinner";
 
 export function Chat({
     senderDataForChat, // the one who send the message (you)
@@ -19,6 +20,7 @@ export function Chat({
     setContactData
 }: ChatProps) {
     const [messages, setMessages] = useState<{ from: string; message: string; dateTime: string }[]>([])
+    const [isMessagesLoaded, setIsMessagesLoaded] = useState(false)
     const ws = useRef<WebSocket | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -193,6 +195,7 @@ export function Chat({
                     message: messageToSend,
                     dateTime: (new Date()).toISOString()
                 }]);
+
                 setInput("");
             } catch (e) {
                 console.error("Encryption error:", e);
@@ -242,10 +245,10 @@ export function Chat({
             })
             .then(() => {
 
-            receiverDataForChat.notificationPayload.forEach((notificationPayload) => {
-                sendNotification(atob(notificationPayload), senderDataForChat.username)
-            })
-            
+                receiverDataForChat.notificationPayload.forEach((notificationPayload) => {
+                    sendNotification(atob(notificationPayload), senderDataForChat.username)
+                })
+
 
             })
             .catch((error) => {
@@ -321,8 +324,13 @@ export function Chat({
                             });
                         }
 
-                        if (!cancelled && decryptedMessages.length > 0) setMessages(prev => [...prev, ...decryptedMessages]);
+                        if (!cancelled && decryptedMessages.length > 0) {
+                            setMessages(prev => [...prev, ...decryptedMessages]);
+                        }
+
                         if (!cancelled) setIsSavedMessagePrint(true);
+
+                        setIsMessagesLoaded(true)
                     }
 
                 } catch (error) {
@@ -410,20 +418,23 @@ export function Chat({
 
             <div className="flex-1 overflow-y-auto border rounded-md p-2 flex flex-col h-full">
                 <div className="flex-1"></div>
-                {messages.map((msg, index) => (
-                    <div key={index}
-                        className={`
+                {isMessagesLoaded ?
+                    (
+                        messages.map((msg, index) => (
+                            <div key={index}
+                                className={`
                             mb-2 flex
                             ${msg.from === senderDataForChat.username ? "justify-end" : "justify-start"}
                         `}
-                    >
-                        <div className={`
+                            >
+                                <div className={`
                             text-gray-800 px-4 py-2 rounded-xl max-w-[66%] break-words shadow-sm
                             ${msg.from === senderDataForChat.username ?
-                                "bg-gray-300 rounded-br-sm" :
-                                "bg-blue-300 rounded-bl-sm"
-                            }
+                                        "bg-gray-300 rounded-br-sm" :
+                                        "bg-blue-300 rounded-bl-sm"
+                                    }
                         `}>
+<<<<<<< HEAD
                             <p className="text-sm leading-relaxed mb-1">
                                 {msg.message}
                             </p>
@@ -433,6 +444,23 @@ export function Chat({
                         </div>
                     </div>
                 ))}
+=======
+                                    <p className="text-sm leading-relaxed mb-1">
+                                        {msg.message}
+                                    </p>
+                                    <p className="text-xs text-gray-600 opacity-70 text-right">
+                                        {dateTimeFormat(msg.dateTime)}
+                                    </p>
+                                </div>
+                            </div>
+                        )
+                        )
+                    ) : (
+                        <div className="flex justify-end"><Spinner /></div>
+                    )
+
+                }
+>>>>>>> main
                 <div ref={bottomRef} />
             </div>
 

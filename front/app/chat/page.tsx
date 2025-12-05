@@ -26,22 +26,14 @@ export default function Home() {
 
     useEffect(() => {
 
-
-
         (async () => {
 
             const jwtToken = await JwtTokenLib.isValidJwtToken()
             if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtToken)
-            if (!jwtToken) window.location.replace("/");
+            if (jwtToken === null) { window.location.replace("/"); return; }
 
             const privateKeyInterface = await SwDb.getPrivateKey()
             hasPrivateKey.current = privateKeyInterface ? true : false
-
-            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string) 
-            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
-                "The registration for push notifications for this browser was not found in the database and has been deleted.",
-                {duration: 5000}
-            )
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer " + jwtToken);
@@ -52,7 +44,7 @@ export default function Home() {
                 redirect: "follow"
             };
 
-            return fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+            await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     setIdentifier(result.identifier)
@@ -65,6 +57,15 @@ export default function Home() {
                     setCanShowPage(true)
                 })
                 .catch((error) => console.error(error));
+
+
+            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string)
+            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
+                "The registration for push notifications for this browser was not found in the database and has been deleted.",
+                { duration: 5000 }
+            )
+            
+            return;
         })()
     }, [])
 
@@ -79,7 +80,7 @@ export default function Home() {
                 <main className="w-full border p-3 flex flex-col gap-3">
                     <SidebarTrigger />
 
-                    {isPushNotificationSupported() && (<PushNotificationManager />)}
+                    {isPushNotificationSupported() && !selectedContact && (<PushNotificationManager />)}
                     <InstallPrompt />
 
                     {!hasPrivateKey.current && (

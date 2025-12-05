@@ -45,6 +45,7 @@ The __RSA private key is stored in your browser__. If you clean up “Cookies an
 - [🏗️ Technical Architecture](./ARCHITECTURE.md)
 - [⚙️ How the security works](./docs/HOW_IT_WORKS.md)
 
+You can copy the key pair too and save it yourself.
 
 
 ## 🤔 How to use 
@@ -71,7 +72,7 @@ You mainly need to modify :
 
 ```env
 # SecuredWhisker
-VERSION=1.3.4
+VERSION=1.3.5
 
 # User manager (Symfony, PHP) 
 APP_ENV=dev
@@ -106,19 +107,16 @@ POSTGRES_PASSWORD=securedwhisker
 POSTGRES_USER=root
 POSTGRES_PORT=5432
 POSTGRES_VERSION=
-
 ```
 
 ## ChangeLog
 
-## [1.3.4] - 2025-10-30
+## [1.3.5] - 2025-11-06
 
 ### Added
 
-- Display an invitation to install the pwa on iOS
-- Notification Web push
-    - Subscribe a device
-    - page to remove notifications for each device linked to the account
+- Page to delete contact
+- Loader on saved messages loading
 
 ### Changed
 

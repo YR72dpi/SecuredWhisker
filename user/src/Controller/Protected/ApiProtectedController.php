@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\FriendshipRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +46,59 @@ class ApiProtectedController extends AbstractController
         ]);
     }
 
-    #[Route('/addFriend', name: '_addFriend', methods: ["POST"])]
+    #[Route('/removeFriend', name: '_removeFriend', methods: ["POST"])]
+    public function removeFriend(
+        Request $request,
+        FriendshipRepository $friendshipRepository,
+        EntityManagerInterface $em,
+        LoggerInterface $logger,
+        #[CurrentUser()] ?User $user
+    ): JsonResponse {
+        $userIdToDelete = json_decode($request->getContent(), true)["userIdToDelete"];
+
+        $contacts = $friendshipRepository->findUserContacts($user);
+        $contatctToDelete = null;
+
+        foreach ($contacts as $contact) {
+            if(
+                ($contact->getRequestFrom()->getId() === $user->getId() && $contact->getRequestTo()->getId() === $userIdToDelete) 
+                || 
+                ($contact->getRequestTo()->getId() === $user->getId() && $contact->getRequestFrom()->getId() === $userIdToDelete)
+            ) {
+                $contatctToDelete = $contact;
+                break;
+            }
+        }
+
+        if($contatctToDelete !== null) {
+            try {
+                $em->remove($contact);
+                $em->flush();
+                return $this->json([
+                    'message' => 'ok',
+                ]);
+            } catch (\Throwable $th) {
+                $logger->error(
+                    "Something went wrong during deleting a contact. User " 
+                    . $user->getId() 
+                    . " wanted to delete relationship with user "
+                    . $userIdToDelete,
+                    [$th->getMessage()]
+                );
+                return $this->json([
+                    'message' => 'Something went wrong.',
+                ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return $this->json([
+                'message' => 'Not on your contacts list',
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        
+    }
+
+      #[Route('/addFriend', name: '_addFriend', methods: ["POST"])]
     public function addFriend(
         UserRepository $userRepository,
         FriendshipRepository $friendshipRepository,
