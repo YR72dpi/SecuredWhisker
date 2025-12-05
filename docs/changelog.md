@@ -10,19 +10,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Page to delete contact
 - Loader on saved messages loading
-
-### Changed
-
--
-
-### Fixed
-
--
-
----
-
-### Added
-
 - Display an invitation to install the pwa on iOS
 - Notification Web push
     - Subscribe a device
