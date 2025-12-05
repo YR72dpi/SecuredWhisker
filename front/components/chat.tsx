@@ -434,22 +434,11 @@ export function Chat({
                                         "bg-blue-300 rounded-bl-sm"
                                     }
                         `}>
-<<<<<<< HEAD
-                            <p className="text-sm leading-relaxed mb-1">
-                                {msg.message}
-                            </p>
-                            <p className="text-xs text-gray-600 opacity-70 text-right">
-                                {ChatLib.dateTimeFormat(msg.dateTime)}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-=======
                                     <p className="text-sm leading-relaxed mb-1">
                                         {msg.message}
                                     </p>
                                     <p className="text-xs text-gray-600 opacity-70 text-right">
-                                        {dateTimeFormat(msg.dateTime)}
+                                        {ChatLib.dateTimeFormat(msg.dateTime)}
                                     </p>
                                 </div>
                             </div>
@@ -460,7 +449,6 @@ export function Chat({
                     )
 
                 }
->>>>>>> main
                 <div ref={bottomRef} />
             </div>
 
