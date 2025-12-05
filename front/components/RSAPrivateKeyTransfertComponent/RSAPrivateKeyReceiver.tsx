@@ -135,7 +135,7 @@ export const RSAPrivateKeyReceiver = () => {
                             onSelect={(e) => e.preventDefault()}
                             className="flex items-center justify-between gap-2"
                         >
-                            Private key transfer (rx)
+                            Private key transfer (receive)
                         </SidebarMenuButton>
                     </DialogTrigger>
                     <DialogContent>

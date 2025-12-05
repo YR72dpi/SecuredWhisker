@@ -20,6 +20,7 @@ import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { QrCodeScanner } from "../qrcode/QrCodeScanner";
 import { toast } from "sonner";
 import { SidebarMenuButton } from "../ui/sidebar";
+import { Spinner } from "../ui/spinner";
 
 const formSchema = z.object({
     userIdentifier: z.string().min(2, {
@@ -32,6 +33,7 @@ export function AddFriend() {
     const [open, setOpen] = useState(false)
     const [qrcode, setQrCode] = useState<boolean>(false)
     const [wantedFriend, setWantedFriend] = useState<string>("")
+    const [isSendingRequest, setIsSendingRequest] = useState<boolean>()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,6 +47,7 @@ export function AddFriend() {
     }
 
     async function sendRequest() {
+        setIsSendingRequest(true)
         const jwtToken = await SwDb.getJwtToken()
 
         const myHeaders = new Headers();
@@ -74,6 +77,7 @@ export function AddFriend() {
                 // setAlert("Request send")
                 // setAlertType(true)
                 setOpen(false)
+                setIsSendingRequest(false)
             })
             .catch((error) => {
                 console.error(error)
@@ -145,7 +149,9 @@ export function AddFriend() {
                                         >
                                             Cancel
                                         </Button>
-                                        <Button type="submit">Submit</Button>
+                                        <Button type="submit" disabled={isSendingRequest}>
+                                            {isSendingRequest ? (<>Sending... <Spinner /></>) : ("Submit")}
+                                        </Button>
                                     </div>
                                 </div>
                             </form>
