@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { SwDb } from "@/lib/SwDatabase";
-import { ReceiverDataForChat☺ } from "@/lib/ChatLib";
+import { ReceiverDataForChat } from "@/lib/ChatLib";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 import { Spinner } from "../ui/spinner";
 
