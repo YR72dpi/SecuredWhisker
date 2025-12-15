@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
         request.headers.get('x-forwarded-for')?.split(',')[0] ||
         'unknown'
 
-    const isAllowedIp = ALLOWED_IPS === "\"\"" ? true : ALLOWED_IPS.split(',').includes(ip)
+    const isAllowedIp = ALLOWED_IPS === "" ? true : ALLOWED_IPS.split(',').includes(ip)
 
     console.log("\n")
     console.log("========== White List Middleware ==========")
