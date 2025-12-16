@@ -111,20 +111,19 @@ POSTGRES_VERSION=
 
 ## ChangeLog
 
-## [1.3.5] - 2025-11-06
+## [1.4.0] - 2025-12-15
 
 ### Added
 
-- Page to delete contact
-- Loader on saved messages loading
+- Full doc
 
 ### Changed
 
--
+- Refoctor code management
 
 ### Fixed
 
--
+- Security issue on Nextjs
 
 ---
 
