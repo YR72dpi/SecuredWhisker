@@ -20,7 +20,7 @@ security:
                 - App\Security\CustomAuthenticator
         
         api:
-            pattern: ^/api/protected
+            pattern: ^/api/
             stateless: true
             provider: app_user_provider
             jwt: ~
@@ -42,6 +42,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/protected, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/messages, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/qrcodce, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 

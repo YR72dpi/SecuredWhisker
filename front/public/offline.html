@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Secured Whisker</title>
+    <meta name="description" content="You're offline, see you later ?">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            padding-top: 3rem;
+            align-items: center;
+            height: 90vh;
+            gap: 1rem;
+        }
+
+        header {
+            margin: 1.5rem;
+            padding: 0.75rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .offline-title {
+            font-size: 1.875rem;
+            color: #ffffff;
+        }
+
+        .offline-description {
+            font-size: 1rem;
+            color: #333333;
+        }
+
+        /* Mode sombre (optionnel) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #ffffff;
+                color: #000000;
+            }
+
+            h1, .offline-title {
+                color: #000000;
+            }
+
+            .offline-description {
+                color: #000000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Secured Whisker</h1>
+        </header>
+        <p class="offline-title">You're offline ! 😭</p>
+        <p class="offline-description">That's a shame, find a connection and come back.</p>
+    </div>
+</body>
+</html>

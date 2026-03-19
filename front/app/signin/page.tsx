@@ -7,11 +7,10 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { SubscribeResponse, UserApi } from "@/lib/UserApi";
-import { RsaLib } from "@/lib/RsaLib";
+import { RsaLib } from "@/lib/Crypto/RsaLib";
 import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react"
 import { SwDb } from '../../lib/SwDatabase'
-
 import {
   Alert,
   AlertDescription,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/alert"
 import { useRouter } from "next/navigation";
 import { HomeHeader } from "@/components/HomeHeader";
+import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -37,6 +37,8 @@ export default function Home() {
 
   const [subscribeError, setSubscribeError] = useState<string>("")
   const [pendingValues, setPendingValues] = useState<z.infer<typeof formSchema> | null>(null)
+  const [canShowPage, setCanShowPage] = useState<boolean>(false)
+
   const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,11 +50,12 @@ export default function Home() {
     },
   });
 
+  const onSubmit = (values: z.infer<typeof formSchema>) => setPendingValues(values)
+
   useEffect(() => {
     if (!pendingValues) return;
 
     const doSubmit = async () => {
-      console.log(pendingValues)
       const serverPublicKey = await UserApi.getApiPublicKey();
       const passwordCrypted = await RsaLib.textToCrypted(pendingValues.password, serverPublicKey)
 
@@ -82,72 +85,80 @@ export default function Home() {
     doSubmit()
   }, [pendingValues, router])
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setPendingValues(values)
-  }
+  useEffect(() => {
+    (async () => {
+
+      const jwtToken = await JwtTokenLib.isValidJwtToken()
+      if (jwtToken) window.location.replace("/chat");
+      else setCanShowPage(true)
+
+    })();
+  }, []);
 
   return (
-    <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">
-      <HomeHeader title="Sign in" />
+    canShowPage && (
+      <div className="flex flex-col pt-12 items-center h-[90vh] font-[family-name:var(--font-geist-sans)]">
+        <HomeHeader title="Sign in" />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Confirm password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Submit</Button>
-        </form>
-      </Form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Confirm password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Submit</Button>
+          </form>
+        </Form>
 
-      {subscribeError !== "" && (
-        <Alert variant="destructive" className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {subscribeError}
-          </AlertDescription>
-        </Alert>
-      )}
+        {subscribeError !== "" && (
+          <Alert variant="destructive" className="fixed bottom-[15px] w-[80%] bg-[#fff] z-10">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              {subscribeError}
+            </AlertDescription>
+          </Alert>
+        )}
 
-      <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
-        Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
-      </a>
-    </div>
+        <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
+          Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
+        </a>
+      </div>
+    )
   );
 }

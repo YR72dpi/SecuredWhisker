@@ -46,9 +46,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Friendship::class, mappedBy: 'requestFrom', orphanRemoval: true)]
     private Collection $friendships;
 
+    /**
+     * @var Collection<int, UserNotificationSubscription>
+     */
+    #[ORM\OneToMany(targetEntity: UserNotificationSubscription::class, mappedBy: 'userId')]
+    private Collection $userNotificationSubscriptions;
+
     public function __construct()
     {
         $this->friendships = new ArrayCollection();
+        $this->userNotificationSubscriptions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,11 +157,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFullIdentifier(): string
-    {
-        return $this->username . '_' . $this->uniqid;
-    }
-
     /**
      * @return Collection<int, Friendship>
      */
@@ -179,6 +181,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($friendship->getRequestFrom() === $this) {
                 $friendship->setRequestFrom(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserNotificationSubscription>
+     */
+    public function getUserNotificationSubscriptions(): Collection
+    {
+        return $this->userNotificationSubscriptions;
+    }
+
+    public function addUserNotificationSubscription(UserNotificationSubscription $userNotificationSubscription): static
+    {
+        if (!$this->userNotificationSubscriptions->contains($userNotificationSubscription)) {
+            $this->userNotificationSubscriptions->add($userNotificationSubscription);
+            $userNotificationSubscription->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserNotificationSubscription(UserNotificationSubscription $userNotificationSubscription): static
+    {
+        if ($this->userNotificationSubscriptions->removeElement($userNotificationSubscription)) {
+            // set the owning side to null (unless already changed)
+            if ($userNotificationSubscription->getUserId() === $this) {
+                $userNotificationSubscription->setUserId(null);
             }
         }
 
