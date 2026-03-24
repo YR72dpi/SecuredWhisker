@@ -14,6 +14,7 @@ import { InstallPrompt } from "@/components/Notification/InstallPrompt";
 import { deleteBrowserSubscriptionIfNotFindOnDb, isPushNotificationSupported } from "@/lib/Notification";
 import { toast } from "sonner";
 import { ReceiverDataForChat, SenderDataForChat } from "@/lib/ChatLib";
+import { isVapIdOk } from "@/lib/ServerAction/NotificationActions";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
@@ -24,10 +25,12 @@ export default function Home() {
     const [senderData, setSenderData] = useState<SenderDataForChat>(); // you
     const [selectedContact, setSelectedContact] = useState<ReceiverDataForChat | null>(null); // the choosen friend
 
+    const [hasVapId, setHasVapId] = useState<boolean|null>(null)
+
     useEffect(() => {
 
         (async () => {
-
+            setHasVapId(await isVapIdOk())
             const jwtToken = await JwtTokenLib.isValidJwtToken()
             if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtToken)
             if (jwtToken === null) { window.location.replace("/"); return; }
@@ -58,12 +61,13 @@ export default function Home() {
                 })
                 .catch((error) => console.error(error));
 
-
-            const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string)
-            if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
-                "The registration for push notifications for this browser was not found in the database and has been deleted.",
-                { duration: 5000 }
-            )
+            if(hasVapId) {
+                const isThisBrowserSubscriptionDeletedOnBase = await deleteBrowserSubscriptionIfNotFindOnDb(jwtToken as string)
+                if (isThisBrowserSubscriptionDeletedOnBase) toast.info(
+                    "The registration for push notifications for this browser was not found in the database and has been deleted.",
+                    { duration: 5000 }
+                )
+            }
             
             return;
         })()
@@ -76,11 +80,12 @@ export default function Home() {
                     username={senderData.username}
                     identifier={identifier}
                     publicKey={senderData.publicKey}
+                    hasVapId={hasVapId}
                 />
                 <main className="w-full border p-3 flex flex-col gap-3">
                     <SidebarTrigger />
 
-                    {isPushNotificationSupported() && !selectedContact && (<PushNotificationManager />)}
+                    {hasVapId && isPushNotificationSupported() && !selectedContact && (<PushNotificationManager />)}
                     <InstallPrompt />
 
                     {!hasPrivateKey.current && (

@@ -3,28 +3,22 @@ import { API_PROTOCOL } from '@/lib/NetworkProtocol'
 import webpush from 'web-push'
 import { type PushSubscription } from 'web-push'
 
-webpush.setVapidDetails(
-  'mailto:dev@localhost.com',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
-
-export async function isVapIdOk () {
+export async function isVapIdOk() : Promise<boolean> {
   return !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && !!process.env.VAPID_PRIVATE_KEY
 }
 
 export async function subscribeUser(
-  sub: PushSubscription, 
+  sub: PushSubscription,
   deviceName: string,
   userAgent: string,
   jwtToken: string
 ) {
-  
+
   const subscriptionPayload = btoa(JSON.stringify(sub))
 
   const data = JSON.stringify({
     deviceName: deviceName,
-    userAgent:userAgent,
+    userAgent: userAgent,
     subsciption: subscriptionPayload
   })
 
@@ -48,11 +42,11 @@ export async function subscribeUser(
     })
     .catch((error) => console.error(error));
 
-  
+
 }
 
 export async function unsubscribeUser(
-  sub: string, 
+  sub: string,
   jwtToken: string
 ) {
 
@@ -101,3 +95,13 @@ export async function sendNotification(sub: string, from: string) {
     return { success: false, error: 'Failed to send notification' }
   }
 }
+
+(async () => {
+  if (await isVapIdOk()) {
+  webpush.setVapidDetails(
+    'mailto:dev@localhost.com',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  )
+}
+})()

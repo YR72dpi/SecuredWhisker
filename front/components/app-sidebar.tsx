@@ -45,9 +45,10 @@ type AppSidebarProps = {
   identifier: string | null
   publicKey: string | null
   username: string | null
+  hasVapId: boolean | null
 }
 
-export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps) {
+export function AppSidebar({ identifier, publicKey, username, hasVapId }: AppSidebarProps) {
   const version = process.env.NEXT_PUBLIC_APP_VERSION
   const [privateKey, setPrivateKey] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
@@ -218,7 +219,7 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
           <SidebarGroupContent>
             <SidebarMenu>
               
-                {isPushNotificationSupported() && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
+                {hasVapId && isPushNotificationSupported() && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
                 <SidebarMenuItem className="px-2 py-1.5"> <Link href={"/contacts"}>Contacts</Link> </SidebarMenuItem>
 
             </SidebarMenu>

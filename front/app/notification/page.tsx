@@ -13,6 +13,7 @@ import { LuSmartphone, LuTablet, LuMonitor, LuBot } from "react-icons/lu";
 import { FaWindows, FaApple, FaLinux, FaAndroid, FaChrome, FaFirefoxBrowser, FaSafari } from "react-icons/fa";
 import { deleteBrowserSubscriptionIfNotFindOnDb, deleteSubscription, fetchSubscriptionFromDb, NotificationSubscriptionResponse } from "@/lib/Notification";
 import { toast } from "sonner";
+import { isVapIdOk } from "@/lib/ServerAction/NotificationActions";
 
 export default function Home() {
 	const [canShowPage, setCanShowPage] = useState(false)
@@ -22,9 +23,17 @@ export default function Home() {
 	const [subscriptionToDelete, setSubscriptionToDelete] = useState<NotificationSubscriptionResponse | null>(null)
 	const [jwtToken, setJwtToken] = useState<string | null>(null)
 	const [isDeleting, setIsDeleting] = useState<boolean>(false)
+    const [hasVapId, setHasVapId] = useState<boolean|null>(null)
 
 	useEffect(() => {
 		(async () => {
+		
+			setHasVapId(await isVapIdOk())
+
+			if (!hasVapId) {
+				window.location.href = "/"
+				return;
+			}
 
 			const jwtTokenValid = await JwtTokenLib.isValidJwtToken()
 			if (process.env.NODE_ENV === "development") console.log("JWT Token: " + jwtTokenValid)
@@ -44,7 +53,7 @@ export default function Home() {
 
 				setSelfNotificationDataPayload(userSubscriptionFromDb)
 			}
-			
+
 			setCanShowPage(true)
 
 		})()
@@ -62,7 +71,7 @@ export default function Home() {
 			try {
 				await deleteSubscription(subscriptionToDelete, jwtToken)
 				toast.success("The device has been successfully deleted.")
-			} catch(err: any) {
+			} catch (err: any) {
 				console.error(err)
 				toast.error("The device could not be deleted.")
 			}
@@ -120,82 +129,84 @@ export default function Home() {
 	return (
 
 		<SidebarProvider>
+			{!hasVapId && (<p>The application is not configured to enable notifications</p>)}
+			{hasVapId && (
+				<main className="w-full border p-3 flex flex-col gap-3">
+					<Link href={"/chat"} prefetch={true} >
+						<Button variant="secondary" size="icon" className="size-8" >
+							<ChevronLeftIcon />
+						</Button>
+					</Link>
+					<>
 
-			<main className="w-full border p-3 flex flex-col gap-3">
-				<Link href={"/chat"} prefetch={true} >
-					<Button variant="secondary" size="icon" className="size-8" >
-						<ChevronLeftIcon />
-					</Button>
-				</Link>
-				<>
+						<div className="w-full max-w-[428px] mx-auto flex flex-col gap-3">
+							<h1 className="font-bold text-xl mb-3">Notification receiving device</h1>
 
-					<div className="w-full max-w-[428px] mx-auto flex flex-col gap-3">
-						<h1 className="font-bold text-xl mb-3">Notification receiving device</h1>
-
-						{canShowPage ? (
-							<>
-								{subscriptionToDelete && (
-									<Alert variant="default">
-										<AlertCircleIcon />
-										<AlertTitle className="font-bold">Delete the notification subscription for {subscriptionToDelete.getDeviceName}</AlertTitle>
-										<AlertDescription>
-											<p>Are you sure you want to delete notifications for the device "{subscriptionToDelete.getDeviceName}"?</p>
-											<div className="p-3 flex gap-3 justify-end">
-												<Button
-													variant="destructive"
-													onClick={() => deleteSubscriptionHandler(subscriptionToDelete.getSubscription)}
-													disabled={isDeleting}
-												>
-													{isDeleting ? (
-														<>
-															<Spinner /> Deleting...
-														</>
-													) : "Yes, delete it !"}
-												</Button>
-												<Button
-													variant="secondary"
-													disabled={isDeleting}
-													onClick={() => setSubscriptionToDelete(null)}
-												>Nop</Button>
-											</div>
-										</AlertDescription>
-									</Alert>
-								)}
-
-
-								{selfNotificationDataPayload && selfNotificationDataPayload.length > 0 ? (
-									<ul className="w-full my-0 mx-auto flex flex-wrap gap-3 box-border">
-										{selfNotificationDataPayload.map(payload => (
-											<li key={payload.getId} className="w-[48%] h-32 border rounded-xl p-3 flex flex-col justify-between">
-												<div className="h-full flex items-center justify-center">
-													{DeviceIcons(parseUserAgent(payload.getUserAgent))}
-												</div>
-												<div className="h-[44px] flex items-center justify-between">
-													<p className="w-full truncate pr-1">{payload.getDeviceName}</p>
+							{canShowPage ? (
+								<>
+									{subscriptionToDelete && (
+										<Alert variant="default">
+											<AlertCircleIcon />
+											<AlertTitle className="font-bold">Delete the notification subscription for {subscriptionToDelete.getDeviceName}</AlertTitle>
+											<AlertDescription>
+												<p>Are you sure you want to delete notifications for the device "{subscriptionToDelete.getDeviceName}"?</p>
+												<div className="p-3 flex gap-3 justify-end">
 													<Button
-														className="w-[44px] h-[44px]"
-														disabled={!!subscriptionToDelete}
-														onClick={() => confirmBeforeDelete(payload)}
+														variant="destructive"
+														onClick={() => deleteSubscriptionHandler(subscriptionToDelete.getSubscription)}
+														disabled={isDeleting}
 													>
-														<Trash2 />
+														{isDeleting ? (
+															<>
+																<Spinner /> Deleting...
+															</>
+														) : "Yes, delete it !"}
 													</Button>
+													<Button
+														variant="secondary"
+														disabled={isDeleting}
+														onClick={() => setSubscriptionToDelete(null)}
+													>Nop</Button>
 												</div>
-											</li>
-										))}
-									</ul>
-								) : (
-									<p className="px-3 text-center">You didn't subscribe on any device ! 🤷‍♂️</p>
-								)}
-							</>
-						) : (
-							<div className="w-full p-3 flex items-center justify-center min-h-[50vh]">
-								<Spinner className="size-8" />
-							</div>
-						)}
-					</div>
-				</>
+											</AlertDescription>
+										</Alert>
+									)}
 
-			</main>
+
+									{selfNotificationDataPayload && selfNotificationDataPayload.length > 0 ? (
+										<ul className="w-full my-0 mx-auto flex flex-wrap gap-3 box-border">
+											{selfNotificationDataPayload.map(payload => (
+												<li key={payload.getId} className="w-[48%] h-32 border rounded-xl p-3 flex flex-col justify-between">
+													<div className="h-full flex items-center justify-center">
+														{DeviceIcons(parseUserAgent(payload.getUserAgent))}
+													</div>
+													<div className="h-[44px] flex items-center justify-between">
+														<p className="w-full truncate pr-1">{payload.getDeviceName}</p>
+														<Button
+															className="w-[44px] h-[44px]"
+															disabled={!!subscriptionToDelete}
+															onClick={() => confirmBeforeDelete(payload)}
+														>
+															<Trash2 />
+														</Button>
+													</div>
+												</li>
+											))}
+										</ul>
+									) : (
+										<p className="px-3 text-center">You didn't subscribe on any device ! 🤷‍♂️</p>
+									)}
+								</>
+							) : (
+								<div className="w-full p-3 flex items-center justify-center min-h-[50vh]">
+									<Spinner className="size-8" />
+								</div>
+							)}
+						</div>
+					</>
+
+				</main>
+			)}
 		</SidebarProvider>
 	);
 }
