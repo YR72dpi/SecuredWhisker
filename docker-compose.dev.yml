@@ -69,7 +69,7 @@ services:
       - dev-app-network
 
   dev-next-app:
-    container_name: next-app
+    container_name: dev-next-app
     build:
       context: ./front/
       dockerfile: Dockerfile.dev
