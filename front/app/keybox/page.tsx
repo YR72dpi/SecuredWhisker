@@ -141,8 +141,8 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       const jwtToken = await JwtTokenLib.isValidJwtToken()
-      if (jwtToken) {
-        router.replace("/chat")
+      if (!jwtToken) {
+        router.replace("/login")
         return
       }
       setBleAvailable(!!navigator.bluetooth)
