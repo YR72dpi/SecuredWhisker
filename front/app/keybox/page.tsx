@@ -42,6 +42,7 @@ export default function Home() {
     try {
       const device = await scanKeybox()
       setBleDevices((prev) => prev.find((d) => d.id === device.id) ? prev : [...prev, device])
+      await handleConnect(device)
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'NotFoundError') {
         toast.error("Bluetooth error: " + err.message)
@@ -178,14 +179,18 @@ export default function Home() {
           {bleDevices.length > 0 && !deviceData && (
             <ul className="border rounded-md divide-y">
               {bleDevices.map((device) => (
-                <li key={device.id} className="px-4 py-3 flex items-center justify-between text-sm">
+                <li
+                  key={device.id}
+                  className="px-4 py-3 flex items-center justify-between text-sm cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleConnect(device)}
+                >
                   <div>
                     {device.name ?? <span className="text-muted-foreground italic">Unknown device</span>}
                     <span className="block text-xs text-muted-foreground">{device.id}</span>
                   </div>
-                  <Button size="sm" disabled={connectingId === device.id} onClick={() => handleConnect(device)}>
-                    {connectingId === device.id ? "Connecting..." : "Connect"}
-                  </Button>
+                  {connectingId === device.id && (
+                    <span className="text-xs text-muted-foreground">Connecting...</span>
+                  )}
                 </li>
               ))}
             </ul>
