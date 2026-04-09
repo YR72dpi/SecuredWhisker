@@ -1,8 +1,13 @@
+
 export const KEYBOX_SERVICE_UUID = "12345678-1234-5678-1234-56789abcdef0"
-export const KEYBOX_CHAR_UUID    = "12345678-1234-5678-1234-56789abcdef1"
+export const KEYBOX_CHAR_UUID = "12345678-1234-5678-1234-56789abcdef1"
 export const STANDARD_SERVICES: BluetoothServiceUUID[] = [KEYBOX_SERVICE_UUID]
 
 export type DeviceData = { device: BluetoothDevice }
+export const KEYBOX_ACTION = {
+  "shutdown": { "action": "shutdown" },
+  // "reboot" : {"action": "reboot"},
+}
 
 async function getChar(device: BluetoothDevice): Promise<BluetoothRemoteGATTCharacteristic> {
   const server = device.gatt!.connected ? device.gatt! : await device.gatt!.connect()
@@ -65,3 +70,10 @@ export async function sendPin(device: BluetoothDevice, pin: string): Promise<voi
     await char.writeValueWithoutResponse(data)
   }
 }
+
+export async function shutdownKeybox(device: BluetoothDevice): Promise<void> {
+  const jsonToSend = JSON.stringify(KEYBOX_ACTION["shutdown"])
+  const send = await writeKeybox(device, jsonToSend)
+  return send
+}
+
