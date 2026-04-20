@@ -26,6 +26,7 @@ import {
   cryptBeforeSendToKeybox,
   formateDataToSendToKeybox,
   sliceDataOnBlock,
+  md5,
 } from "@/lib/bluetooth/keyboxDataFormater"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import z from "zod"
@@ -161,46 +162,55 @@ export default function Home() {
   }
 
   useEffect(() => {
-      if(!pairPassword) return
-      (async () => {
-        const privateKey = await SwDb.getPrivateKey()
-        if (!privateKey) { toast.error("There is no key on this browser"); return}
+    if (!pairPassword) return
+    (async () => {
+      const privateKey = await SwDb.getPrivateKey()
+      if (!privateKey) { toast.error("There is no key on this browser"); return }
 
-        const jwtToken = await JwtTokenLib.isValidJwtToken()
+      const jwtToken = await JwtTokenLib.isValidJwtToken()
 
-        const myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer " + jwtToken);
+      const myHeaders = new Headers();
+      myHeaders.append("Authorization", "Bearer " + jwtToken);
 
-        const requestOptions: RequestInit = {
-          method: "GET",
-          headers: myHeaders,
-          redirect: "follow"
-        };
+      const requestOptions: RequestInit = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
 
-        const publicKey = await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
-          .then((response) => response.json())
-          .then((result) => {
-            return result.publicKey;
-          })
-          .catch((error) => console.error(error));
-        if(!publicKey) { toast.error("There is no key on this browser"); return}
+      const publicKey = await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          return result.publicKey;
+        })
+        .catch((error) => console.error(error));
+      if (!publicKey) { toast.error("There is no key on this browser"); return }
 
-        const passwordForCrypt = AesLib.iterateToMakePasswordLonger(pairPassword.password)
-        const cryptedPrivateKeyToSend = await cryptBeforeSendToKeybox(passwordForCrypt, privateKey)
+      const passwordForCrypt = AesLib.iterateToMakePasswordLonger(pairPassword.password)
+      const cryptedPrivateKeyToSend = await cryptBeforeSendToKeybox(passwordForCrypt, privateKey)
 
-      // send iv
-        await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_iv", cryptedPrivateKeyToSend.iv))
-      // send public key
-        const slicedEncrpytedPrivateKey = sliceDataOnBlock(cryptedPrivateKeyToSend.encryptedData)
-        for (const block of slicedEncrpytedPrivateKey) {
-          await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_private", block))
-        }
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_private", md5(cryptedPrivateKeyToSend.encryptedData)))
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_public", md5(publicKey)))
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_iv", md5(cryptedPrivateKeyToSend.iv)))
+
       // send private key
-        const slicedEncrpytedPublicKeyKey = sliceDataOnBlock(publicKey)
-        for (const block of slicedEncrpytedPublicKeyKey) {
-          await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_public", block))
-        }
-      })()
+      const slicedEncrpytedPrivateKey = sliceDataOnBlock(cryptedPrivateKeyToSend.encryptedData)
+      for (const block of slicedEncrpytedPrivateKey) {
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_private", block))
+      }
+
+      // send public key
+      const slicedEncrpytedPublicKeyKey = sliceDataOnBlock(publicKey)
+      for (const block of slicedEncrpytedPublicKeyKey) {
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_public", block))
+      }
+      
+      // send iv
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_iv", cryptedPrivateKeyToSend.iv))
+      
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("validate"))
+
+    })()
   }, [pairPassword])
 
   useEffect(() => {
