@@ -294,6 +294,7 @@ export default function Home() {
       setPairSteps(prev => [...prev, { label: "✓ Keybox initialization complete", done: true }])
       setIsKeyboxInit(true)
       toast.success("Keybox successfully initialized!")
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("shutdown"))
 
     })()
   }, [pairPassword])
@@ -313,6 +314,7 @@ export default function Home() {
         )
         SessionStore.set('privateKey', decryptedKey)
         toast.success("Private key unlocked")
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("shutdown"))
       } catch {
         toast.error("Failed to decrypt private key — wrong password?")
       }
