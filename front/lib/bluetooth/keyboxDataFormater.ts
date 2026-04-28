@@ -10,7 +10,7 @@ export async function cryptBeforeSendToKeybox(password: string, privateKey: Priv
 }
 
 export function formateDataToSendToKeybox(action: string, data: string|null = null) :string {
-  let payload: {action: string, data?: string} = {action: action}
+  const payload: {action: string, data?: string} = {action: action}
   if (data !== null) payload.data = data
   return JSON.stringify(payload)
 }
@@ -69,8 +69,8 @@ export function md5(str: string): string {
 }
 
 export function sliceDataOnBlock(data: string): string[] {
-  let encoder = new TextEncoder()
-  let slicedData = []
+  const encoder = new TextEncoder()
+  const slicedData = []
   const blockSize = 30
   for (let i = 0; i < Math.ceil(data.length / blockSize); i++) {
     const charsBlock = data.slice(i * blockSize, i * blockSize + blockSize)
