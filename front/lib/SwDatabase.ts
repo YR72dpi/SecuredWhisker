@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
+import { SessionStore } from '@/lib/SessionStore';
 
 export interface PrivateKey {
   privateKey: string;
@@ -30,9 +31,16 @@ class SwDatabase extends Dexie {
   }
 
   async getPrivateKey(): Promise<PrivateKey | undefined> {
-    const result = await this.keys.get('main_private_key');
+    // const result = await this.keys.get('main_private_key');
+    const result = null
+    
     if (result) {
       return { privateKey: result.privateKey };
+    }
+
+    const sessionKey = SessionStore.get('privateKey');
+    if (sessionKey) {
+      return { privateKey: sessionKey };
     }
     return undefined;
   }

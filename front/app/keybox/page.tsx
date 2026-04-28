@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form";
 import { API_PROTOCOL } from "@/lib/NetworkProtocol";
 
@@ -33,6 +33,9 @@ import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SwDb } from "@/lib/SwDatabase"
 import { AesLib } from "@/lib/Crypto/AesLib"
+import { SessionStore } from "@/lib/SessionStore"
+
+type PairStep = { label: string; done: boolean }
 
 const formSchema = z.object({
   password: z.string().min(6, {
@@ -60,9 +63,12 @@ export default function Home() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
 
   const [isKeyboxInit, setIsKeyboxInit] = useState<boolean | null>(null)
+  const [bleDownloading, setBleDownloading] = useState<'idle' | 'downloading' | 'done' | 'error'>('idle')
 
   const [showPairDialog, setShowPairDialog] = useState(false)
   const [pairPassword, setPairPassword] = useState<z.infer | null>(null)
+  const [pairSteps, setPairSteps] = useState<PairStep[]>([])
+  const pairStepsEndRef = useRef<HTMLDivElement>(null)
 
   const router = useRouter()
 
@@ -74,7 +80,10 @@ export default function Home() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => setPairPassword(values)
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setPairPassword(values)
+    setShowPairDialog(false)
+  }
 
 
   const handleScan = async () => {
@@ -163,7 +172,8 @@ export default function Home() {
 
   useEffect(() => {
     if (!pairPassword) return
-    (async () => {
+    setPairSteps([])
+    ;(async () => {
       const privateKey = await SwDb.getPrivateKey()
       if (!privateKey) { toast.error("There is no key on this browser"); return }
 
@@ -190,25 +200,32 @@ export default function Home() {
       const cryptedPrivateKeyToSend = await cryptBeforeSendToKeybox(passwordForCrypt, privateKey)
 
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_private", md5(cryptedPrivateKeyToSend.encryptedData)))
+      setPairSteps(prev => [...prev, { label: "Private key hash sent", done: true }])
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_public", md5(publicKey)))
+      setPairSteps(prev => [...prev, { label: "Public key hash sent", done: true }])
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_iv", md5(cryptedPrivateKeyToSend.iv)))
+      setPairSteps(prev => [...prev, { label: "IV hash sent", done: true }])
 
       // send private key
       const slicedEncrpytedPrivateKey = sliceDataOnBlock(cryptedPrivateKeyToSend.encryptedData)
-      for (const block of slicedEncrpytedPrivateKey) {
-        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_private", block))
+      for (let i = 0; i < slicedEncrpytedPrivateKey.length; i++) {
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_private", slicedEncrpytedPrivateKey[i]))
+        setPairSteps(prev => [...prev, { label: `Private key block ${i + 1}/${slicedEncrpytedPrivateKey.length} sent`, done: true }])
       }
 
       // send public key
       const slicedEncrpytedPublicKeyKey = sliceDataOnBlock(publicKey)
-      for (const block of slicedEncrpytedPublicKeyKey) {
-        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_public", block))
+      for (let i = 0; i < slicedEncrpytedPublicKeyKey.length; i++) {
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_public", slicedEncrpytedPublicKeyKey[i]))
+        setPairSteps(prev => [...prev, { label: `Public key block ${i + 1}/${slicedEncrpytedPublicKeyKey.length} sent`, done: true }])
       }
-      
+
       // send iv
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_iv", cryptedPrivateKeyToSend.iv))
-      
+      setPairSteps(prev => [...prev, { label: "IV sent", done: true }])
+
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("validate"))
+      setPairSteps(prev => [...prev, { label: "Keybox paired successfully", done: true }])
 
     })()
   }, [pairPassword])
@@ -217,14 +234,22 @@ export default function Home() {
     if (!pinSent || !deviceData) return
 
     (async () => {
-      const keyboxDataString = await readKeybox(deviceData.device)
-      const keyBoxData = JSON.parse(keyboxDataString)
-      console.log(keyBoxData)
-      setIsKeyboxInit(keyBoxData.initialized)
+      setBleDownloading('downloading')
+      try {
+        const keyboxDataString = await readKeybox(deviceData.device)
+        SessionStore.set('keyboxRawData', keyboxDataString)
+        const keyBoxData = JSON.parse(keyboxDataString)
+        console.log(keyBoxData)
+        setIsKeyboxInit(keyBoxData.initialized)
+        setBleDownloading('done')
+      } catch (err: unknown) {
+        setBleDownloading('error')
+        toast.error("Failed to read keybox status: " + (err instanceof Error ? err.message : String(err)))
+      }
     })()
 
-    const interval = setInterval(async () => {
-      const ok = await pingKeybox(deviceData.device)
+    const interval = setInterval(() => {
+      const ok = pingKeybox(deviceData.device)
       setIsConnected(ok)
     }, 1000)
 
@@ -248,6 +273,10 @@ export default function Home() {
       setCanShowPage(true)
     })()
   }, [router])
+
+  useEffect(() => {
+    pairStepsEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [pairSteps])
 
   if (!canShowPage) return null
 
@@ -327,6 +356,26 @@ export default function Home() {
                     <p className="text-sm font-medium text-green-600 dark:text-green-400">Authenticated</p>
                   </div>
 
+                  {bleDownloading === 'downloading' && (
+                    <div className="flex items-center gap-2 rounded-md border border-blue-400 bg-blue-50 dark:bg-blue-950 px-3 py-2 text-sm text-blue-700 dark:text-blue-300">
+                      <svg className="animate-spin w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      Downloading keybox data...
+                    </div>
+                  )}
+                  {bleDownloading === 'done' && (
+                    <div className="flex items-center gap-2 rounded-md border border-green-400 bg-green-50 dark:bg-green-950 px-3 py-2 text-sm text-green-700 dark:text-green-300">
+                      <span>✓</span> Keybox data loaded successfully
+                    </div>
+                  )}
+                  {bleDownloading === 'error' && (
+                    <div className="flex items-center gap-2 rounded-md border border-red-400 bg-red-50 dark:bg-red-950 px-3 py-2 text-sm text-red-700 dark:text-red-300">
+                      <span>✕</span> Failed to load keybox data
+                    </div>
+                  )}
+
                   {process.env.NODE_ENV === 'development' && (
                     <>
                       <div className="space-y-1.5">
@@ -360,6 +409,24 @@ export default function Home() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {pairSteps.length > 0 && (
+            <div className="border rounded-md p-4 space-y-2">
+              <p className="text-sm font-medium">Pairing progress</p>
+              <ul
+                className="space-y-1 overflow-y-auto font-mono bg-black rounded p-2"
+                style={{ height: "50vh" }}
+              >
+                {pairSteps.map((step, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${step.done ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span className={step.done ? 'text-green-400' : 'text-red-400'}>{step.label}</span>
+                  </li>
+                ))}
+                <div ref={pairStepsEndRef} />
+              </ul>
             </div>
           )}
 
