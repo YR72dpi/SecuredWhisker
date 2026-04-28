@@ -47,6 +47,10 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const unlockFormSchema = z.object({
+  password: z.string().min(6, { message: "6 chars minimum" }),
+});
+
 export default function Home() {
   const [canShowPage, setCanShowPage] = useState(false)
   const [bleAvailable, setBleAvailable] = useState(false)
@@ -70,6 +74,9 @@ export default function Home() {
   const [pairSteps, setPairSteps] = useState<PairStep[]>([])
   const pairStepsEndRef = useRef<HTMLDivElement>(null)
 
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false)
+  const [unlockPassword, setUnlockPassword] = useState<string | null>(null)
+
   const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -83,6 +90,16 @@ export default function Home() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setPairPassword(values)
     setShowPairDialog(false)
+  }
+
+  const unlockForm = useForm<z.infer<typeof unlockFormSchema>>({
+    resolver: zodResolver(unlockFormSchema),
+    defaultValues: { password: "" },
+  })
+
+  const onUnlockSubmit = (values: z.infer<typeof unlockFormSchema>) => {
+    setUnlockPassword(values.password)
+    setShowUnlockDialog(false)
   }
 
 
@@ -170,65 +187,137 @@ export default function Home() {
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // PAIRING FLOW
+  // Triggered when user submits the password form.
+  // Steps: fetch keys → encrypt → send chunks → validate → verify → confirm
+  // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!pairPassword) return
+    if (!pairPassword || !deviceData) return
     setPairSteps([])
     ;(async () => {
-      const privateKey = await SwDb.getPrivateKey()
-      if (!privateKey) { toast.error("There is no key on this browser"); return }
+      // ── 1. Récupération des clés locales ──────────────────────────────────
+      const privateKeyResult = await SwDb.getPrivateKey()
+      if (!privateKeyResult) { toast.error("There is no key on this browser"); return }
+      const privateKey = privateKeyResult.privateKey
 
       const jwtToken = await JwtTokenLib.isValidJwtToken()
+      const myHeaders = new Headers()
+      myHeaders.append("Authorization", "Bearer " + jwtToken)
+      const publicKey = await fetch(
+        API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData",
+        { method: "GET", headers: myHeaders, redirect: "follow" }
+      )
+        .then(r => r.json())
+        .then(r => r.publicKey)
+        .catch((e) => { console.error(e); return null })
+      if (!publicKey) { toast.error("Could not fetch public key"); return }
 
-      const myHeaders = new Headers();
-      myHeaders.append("Authorization", "Bearer " + jwtToken);
-
-      const requestOptions: RequestInit = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow"
-      };
-
-      const publicKey = await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", requestOptions)
-        .then((response) => response.json())
-        .then((result) => {
-          return result.publicKey;
-        })
-        .catch((error) => console.error(error));
-      if (!publicKey) { toast.error("There is no key on this browser"); return }
-
+      // ── 2. Chiffrement de la clé privée avec le mot de passe ─────────────
       const passwordForCrypt = AesLib.iterateToMakePasswordLonger(pairPassword.password)
-      const cryptedPrivateKeyToSend = await cryptBeforeSendToKeybox(passwordForCrypt, privateKey)
+      const cryptedPrivateKey = await cryptBeforeSendToKeybox(passwordForCrypt, privateKeyResult)
 
-      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_private", md5(cryptedPrivateKeyToSend.encryptedData)))
+      // ── 3. Envoi des hashes de contrôle ───────────────────────────────────
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_private", md5(cryptedPrivateKey.encryptedData)))
       setPairSteps(prev => [...prev, { label: "Private key hash sent", done: true }])
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_public", md5(publicKey)))
       setPairSteps(prev => [...prev, { label: "Public key hash sent", done: true }])
-      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_iv", md5(cryptedPrivateKeyToSend.iv)))
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_hash_iv", md5(cryptedPrivateKey.iv)))
       setPairSteps(prev => [...prev, { label: "IV hash sent", done: true }])
 
-      // send private key
-      const slicedEncrpytedPrivateKey = sliceDataOnBlock(cryptedPrivateKeyToSend.encryptedData)
-      for (let i = 0; i < slicedEncrpytedPrivateKey.length; i++) {
-        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_private", slicedEncrpytedPrivateKey[i]))
-        setPairSteps(prev => [...prev, { label: `Private key block ${i + 1}/${slicedEncrpytedPrivateKey.length} sent`, done: true }])
+      // ── 4. Envoi de la clé privée chiffrée (par blocs) ───────────────────
+      const privateKeyBlocks = sliceDataOnBlock(cryptedPrivateKey.encryptedData)
+      for (let i = 0; i < privateKeyBlocks.length; i++) {
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_private", privateKeyBlocks[i]))
+        setPairSteps(prev => [...prev, { label: `Private key block ${i + 1}/${privateKeyBlocks.length} sent`, done: true }])
       }
 
-      // send public key
-      const slicedEncrpytedPublicKeyKey = sliceDataOnBlock(publicKey)
-      for (let i = 0; i < slicedEncrpytedPublicKeyKey.length; i++) {
-        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_public", slicedEncrpytedPublicKeyKey[i]))
-        setPairSteps(prev => [...prev, { label: `Public key block ${i + 1}/${slicedEncrpytedPublicKeyKey.length} sent`, done: true }])
+      // ── 5. Envoi de la clé publique (par blocs) ───────────────────────────
+      const publicKeyBlocks = sliceDataOnBlock(publicKey)
+      for (let i = 0; i < publicKeyBlocks.length; i++) {
+        await writeKeybox(deviceData.device, formateDataToSendToKeybox("concat_public", publicKeyBlocks[i]))
+        setPairSteps(prev => [...prev, { label: `Public key block ${i + 1}/${publicKeyBlocks.length} sent`, done: true }])
       }
 
-      // send iv
-      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_iv", cryptedPrivateKeyToSend.iv))
+      // ── 6. Envoi de l'IV ──────────────────────────────────────────────────
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("set_iv", cryptedPrivateKey.iv))
       setPairSteps(prev => [...prev, { label: "IV sent", done: true }])
 
-      await writeKeybox(deviceData.device, formateDataToSendToKeybox("validate"))
-      setPairSteps(prev => [...prev, { label: "Keybox paired successfully", done: true }])
+      // ── 7. Demande de validation des hashes côté BLE ──────────────────────
+      await writeKeybox(deviceData.device, JSON.stringify({ action: "validate" }))
+      setPairSteps(prev => [...prev, { label: "Validation requested", done: true }])
+
+      // ── 8. Lecture des données de retour ──────────────────────────────────
+      setPairSteps(prev => [...prev, { label: "Reading back keybox data...", done: true }])
+      const readBack = await readKeybox(deviceData.device)
+      console.log("[Keybox] raw readBack:", readBack)
+      const readBackData = JSON.parse(readBack)
+      console.log("[Keybox] parsed readBack:", readBackData)
+
+      // ── 9. Vérification : hash.allHashCorresponding + déchiffrement + comparaison clé privée
+      const allHashesOk = readBackData.hash?.allHashCorresponding === true
+
+      if (!allHashesOk) {
+        setPairSteps(prev => [...prev, { label: "❌ Hash verification failed", done: false }])
+        toast.error("Pairing failed: hashes do not all match on keybox.")
+        return
+      }
+
+      // Déchiffrement de la clé privée stockée dans le BLE avec le mot de passe saisi
+      setPairSteps(prev => [...prev, { label: "Decrypting BLE private key...", done: true }])
+      let decryptedBlePrivateKey: string
+      try {
+        decryptedBlePrivateKey = await AesLib.cryptedToText(
+          readBackData.keypair.private,
+          readBackData.iv,
+          passwordForCrypt
+        )
+      } catch {
+        setPairSteps(prev => [...prev, { label: "❌ Failed to decrypt BLE private key", done: false }])
+        toast.error("Pairing failed: could not decrypt the private key stored on keybox.")
+        return
+      }
+
+      const privateKeyOk = decryptedBlePrivateKey === privateKey
+
+      if (!privateKeyOk) {
+        setPairSteps(prev => [...prev, { label: "❌ Private key mismatch", done: false }])
+        toast.error("Pairing failed: decrypted BLE private key does not match local key.")
+        return
+      }
+
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("fix"))
+
+      // ── 10. Tout est OK → stockage + confirmation ─────────────────────────
+      SessionStore.set('privateKey', decryptedBlePrivateKey)
+      setPairSteps(prev => [...prev, { label: "✓ All hashes verified", done: true }])
+      setPairSteps(prev => [...prev, { label: "✓ Keybox initialization complete", done: true }])
+      setIsKeyboxInit(true)
+      toast.success("Keybox successfully initialized!")
 
     })()
   }, [pairPassword])
+
+  useEffect(() => {
+    if (!unlockPassword) return
+    ;(async () => {
+      const rawData = SessionStore.get('keyboxRawData')
+      if (!rawData) { toast.error("No keybox data in session"); return }
+      try {
+        const keyBoxData = JSON.parse(rawData)
+        const passwordForCrypt = AesLib.iterateToMakePasswordLonger(unlockPassword)
+        const decryptedKey = await AesLib.cryptedToText(
+          keyBoxData.keypair.private,
+          keyBoxData.iv,
+          passwordForCrypt
+        )
+        SessionStore.set('privateKey', decryptedKey)
+        toast.success("Private key unlocked")
+      } catch {
+        toast.error("Failed to decrypt private key — wrong password?")
+      }
+    })()
+  }, [unlockPassword])
 
   useEffect(() => {
     if (!pinSent || !deviceData) return
@@ -241,6 +330,9 @@ export default function Home() {
         const keyBoxData = JSON.parse(keyboxDataString)
         console.log(keyBoxData)
         setIsKeyboxInit(keyBoxData.initialized)
+        if (keyBoxData.initialized === true) {
+          setShowUnlockDialog(true)
+        }
         setBleDownloading('done')
       } catch (err: unknown) {
         setBleDownloading('error')
@@ -376,7 +468,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  {process.env.NODE_ENV === 'development' && (
+                  {process.env.NODE_ENV === 'developmens' && (
                     <>
                       <div className="space-y-1.5">
                         <p className="text-xs text-muted-foreground">Read</p>
@@ -429,6 +521,36 @@ export default function Home() {
               </ul>
             </div>
           )}
+
+          <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Unlock your private key</DialogTitle>
+              </DialogHeader>
+              <p className="text-sm text-muted-foreground">Enter the password you used to encrypt your private key on this keybox.</p>
+              <Form {...unlockForm}>
+                <form onSubmit={unlockForm.handleSubmit(onUnlockSubmit)} className="space-y-2">
+                  <FormField
+                    control={unlockForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" autoComplete="current-password" placeholder="Password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit">Unlock</Button>
+                </form>
+              </Form>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setShowUnlockDialog(false)}>Cancel</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {isKeyboxInit === false && (
             <>

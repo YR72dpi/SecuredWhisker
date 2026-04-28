@@ -46,9 +46,9 @@ export async function readKeybox(device: BluetoothDevice): Promise<string> {
   return new Promise((resolve, reject) => {
     let inactivityTimer: ReturnType<typeof setTimeout>
 
-    // Strip all BLE framing control characters from the final buffer
-    // Removes 0x00-0x08 and 0x0E-0x1F everywhere except valid JSON whitespace (tab, LF, CR)
-    const flush = () => buffer.replace(/[\x00-\x08\x0E-\x1F]/g, '')
+    // Strip ALL control characters (0x00-0x1F) — the keybox JSON only contains
+    // base64/hex values so no whitespace control chars are ever intentional
+    const flush = () => buffer.replace(/[\x00-\x1F]/g, '')
 
     const done = () => {
       clearTimeout(inactivityTimer)

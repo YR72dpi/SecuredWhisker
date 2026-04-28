@@ -31,10 +31,8 @@ class SwDatabase extends Dexie {
   }
 
   async getPrivateKey(): Promise<PrivateKey | undefined> {
-    // const result = await this.keys.get('main_private_key');
-    const result = null
-    
-    if (result) {
+    const result = await this.keys.get('main_private_key');
+    if (result?.privateKey) {
       return { privateKey: result.privateKey };
     }
 
