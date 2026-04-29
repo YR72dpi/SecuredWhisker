@@ -33,6 +33,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { SwDb } from "@/lib/SwDatabase"
 import { AesLib } from "@/lib/Crypto/AesLib"
 import { SessionStore } from "@/lib/SessionStore"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { isVapIdOk } from "@/lib/ServerAction/NotificationActions"
 
 type PairStep = { label: string; done: boolean }
 
@@ -75,6 +78,11 @@ export default function Home() {
 
   const [showUnlockDialog, setShowUnlockDialog] = useState(false)
   const [unlockPassword, setUnlockPassword] = useState<string | null>(null)
+
+  const [identifier, setIdentifier] = useState<string | null>(null)
+  const [username, setUsername] = useState<string | null>(null)
+  const [publicKey, setPublicKey] = useState<string | null>(null)
+  const [hasVapId, setHasVapId] = useState<boolean | null>(null)
 
   const router = useRouter()
 
@@ -363,6 +371,19 @@ export default function Home() {
           setBleDevices(bonded)
         }
       }
+      setHasVapId(await isVapIdOk())
+      const myHeaders = new Headers()
+      myHeaders.append("Authorization", "Bearer " + jwtToken)
+      await fetch(API_PROTOCOL + "://" + process.env.NEXT_PUBLIC_USER_HOST + "/api/protected/selfUserData", {
+        method: "GET", headers: myHeaders, redirect: "follow"
+      })
+        .then(r => r.json())
+        .then(result => {
+          setIdentifier(result.identifier)
+          setUsername(result.username)
+          setPublicKey(result.publicKey)
+        })
+        .catch(console.error)
       setCanShowPage(true)
     })()
   }, [router])
@@ -374,7 +395,16 @@ export default function Home() {
   if (!canShowPage) return null
 
   return (
-    <div className="flex flex-col pt-12 items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
+    <SidebarProvider>
+      <AppSidebar
+        username={username}
+        identifier={identifier}
+        publicKey={publicKey}
+        hasVapId={hasVapId}
+      />
+      <main className="w-full p-3">
+        <SidebarTrigger />
+        <div className="flex flex-col pt-12 items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
 
       {!bleAvailable ? (
         <p className="text-destructive text-sm text-center mt-8">
@@ -610,5 +640,7 @@ export default function Home() {
         </div>
       )}
     </div>
+      </main>
+    </SidebarProvider>
   )
 }
