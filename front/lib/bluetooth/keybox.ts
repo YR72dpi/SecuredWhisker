@@ -50,18 +50,18 @@ export async function readKeybox(device: BluetoothDevice): Promise<string> {
     // base64/hex values so no whitespace control chars are ever intentional
     const flush = () => buffer.replace(/[\x00-\x1F]/g, '')
 
-    const done = () => {
+    const done = async (): Promise<string> => {
       clearTimeout(inactivityTimer)
       char.removeEventListener("characteristicvaluechanged", handler)
-      char.stopNotifications().catch(() => {})
+      try { await char.stopNotifications() } catch { /* ignore */ }
+      return flush()
     }
 
     const resetTimer = () => {
       clearTimeout(inactivityTimer)
       inactivityTimer = setTimeout(() => {
         console.warn("[BLE] readKeybox: timeout, resolving with", buffer.length, "chars")
-        done()
-        resolve(flush())
+        done().then(resolve).catch(reject)
       }, 3000)
     }
 
@@ -82,8 +82,7 @@ export async function readKeybox(device: BluetoothDevice): Promise<string> {
         (raw.length === 3 && raw[0] === 0 && raw[1] === 4 && raw[2] === 0)
 
       if (isTerminator) {
-        done()
-        resolve(flush())
+        done().then(resolve).catch(reject)
         return
       }
 
@@ -96,9 +95,9 @@ export async function readKeybox(device: BluetoothDevice): Promise<string> {
       .then(() => {
         resetTimer()
         const trigger = new TextEncoder().encode(JSON.stringify({ action: "read" }))
-        return char.properties.write
-          ? char.writeValueWithResponse(trigger)
-          : char.writeValueWithoutResponse(trigger)
+        return char.properties.writeWithoutResponse
+          ? char.writeValueWithoutResponse(trigger)
+          : char.writeValueWithResponse(trigger)
       })
       .catch(reject)
   })
@@ -107,20 +106,32 @@ export async function readKeybox(device: BluetoothDevice): Promise<string> {
 export async function writeKeybox(device: BluetoothDevice, value: string): Promise<void> {
   const char = await getChar(device)
   const data = new TextEncoder().encode(value)
-  if (char.properties.write) {
-    await char.writeValueWithResponse(data)
-  } else {
+  // Prefer writeWithoutResponse: fire-and-forget, no ATT_WRITE_RSP needed.
+  // Fall back to writeWithResponse but swallow GATT errors: the device may execute
+  // the command (reset/validate/fix/shutdown) before it can send ATT_WRITE_RSP,
+  // causing a spurious "GATT operation failed" even though the write succeeded.
+  if (char.properties.writeWithoutResponse) {
     await char.writeValueWithoutResponse(data)
+  } else if (char.properties.write) {
+    try {
+      await char.writeValueWithResponse(data)
+    } catch (err) {
+      if (err instanceof Error && err.name === 'NetworkError' || err instanceof Error && err.message.toLowerCase().includes('gatt')) {
+        console.warn("[BLE] writeKeybox: GATT error swallowed (write likely succeeded):", err.message)
+      } else {
+        throw err
+      }
+    }
   }
 }
 
 export async function sendPin(device: BluetoothDevice, pin: string): Promise<void> {
   const char = await getChar(device)
   const data = new TextEncoder().encode(JSON.stringify({ pin }))
-  if (char.properties.write) {
-    await char.writeValueWithResponse(data)
-  } else {
+  if (char.properties.writeWithoutResponse) {
     await char.writeValueWithoutResponse(data)
+  } else if (char.properties.write) {
+    await char.writeValueWithResponse(data)
   }
 }
 

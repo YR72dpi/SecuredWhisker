@@ -251,8 +251,10 @@ export default function Home() {
       setPairSteps(prev => [...prev, { label: "IV sent", done: true }])
 
       // ── 7. Demande de validation des hashes côté BLE ──────────────────────
-      await writeKeybox(deviceData.device, JSON.stringify({ action: "validate" }))
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("validate"))
       setPairSteps(prev => [...prev, { label: "Validation requested", done: true }])
+      // Give the keybox time to finish hash validation before we open notifications
+      await new Promise(res => setTimeout(res, 500))
 
       // ── 8. Lecture des données de retour ──────────────────────────────────
       setPairSteps(prev => [...prev, { label: "Reading back keybox data...", done: true }])
@@ -265,10 +267,11 @@ export default function Home() {
       const allHashesOk = readBackData.hash?.allHashCorresponding === true
 
       if (!allHashesOk) {
-        setPairSteps(prev => [...prev, { label: "❌ Hash verification failed", done: false }])
+        setPairSteps(prev => [...prev, { label: "❌ Hash verification failed, reset keybox", done: false }])
         toast.error("Pairing failed: hashes do not all match on keybox.")
         return
       }
+      setPairSteps(prev => [...prev, { label: "✓ All hashes verified", done: true }])
 
       // Déchiffrement de la clé privée stockée dans le BLE avec le mot de passe saisi
       setPairSteps(prev => [...prev, { label: "Decrypting BLE private key...", done: true }])
@@ -280,10 +283,11 @@ export default function Home() {
           passwordForCrypt
         )
       } catch {
-        setPairSteps(prev => [...prev, { label: "❌ Failed to decrypt BLE private key", done: false }])
+        setPairSteps(prev => [...prev, { label: "❌ Failed to decrypt private key form BLE, reset keybox", done: false }])
         toast.error("Pairing failed: could not decrypt the private key stored on keybox.")
         return
       }
+      setPairSteps(prev => [...prev, { label: "✓ Private key from BLE can be correctly decrypted", done: true }])
 
       const privateKeyOk = decryptedBlePrivateKey === privateKey
 
@@ -294,12 +298,13 @@ export default function Home() {
         setPairSteps(prev => [...prev, { label: "❌ Complete reset of Keybox data", done: false }])
         return
       }
+      setPairSteps(prev => [...prev, { label: "✓ Decrpyted private key from BLE is correct", done: true }])
 
       await writeKeybox(deviceData.device, formateDataToSendToKeybox("fix"))
+      setPairSteps(prev => [...prev, { label: "✓ Overrite keybox data blocked", done: true }])
 
       // ── 10. Tout est OK → stockage + confirmation ─────────────────────────
       SessionStore.set('privateKey', decryptedBlePrivateKey)
-      setPairSteps(prev => [...prev, { label: "✓ All hashes verified", done: true }])
       setPairSteps(prev => [...prev, { label: "✓ Keybox initialization complete", done: true }])
       setIsKeyboxInit(true)
       toast.success("Keybox successfully initialized!")
@@ -499,9 +504,10 @@ export default function Home() {
                     </div>
                   )}
 
-                  {process.env.NODE_ENV === 'developmens' && (
+                  {process.env.NODE_ENV === 'development' && (
                     <>
-                      <div className="space-y-1.5">
+                      <fieldset className="space-y-1.5 border rounded p-3">
+                        <legend>Developement</legend>
                         <p className="text-xs text-muted-foreground">Read</p>
                         <div className="flex items-center gap-2">
                           <code className="text-xs bg-muted px-2 py-1 rounded flex-1 break-all min-w-0">
@@ -511,9 +517,8 @@ export default function Home() {
                             {charBusy ? "..." : "Read"}
                           </Button>
                         </div>
-                      </div>
 
-                      <div className="space-y-1.5">
+                        <div className="space-y-1.5">
                         <p className="text-xs text-muted-foreground">Write</p>
                         <div className="flex items-center gap-2">
                           <Input
@@ -528,6 +533,9 @@ export default function Home() {
                           </Button>
                         </div>
                       </div>
+                      </fieldset>
+
+                      
                     </>
                   )}
                 </div>
@@ -586,7 +594,7 @@ export default function Home() {
           {isKeyboxInit === false && (
             <>
               <div className="flex justify-end">
-                <Button onClick={() => setShowPairDialog(true)}>Put pair key on Keybox</Button>
+                <Button onClick={() => setShowPairDialog(true)} disabled={pairSteps.length > 0}>Put pair key on Keybox</Button>
               </div>
 
               <Dialog open={showPairDialog} onOpenChange={setShowPairDialog}>
