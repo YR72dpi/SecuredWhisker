@@ -15,6 +15,9 @@ import { deleteBrowserSubscriptionIfNotFindOnDb, isPushNotificationSupported } f
 import { toast } from "sonner";
 import { ReceiverDataForChat, SenderDataForChat } from "@/lib/ChatLib";
 import { isVapIdOk } from "@/lib/ServerAction/NotificationActions";
+import { RSAPrivateKeyReceiver } from "@/components/RSAPrivateKeyTransfertComponent/RSAPrivateKeyReceiver";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
     const [canShowPage, setCanShowPage] = useState(false)
@@ -89,21 +92,25 @@ export default function Home() {
                     <InstallPrompt />
 
                     {!hasPrivateKey.current && (
-                        <Alert variant="destructive">
-                            <AlertCircleIcon />
-                            <AlertTitle className="font-bold">No private key here 😥</AlertTitle>
-                            <AlertDescription>
-                                <p>To decode your message, you need to have your private key on this browser</p>
-                                <ul className="list-inside list-disc text-sm">
-                                    <li>
-                                        On the browser where you subscribe: Side bar {">"} Security {">"} Private key transfert (tx)
-                                    </li>
-                                    <li>
-                                        On the this browser: Menu bar {">"} Security {">"} Private key transfert (rx)
-                                    </li>
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
+                        <>
+                            <Alert variant="destructive">
+                                <AlertCircleIcon />
+                                <AlertTitle className="font-bold">No private key here 😥</AlertTitle>
+                                <AlertDescription>
+                                    <p>To decode your messages, your private key must be available on this browser. You have two options to recover it:</p>
+                                    <ul className="list-inside list-disc text-sm mt-1">
+                                        <li><strong>Key transfer</strong> — transfer your key from another browser where you already have it.</li>
+                                        <li><strong>Keybox</strong> — retrieve your key from the encrypted keybox you previously saved.</li>
+                                    </ul>
+                                </AlertDescription>
+                            </Alert>
+                            <div className="flex gap-3">
+                                <RSAPrivateKeyReceiver standalone />
+                                <Button className="flex-1" asChild>
+                                    <Link href="/keybox">Keybox</Link>
+                                </Button>
+                            </div>
+                        </>
                     )}
 
                     {hasPrivateKey.current && identifier && !selectedContact && (
