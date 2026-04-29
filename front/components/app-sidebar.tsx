@@ -206,6 +206,7 @@ export function AppSidebar({ identifier, publicKey, username, hasVapId }: AppSid
 
               <RSAPrivateKeyTransmetter />
               <RSAPrivateKeyReceiver />
+              <SidebarMenuItem className="px-2 py-1.5"><Link href="/keybox">Keybox</Link></SidebarMenuItem>
 
             </SidebarMenu>
           </SidebarGroupContent>
