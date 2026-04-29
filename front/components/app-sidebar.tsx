@@ -29,7 +29,8 @@ import {
   FileText,
   Moon,
   Sun,
-  ChevronDown
+  ChevronDown,
+  House
 } from "lucide-react"
 import { CopyButton } from "./ui/shadcn-io/copy-button"
 import { AddFriend } from "./Friendship/addFriend"
@@ -120,6 +121,24 @@ export function AppSidebar({ identifier, publicKey, username, hasVapId }: AppSid
       </SidebarHeader>
 
       <SidebarContent>
+
+        {/* Home Section */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/">
+                    <House className="h-4 w-4" />
+                    <span>Home</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
 
         {/* Relationship Section */}
         <SidebarGroup>
