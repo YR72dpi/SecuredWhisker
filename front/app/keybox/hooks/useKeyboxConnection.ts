@@ -30,6 +30,7 @@ type UseKeyboxConnectionReturn = {
   isConnected: boolean | null
   bleDownloading: BleDownloadState
   isKeyboxInit: boolean | null
+  isPrivateKeyUnlocked: boolean
   showUnlockDialog: boolean
   setShowUnlockDialog: (v: boolean) => void
   handleScan: () => Promise<void>
@@ -37,6 +38,7 @@ type UseKeyboxConnectionReturn = {
   handleDisconnect: () => void
   handleSendPin: () => Promise<void>
   handleUnlock: (password: string) => Promise<void>
+  handleShutdown: () => Promise<void>
   initBle: () => Promise<void>
   setIsKeyboxInit: (v: boolean) => void
 }
@@ -53,6 +55,7 @@ export function useKeyboxConnection(): UseKeyboxConnectionReturn {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
   const [bleDownloading, setBleDownloading] = useState<BleDownloadState>('idle')
   const [isKeyboxInit, setIsKeyboxInit] = useState<boolean | null>(null)
+  const [isPrivateKeyUnlocked, setIsPrivateKeyUnlocked] = useState(false)
   const [showUnlockDialog, setShowUnlockDialog] = useState(false)
 
   const handleScan = async () => {
@@ -93,6 +96,7 @@ export function useKeyboxConnection(): UseKeyboxConnectionReturn {
     setIsConnected(null)
     setBleDownloading('idle')
     setIsKeyboxInit(null)
+    setIsPrivateKeyUnlocked(false)
   }
 
   const handleSendPin = async () => {
@@ -122,10 +126,21 @@ export function useKeyboxConnection(): UseKeyboxConnectionReturn {
         passwordForCrypt
       )
       SessionStore.set('privateKey', decryptedKey)
+      setIsPrivateKeyUnlocked(true)
       toast.success("Private key unlocked")
     } catch {
       toast.error("Failed to decrypt private key — wrong password?")
       if (deviceData) await writeKeybox(deviceData.device, formateDataToSendToKeybox("shutdown"))
+    }
+  }
+
+  const handleShutdown = async () => {
+    if (!deviceData) return
+    try {
+      await writeKeybox(deviceData.device, formateDataToSendToKeybox("shutdown"))
+      toast.success("Shutdown command sent")
+    } catch (err: unknown) {
+      toast.error("Failed to send shutdown: " + (err instanceof Error ? err.message : String(err)))
     }
   }
 
@@ -164,8 +179,8 @@ export function useKeyboxConnection(): UseKeyboxConnectionReturn {
   return {
     bleAvailable, scanning, bleDevices, connectingId, deviceData,
     pinCode, setPinCode, pinSending, pinSent,
-    isConnected, bleDownloading, isKeyboxInit, setIsKeyboxInit,
+    isConnected, bleDownloading, isKeyboxInit, setIsKeyboxInit, isPrivateKeyUnlocked,
     showUnlockDialog, setShowUnlockDialog,
-    handleScan, handleConnect, handleDisconnect, handleSendPin, handleUnlock, initBle,
+    handleScan, handleConnect, handleDisconnect, handleSendPin, handleUnlock, handleShutdown, initBle,
   }
 }
