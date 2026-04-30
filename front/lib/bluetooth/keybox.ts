@@ -22,8 +22,7 @@ export async function getBondedDevices(): Promise<BluetoothDevice[]> {
 
 export async function scanKeybox(): Promise<BluetoothDevice> {
   return navigator.bluetooth.requestDevice({
-    acceptAllDevices: true,
-    optionalServices: STANDARD_SERVICES,
+    filters: [{ services: [KEYBOX_SERVICE_UUID] }],
   })
 }
 
