@@ -2,7 +2,7 @@ export const KeyboardShortcuts = () => {
     let cleanup: (() => void) | null = null
 
     let keysPressed: string[] = []
-    let shortcutsTarget : HTMLElement[]|null = null
+    let shortcutsTarget : NodeListOf<HTMLElement>|null = null
 
     const handler = (evt: KeyboardEvent) => {
         if(evt.key === 'Alt') evt.preventDefault() 
@@ -34,7 +34,7 @@ export const KeyboardShortcuts = () => {
         if (shortcutsTarget.length > 0 && !cleanup) {
             window.addEventListener("keydown", handler)
             console.log(shortcutsTarget)
-            shortcutsTarget.forEach(el => { el.title = el.dataset.shortcut })
+            shortcutsTarget.forEach(el => { if (el.dataset.shortcut) el.title = el.dataset.shortcut })
             cleanup = () => window.removeEventListener("keydown", handler)
         } else if (shortcutsTarget.length === 0 && cleanup) {
             cleanup()
