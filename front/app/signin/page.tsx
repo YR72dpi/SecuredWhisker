@@ -122,7 +122,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" autocomplet="new-password" placeholder="Password" {...field} />
+                    <Input type="password" autoComplete="new-password" placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
