@@ -135,7 +135,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" autocomplet="new-password" placeholder="Confirm password" {...field} />
+                    <Input type="password" autoComplete="new-password" placeholder="Confirm password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
