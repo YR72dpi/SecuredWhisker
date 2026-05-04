@@ -2,7 +2,7 @@ export const KeyboardShortcuts = () => {
     let cleanup: (() => void) | null = null
 
     let keysPressed: string[] = []
-    let shortcutsTarget : NodeList|null = null
+    let shortcutsTarget : HTMLElement[]|null = null
 
     const handler = (evt: KeyboardEvent) => {
         if(evt.key === 'Alt') evt.preventDefault() 
@@ -12,7 +12,7 @@ export const KeyboardShortcuts = () => {
         if(keysPressed.length === 2) {
             // on check tout ceux qui ont un le combo
             const keysPressedString = keysPressed.join("+")
-            const potentialTarget : Node[] = []
+            const potentialTarget : HTMLElement[] = []
 
             shortcutsTarget?.forEach(target => {
                 if(target.dataset.shortcut === keysPressedString) potentialTarget.push(target)
