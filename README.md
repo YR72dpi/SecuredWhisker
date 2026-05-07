@@ -132,16 +132,13 @@ POSTGRES_VERSION=
 ## To improve it
 
 - Create groups
-- Crypt private key on local storage in AES with the user password
 - send image (transmit the base64) (which means that you have to determine the type of message)
 - passing all of the stack in typescript (no php) (or in Go, who know ?)
 - Reload /chat when fetching contact fail
 - Versionning (de)crypting message mode
-- Manage multiple display of recorded messages received
 - Show how many unseen message by contact
 - Save private key on the serveur, crypted by a password defined by the user
-- Create a encrypted notebook (a memo system so you don't have to send it to someone)
-
+- Get contact list only if there is a private key set
 ## Support me 😘
 
 <a href="http://buymeacoffee.com/yr72dpi">
