@@ -1,7 +1,6 @@
 'use client'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -115,7 +114,7 @@ export default function Home() {
         </Form>
 
         <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
-          Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
+          Secured Whisker <img alt="new tab" src="/icons/newTab.svg" width="20" height="20" style={{ width: "20px", height: "auto" }} />
         </a>
       </div>
     )
