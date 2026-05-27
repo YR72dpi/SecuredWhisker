@@ -10,9 +10,11 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https: wss:",
   'upgrade-insecure-requests',
-].join('; ')
+]
+
+if (isProduction) contentSecurityPolicy.push("connect-src 'self' https: wss:")
+else contentSecurityPolicy.push("connect-src 'self' https: wss: http: ws:")
 
 const nextConfig = {
   reactStrictMode: true,
@@ -20,7 +22,7 @@ const nextConfig = {
     const securityHeaders = [
       {
         key: 'Content-Security-Policy',
-        value: contentSecurityPolicy,
+        value: contentSecurityPolicy.join('; '),
       },
       {
         key: 'X-Content-Type-Options',
