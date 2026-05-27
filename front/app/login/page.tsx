@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { HomeHeader } from "@/components/HomeHeader";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -28,6 +29,7 @@ const formSchema = z.object({
 export default function Home() {
 
   const [canShowPage, setCanShowPage] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -40,7 +42,7 @@ export default function Home() {
   })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-
+    setIsLoading(true)
     const serverPublicKey = await UserApi.getApiPublicKey();
     const passwordCrypted = await RsaLib.textToCrypted(values.password, serverPublicKey)
 
@@ -52,9 +54,11 @@ export default function Home() {
     if (login === undefined) {
       toast.error("The server is not responding")
       form.reset()
+      setIsLoading(false)
     } else if (!login.ok) {
       toast.error(login.message)
       form.reset()
+      setIsLoading(false)
     } else {
       await SwDb.saveJwtToken(login.token)
       router.push("/chat")
@@ -104,7 +108,9 @@ export default function Home() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? <Spinner /> : "Submit"}
+            </Button>
           </form>
         </Form>
 

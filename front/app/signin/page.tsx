@@ -19,6 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 import { HomeHeader } from "@/components/HomeHeader";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -38,6 +39,7 @@ export default function Home() {
   const [subscribeError, setSubscribeError] = useState<string>("")
   const [pendingValues, setPendingValues] = useState<z.infer<typeof formSchema> | null>(null)
   const [canShowPage, setCanShowPage] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -50,7 +52,10 @@ export default function Home() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => setPendingValues(values)
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true)
+    setPendingValues(values)
+  }
 
   useEffect(() => {
     if (!pendingValues) return;
@@ -73,8 +78,10 @@ export default function Home() {
 
       if (subscribe === undefined) {
         setSubscribeError("Server error")
+        setIsLoading(false)
       } else if (!subscribe.ok) {
         setSubscribeError(subscribe.message)
+        setIsLoading(false)
       } else {
         setSubscribeError("")
         router.push("/login")
@@ -141,7 +148,9 @@ export default function Home() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? <Spinner /> : "Submit"}
+            </Button>
           </form>
         </Form>
 
