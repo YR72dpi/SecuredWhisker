@@ -116,7 +116,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Username" {...field} />
+                    <Input autoComplete="username" placeholder="Username" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +129,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" autocomplet="new-password" placeholder="Password" {...field} />
+                    <Input type="password" autoComplete="new-password" placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,7 +142,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" autocomplet="new-password" placeholder="Confirm password" {...field} />
+                    <Input type="password" autoComplete="new-password" placeholder="Confirm password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
