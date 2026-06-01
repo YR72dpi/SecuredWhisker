@@ -11,8 +11,8 @@ export const KeyboardShortcuts = () => {
 
         if(keysPressed.length === 2) {
             // on check tout ceux qui ont un le combo
-            let keysPressedString = keysPressed.join("+")
-            let potentialTarget : Node[] = []
+            const keysPressedString = keysPressed.join("+")
+            const potentialTarget : Node[] = []
 
             shortcutsTarget?.forEach(target => {
                 if(target.dataset.shortcut === keysPressedString) potentialTarget.push(target)
