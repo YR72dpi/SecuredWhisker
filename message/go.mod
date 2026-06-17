@@ -1,12 +1,11 @@
 module securedWhisker
 
-go 1.23.0
+go 1.25.0
 
-toolchain go1.23.2
+toolchain go1.25.11
 
 require (
-	github.com/gorilla/websocket v1.4.2
-	github.com/joho/godotenv v1.5.1
+	github.com/gorilla/websocket v1.5.3
 	github.com/sirupsen/logrus v1.9.3
 )
 
