@@ -27,7 +27,7 @@ const manunalIdFormSchema = z.object({
     transfertCode: z.string()
 });
 
-export const RSAPrivateKeyReceiver = () => {
+export const RSAPrivateKeyReceiver = ({ standalone = false }: { standalone?: boolean }) => {
     const [open, setOpen] = useState<boolean>(false)
 
     const [privateKey, setPrivateKey] = useState<string | null>(null)
@@ -126,8 +126,117 @@ export const RSAPrivateKeyReceiver = () => {
 
     }, [password, transfertCode])
 
+    const dialogContent = (
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Private key transfer</DialogTitle>
+            </DialogHeader>
+
+            {password === null ? (
+                <Form {...passwordForm}>
+                    <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                        <FormField
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <div className="flex justify-center">
+                                            <InputOTP
+                                                maxLength={8}
+                                                inputMode="text"
+                                                pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                                                {...field}
+                                            >
+                                                <InputOTPGroup>
+                                                    <InputOTPSlot index={0} />
+                                                    <InputOTPSlot index={1} />
+                                                    <InputOTPSlot index={2} />
+                                                    <InputOTPSlot index={3} />
+                                                </InputOTPGroup>
+                                                <InputOTPSeparator />
+                                                <InputOTPGroup>
+                                                    <InputOTPSlot index={4} />
+                                                    <InputOTPSlot index={5} />
+                                                    <InputOTPSlot index={6} />
+                                                    <InputOTPSlot index={7} />
+                                                </InputOTPGroup>
+                                            </InputOTP>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="flex justify-end gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="button" onClick={handlePassword}>Submit</Button>
+                        </div>
+                    </form>
+                </Form>
+            ) : (
+                transfertCodeMode === null ? (
+                    <div className="flex gap-3 justify-center">
+                        <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.QRCODE)}>QRCODE</Button>
+                        <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.MANUAL)}>MANUAL</Button>
+                    </div>
+                ) : (
+                    transfertCodeMode === TransfertMode.QRCODE ? (
+                        <div className="flex flex-col items-center gap-4">
+                            {showQrCode && (
+                                <QrCodeScanner
+                                    dataHandler={setTransfertCode}
+                                    onCancel={handleCancelQrCode}
+                                />
+                            )}
+                        </div>
+                    ) : transfertCodeMode === TransfertMode.MANUAL ? (
+                        <Form {...transfertCodeForm}>
+                            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                                <FormField
+                                    name="transfertCode"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input placeholder="Transfert code" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="flex justify-end gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type="button" onClick={handleTransfertCode}>Submit</Button>
+                                </div>
+                            </form>
+                        </Form>
+                    ) : null
+                )
+            )}
+        </DialogContent>
+    )
+
     return (
         !privateKey && (
+            standalone ? (
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="flex-1">Private key transfer</Button>
+                    </DialogTrigger>
+                    {dialogContent}
+                </Dialog>
+            ) : (
             <SidebarMenuItem>
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
@@ -138,107 +247,10 @@ export const RSAPrivateKeyReceiver = () => {
                             Private key transfer (receive)
                         </SidebarMenuButton>
                     </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Private key transfer</DialogTitle>
-                        </DialogHeader>
-
-                        {password === null ? (
-                            <Form {...passwordForm}>
-                                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                    <FormField
-                                        name="password"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <div className="flex justify-center">
-                                                        <InputOTP
-                                                            maxLength={8}
-                                                            inputMode="text"
-                                                            pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                                                            {...field}
-                                                        >
-                                                            <InputOTPGroup>
-                                                                <InputOTPSlot index={0} />
-                                                                <InputOTPSlot index={1} />
-                                                                <InputOTPSlot index={2} />
-                                                                <InputOTPSlot index={3} />
-                                                            </InputOTPGroup>
-                                                            <InputOTPSeparator />
-                                                            <InputOTPGroup>
-                                                                <InputOTPSlot index={4} />
-                                                                <InputOTPSlot index={5} />
-                                                                <InputOTPSlot index={6} />
-                                                                <InputOTPSlot index={7} />
-                                                            </InputOTPGroup>
-                                                        </InputOTP>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => setOpen(false)}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button type="button" onClick={handlePassword}>Submit</Button>
-                                    </div>
-                                </form>
-                            </Form>
-                        ) : (
-                            transfertCodeMode === null ? (
-                                <div className="flex gap-3 justify-center">
-                                    <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.QRCODE)}>QRCODE</Button>
-                                    <Button variant="outline" onClick={() => setTransfertCodeMode(TransfertMode.MANUAL)}>MANUAL</Button>
-                                </div>
-                            ) : (
-                                transfertCodeMode === TransfertMode.QRCODE ? (
-                                    <div className="flex flex-col items-center gap-4">
-                                        {showQrCode && (
-                                            <QrCodeScanner
-                                                dataHandler={setTransfertCode}
-                                                onCancel={handleCancelQrCode}
-                                            />
-                                        )}
-                                    </div>
-                                ) : transfertCodeMode === TransfertMode.MANUAL ? (
-                                    <Form {...transfertCodeForm}>
-                                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                            <FormField
-                                                name="transfertCode"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormControl>
-                                                            <Input placeholder="Transfert code" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={() => setOpen(false)}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                                <Button type="button" onClick={handleTransfertCode}>Submit</Button>
-                                            </div>
-                                        </form>
-                                    </Form>
-                                ) : null
-                            )
-                        )}
-
-                    </DialogContent>
+                    {dialogContent}
                 </Dialog>
             </SidebarMenuItem>
+            )
         )
     )
 }

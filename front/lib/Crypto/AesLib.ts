@@ -94,6 +94,15 @@ export class AesLib {
     }
   };
 
+  static iterateToMakePasswordLonger(text: string): string {
+    const TARGET_BYTES = 32 // 256 bits
+    const encoder = new TextEncoder()
+    let result = text
+    while (encoder.encode(result).length < TARGET_BYTES)result += text
+    const encoded = encoder.encode(result).slice(0, TARGET_BYTES)
+    return AesLib['arrayBufferToBase64'](encoded)
+  }
+
   /* === Utility function === */
 
   private static arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array<ArrayBuffer>): string {
@@ -153,5 +162,7 @@ export class AesLib {
       throw new Error(`Error importing key: ${error.message}`);
     }
   };
+
+
 
 }

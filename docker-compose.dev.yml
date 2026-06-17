@@ -1,108 +1,119 @@
 services:
-  database:
-    container_name: user-database
+  dev-message:
+    container_name: dev-message-microservice
+    build:
+      context: ./message
+      dockerfile: Dockerfile.dev
+      args:
+        SHOW_ONLY_ERROR: ${SHOW_ONLY_ERROR}
+    ports:
+      - "${SOCKET_PORT}:8080"
+    volumes:
+      - ./message:/app
+    environment:
+      - GO_ENV=development
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dev-message.rule=Host(`dev.${SOCKET_HOST}`)"
+      - "traefik.http.routers.dev-message.entrypoints=websecure"
+      - "traefik.http.routers.dev-message.tls.certresolver=myresolver"
+      - "traefik.http.services.dev-message.loadbalancer.server.port=8080"
+
+  dev-user:
+    container_name: dev-user-microservice
+    build:
+      context: ./user
+      dockerfile: Dockerfile.dev
+    ports:
+      - '${SYMFONY_PORT}:8000'
+    volumes:
+    # Uncomment the following lines if you want to use volumes for local development
+      - './user/:/app'
+      - './.env:/app/.env:ro'
+    environment:
+      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
+      - TRANSLATE_API_URL=http://text-manager-gpt:3000
+      - SYMFONY_PROJECT_NAME=securedWhisker
+      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@dev-database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8
+    depends_on:
+      dev-database:
+        condition: service_healthy
+    networks:
+      - dev-app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dev-user.rule=Host(`dev.${SERVER_HOST}`)"
+      - "traefik.http.routers.dev-user.entrypoints=websecure"
+      - "traefik.http.routers.dev-user.tls.certresolver=myresolver"
+      - "traefik.http.services.dev-user.loadbalancer.server.port=8000"
+
+  dev-database:
+    container_name: dev-user-database
     restart: always
     image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
-      POSTGRES_DB: securedwhisker
-      POSTGRES_PASSWORD: securedwhisker
-      POSTGRES_USER: root
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "securedwhisker", "-U", "root"]
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     ports: 
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - ./docker/db/data:/var/lib/postgresql/data:rw
     networks:
-      - app-network-dev
+      - dev-app-network
 
-  user:
-    container_name: user-microservice
+  dev-next-app:
+    container_name: dev-next-app
     build:
-      context: ./user
+      context: ./front/
       dockerfile: Dockerfile.dev
+    restart: always
     ports:
-      - '8000:8000'
+      - ${NEXTJS_PORT}:3000
     volumes:
-    # Uncomment the following lines if you want to use volumes for local development
-      - './user/:/app'
-      - './env:/.env'
-    environment:
-      CORS_ALLOW_ORIGIN: '^.*$'
-      TRANSLATE_API_URL: http://text-manager-gpt:3000
-      SYMFONY_PROJECT_NAME: securedWhisker
-      DATABASE_URL: 'pgsql://root:securedwhisker@database:5432/securedwhisker?serverVersion=16&charset=utf8'
-    depends_on:
-      database:
-        condition: service_healthy
-    networks:
-      - app-network-dev
-
-  front:
-    depends_on:
-      - user
-    container_name: front-nextjs-dev
-    image: node:18-bullseye
-    working_dir: /app
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./front:/app:rw
+      - ./front:/app
       - /app/node_modules
+      - /app/.next
     environment:
       - NODE_ENV=development
-      - NEXT_TELEMETRY_DISABLED=1
-      - BROWSERSLIST_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - NEXTJS_PORT=3000
-      - NEXTJS_DOMAIN=localhost:3000
-      - NEXT_PUBLIC_NEXTJS_DOMAIN=localhost:3000
-      - NEXT_PUBLIC_GPT_API_KEY=
-      - NEXT_PUBLIC_USER_HOST=localhost:8000
-      - NEXT_PUBLIC_MESSAGE_HOST=localhost:5050
-      - NEXT_PUBLIC_TEXT_MANAGER_GPT_HOST=localhost:5020
-      - NEXT_PUBLIC_APP_VERSION=1.3.4
-      - NEXT_PUBLIC_IP_WHITELIST=""
-      - NEXT_PUBLIC_VAPID_PUBLIC_KEY=
-      - IP_WHITELIST=""
-      - VAPID_PUBLIC_KEY=
-      - VAPID_PRIVATE_KEY=
+      - NEXT_PUBLIC_GPT_API_KEY=dev.${GPT_API_KEY}
+      - NEXT_PUBLIC_USER_HOST=dev.${SERVER_HOST}
+      - NEXT_PUBLIC_MESSAGE_HOST=dev.${SOCKET_HOST}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
     networks:
-      - app-network-dev
-    command: >
-      sh -c "
-      npm install --no-audit --no-fund &&
-      npm run dev
-      "
-  message:
+      - dev-app-network
     depends_on:
-      - front
-    container_name: message-microservice-dev
-    image: golang:1.23
-    working_dir: /app
-    ports:
-      - "5050:8080"
-    volumes:
-      - ./message:/app:rw
-    environment:
-      - ENV=development
-      - GO_ENV=development
-      - SHOW_ONLY_ERROR=false
-      - GOTOOLCHAIN=auto
-      - SOCKET_PORT=5050
-      - SOCKET_HOST=localhost:5050
-    networks:
-      - app-network-dev
-    command: >
-      sh -c "
-      go install github.com/air-verse/air@v1.52.3 &&
-      air -c .air.toml
-      "
+      - dev-user
+      - dev-message
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dev-next-app.rule=Host(`dev.${NEXTJS_DOMAIN}`)"
+      - "traefik.http.routers.dev-next-app.entrypoints=websecure"
+      - "traefik.http.routers.dev-next-app.tls.certresolver=myresolver"
+      - "traefik.http.services.dev-next-app.loadbalancer.server.port=3000"
+
+  # dev-text-manager-gpt:
+  #   build:
+  #     context: ./TextManagerGPT
+  #     dockerfile: Dockerfile
+  #   container_name: dev-TextManagerGPT
+  #   ports:
+  #     - "${TextManagerGPT_PORT}:3000"
+  #   environment:
+  #     - NODE_ENV=production
+  #     - GPT_API_KEY=${GPT_API_KEY}
+  #     - PORT=${TextManagerGPT_PORT}
+  #   command: node dist/index.js
+  #   networks:
+  #     - dev-app-network
 
 networks:
-  app-network-dev:
+  dev-app-network:
     driver: bridge

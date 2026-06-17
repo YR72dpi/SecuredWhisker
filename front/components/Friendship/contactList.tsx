@@ -110,16 +110,15 @@ export function ContactList({ onSelectContact }: ContactListProps) {
                     <>
                         <span className="font-bold text-xl text-center">Contacts ({contacts.length})</span>
                         <ul className="mt-2 space-y-2 flex flex-col items-center gap-2">
-                            {contacts.map((contact) => (
+                            {contacts.map((contact, index) => (
                                 <li
                                     key={contact.id}
-                                    className={"border-b break-all w-[300px] max-w-[90%] h-11 leading-10 cursor-pointer hover:bg-accent transition-colors text-center"}
+                                    className={"border-b break-all w-[300px] max-w-[90%] cursor-pointer hover:bg-accent transition-colors flex justify-between px-5 py-3"}
                                     onClick={() => handleSelectContact(contact)}
+                                    data-shortcut={'Alt+' + index}
                                 >
-                                    {contact.username ?? "Contact sans nom"}
-                                    <span className="text-sm text-gray-500 italic">
-                                        {contact.uniqid ? " (" + contact.uniqid + ")" : ""}
-                                    </span>
+                                    <span>{contact.username ?? "Contact sans nom"}</span>
+                                    <span className="rounded p-1 text-xs text-white bg-slate-400">{'Alt+' + index}</span>
                                 </li>
                             ))}
                         </ul>

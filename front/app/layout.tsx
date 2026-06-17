@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
+import { KeyboardShortcutProvider } from "@/components/KeyboardShortcutProvider";
 
 const APP_NAME = "Secure Whisker";
 const APP_DEFAULT_TITLE = "Secured Whisker";
@@ -67,24 +68,25 @@ export default function RootLayout({
 }>) {
 
   return (
-      <html lang="en" suppressHydrationWarning dir="ltr">
-        <head>
-          <link rel="icon" href="/icons/favicon.ico" />
-        </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <html lang="en" suppressHydrationWarning dir="ltr">
+      <head>
+        <link rel="icon" href="/icons/favicon.ico" />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
+          {children}
+          <Toaster richColors />
+        </ThemeProvider>
+        <KeyboardShortcutProvider />
 
-            {children}
-            <Toaster richColors />
-          </ThemeProvider>
-        </body>
-      </html>
+      </body>
+    </html>
   );
 }

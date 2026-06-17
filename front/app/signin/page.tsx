@@ -1,7 +1,6 @@
 "use client"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -19,6 +18,7 @@ import {
 import { useRouter } from "next/navigation";
 import { HomeHeader } from "@/components/HomeHeader";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -38,6 +38,7 @@ export default function Home() {
   const [subscribeError, setSubscribeError] = useState<string>("")
   const [pendingValues, setPendingValues] = useState<z.infer<typeof formSchema> | null>(null)
   const [canShowPage, setCanShowPage] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -50,7 +51,10 @@ export default function Home() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => setPendingValues(values)
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true)
+    setPendingValues(values)
+  }
 
   useEffect(() => {
     if (!pendingValues) return;
@@ -73,8 +77,10 @@ export default function Home() {
 
       if (subscribe === undefined) {
         setSubscribeError("Server error")
+        setIsLoading(false)
       } else if (!subscribe.ok) {
         setSubscribeError(subscribe.message)
+        setIsLoading(false)
       } else {
         setSubscribeError("")
         router.push("/login")
@@ -109,7 +115,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Username" {...field} />
+                    <Input autoComplete="username" placeholder="Username" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,7 +128,7 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} />
+                    <Input type="password" autoComplete="new-password" placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,13 +141,15 @@ export default function Home() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Confirm password" {...field} />
+                    <Input type="password" autoComplete="new-password" placeholder="Confirm password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? <Spinner /> : "Submit"}
+            </Button>
           </form>
         </Form>
 
@@ -156,7 +164,7 @@ export default function Home() {
         )}
 
         <a href="https://github.com/YR72dpi/SecuredWhisker2.0" className="fixed bottom-5 flex gap-1">
-          Secured Whisker <Image alt="new tab" src={'/icons/newTab.svg'} width={20} height={20} />
+          Secured Whisker <img alt="new tab" src="/icons/newTab.svg" width="20" height="20" style={{ width: "20px", height: "auto" }} />
         </a>
       </div>
     )

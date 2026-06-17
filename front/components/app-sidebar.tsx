@@ -29,7 +29,8 @@ import {
   FileText,
   Moon,
   Sun,
-  ChevronDown
+  ChevronDown,
+  House
 } from "lucide-react"
 import { CopyButton } from "./ui/shadcn-io/copy-button"
 import { AddFriend } from "./Friendship/addFriend"
@@ -45,9 +46,10 @@ type AppSidebarProps = {
   identifier: string | null
   publicKey: string | null
   username: string | null
+  hasVapId: boolean | null
 }
 
-export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps) {
+export function AppSidebar({ identifier, publicKey, username, hasVapId }: AppSidebarProps) {
   const version = process.env.NEXT_PUBLIC_APP_VERSION
   const [privateKey, setPrivateKey] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
@@ -119,6 +121,24 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
       </SidebarHeader>
 
       <SidebarContent>
+
+        {/* Home Section */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/">
+                    <House className="h-4 w-4" />
+                    <span>Home</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
 
         {/* Relationship Section */}
         <SidebarGroup>
@@ -205,6 +225,7 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
 
               <RSAPrivateKeyTransmetter />
               <RSAPrivateKeyReceiver />
+              <SidebarMenuItem className="px-2 py-1.5"><Link href="/keybox">Keybox</Link></SidebarMenuItem>
 
             </SidebarMenu>
           </SidebarGroupContent>
@@ -218,7 +239,7 @@ export function AppSidebar({ identifier, publicKey, username }: AppSidebarProps)
           <SidebarGroupContent>
             <SidebarMenu>
               
-                {isPushNotificationSupported() && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
+                {hasVapId && isPushNotificationSupported() && (<SidebarMenuItem className="px-2 py-1.5"> <Link href={"/notification"}>Notification</Link> </SidebarMenuItem>)}
                 <SidebarMenuItem className="px-2 py-1.5"> <Link href={"/contacts"}>Contacts</Link> </SidebarMenuItem>
 
             </SidebarMenu>

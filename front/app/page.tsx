@@ -1,6 +1,5 @@
 "use client"
 import { HomeHeader } from "@/components/HomeHeader";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { JwtTokenLib } from "@/lib/JwtTokenLib";
 
@@ -28,11 +27,12 @@ export default function Home() {
             className="fixed bottom-5 flex gap-1"
           >
             Secured Whisker{" "}
-            <Image
+            <img
               alt="new tab"
-              src={"/icons/newTab.svg"}
-              width={20}
-              height={20}
+              src="/icons/newTab.svg"
+              width="20"
+              height="20"
+              style={{ width: "20px", height: "auto" }}
             />
           </a>
         </div>

@@ -399,7 +399,7 @@ export function Chat({
         <div className="flex flex-col h-[90vh] gap-3">
 
             <div className="flex items-center justify-between">
-                <Button variant="secondary" size="icon" className="size-8" onClick={() => setContactData(null)}>
+                <Button variant="secondary" size="icon" className="size-8" data-shortcut="Alt+Backspace" onClick={() => setContactData(null)}>
                     <ChevronLeftIcon />
                 </Button>
                 <h2 className="flex-auto flex flex-col text-xl font-semibold pl-3">
