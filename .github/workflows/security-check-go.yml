@@ -3,14 +3,14 @@ name: Dependency Security Check - Go
 on:
   schedule:
     - cron: "0 19 * * 4"
-
-# on:
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
+      - develop 
+  pull_request:
+    branches:
+      - main
+      - beta
 
 jobs:
   tests:
