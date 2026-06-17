@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Security http header
+
+### Changed
+
+/
+
+### Fixed
+
+- Security issue on Nextjs
+
+## [1.4.1] - 2026-04-05
+
+### Added
+
 - Implement shortcut system
 - Implement [SW-keybox 1.0.0](https://github.com/YR72dpi/SecuredWhisker-keybox) connection systeme
 
@@ -18,7 +32,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Security issue on Nextjs
-
 
 ## [1.4.0] - 2025-12-15
 
