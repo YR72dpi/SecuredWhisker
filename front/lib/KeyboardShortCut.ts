@@ -2,7 +2,7 @@ export const KeyboardShortcuts = () => {
     let cleanup: (() => void) | null = null
 
     let keysPressed: string[] = []
-    let shortcutsTarget : NodeList|null = null
+    let shortcutsTarget : HTMLElement[]|null = null
 
     const handler = (evt: KeyboardEvent) => {
         if(evt.key === 'Alt') evt.preventDefault() 
@@ -22,19 +22,19 @@ export const KeyboardShortcuts = () => {
             if(potentialTarget.length > 1) throw Error("Multiple target for this shortcut")
 
             if(potentialTarget.length === 1) {
-                potentialTarget[0].click()
+                (potentialTarget[0] as HTMLElement).click()
                 keysPressed = []
             }
         }
     }   
 
     const observer = new MutationObserver(() => {
-        shortcutsTarget = document.querySelectorAll<HTMLElement>("[data-shortcut]")
+        shortcutsTarget = Array.from(document.querySelectorAll<HTMLElement>("[data-shortcut]"))
 
         if (shortcutsTarget.length > 0 && !cleanup) {
             window.addEventListener("keydown", handler)
             console.log(shortcutsTarget)
-            shortcutsTarget.forEach(el => { el.title = el.dataset.shortcut })
+            shortcutsTarget.forEach(el => { if (el.dataset.shortcut) el.title = el.dataset.shortcut })
             cleanup = () => window.removeEventListener("keydown", handler)
         } else if (shortcutsTarget.length === 0 && cleanup) {
             cleanup()
