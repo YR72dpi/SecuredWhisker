@@ -35,6 +35,8 @@ Why Secured Whisker?
 
 The __RSA private key is stored in your browser__. If you clean up “Cookies and site data”, this key, which is used to decrypt messages, will be lost. 😲
 
+For an extra layer of protection, the companion project [SecuredWhisker KeyBox](https://github.com/YR72dpi/SecuredWhisker-keybox) moves the RSA private key out of the browser and into a dedicated offline hardware device, reducing the risk of loss or theft while keeping decryption under your control.
+
 ## 📚 Documentation
 
 - [📜 Changelog](./docs/changelog.md)
