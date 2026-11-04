@@ -4,385 +4,218 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/) 2.0.0.
 
-## [1.4.3] - 2026-09-15
+## [1.4.4] - 2026-11-04
 
 ### Added
 
-/
+- Document SecuredWhisker KeyBox as a private-key protection option.
 
 ### Changed
 
-- upgrade Next.js to version 16.3.5
+- Enable GitHub Actions on pushes and pull requests.
+- Upgrade service runtimes and tooling, including PHP 8.5, Go 1.26.10, and the frontend lint configuration.
+- Align Dockerfiles, Compose services, and environment variables.
+- Enable Doctrine native lazy objects.
 
 ### Fixed
 
-/
+- Resolve Composer and Go dependency vulnerability findings.
+- Remove the Doctrine and Symfony deprecation warnings.
+
+## [1.4.3] - 2026-09-15
+
+### Changed
+
+- Upgrade Next.js to 16.3.5.
 
 ## [1.4.2] - 2026-06-17
 
 ### Added
 
-- Security http header
-
-### Changed
-
-/
+- Add security-related HTTP headers.
 
 ### Fixed
 
-- Security issue on Nextjs
+- Fix a Next.js security issue.
 
 ## [1.4.1] - 2026-04-05
 
 ### Added
 
-- Implement shortcut system
-- Implement [SW-keybox 1.0.0](https://github.com/YR72dpi/SecuredWhisker-keybox) connection systeme
+- Add keyboard shortcuts and integration with [SW-KeyBox](https://github.com/YR72dpi/SecuredWhisker-keybox).
 
 ### Changed
 
-- Refoctor code management
+- Refactor code management.
 
 ### Fixed
 
-- Security issue on Nextjs
+- Fix a Next.js security issue.
 
 ## [1.4.0] - 2025-12-15
 
 ### Added
 
-- Full doc
+- Expand project documentation.
 
 ### Changed
 
-- Refoctor code management
+- Refactor code management.
 
 ### Fixed
 
-- Security issue on Nextjs
-
----
+- Fix a Next.js security issue.
 
 ## [1.3.5] - 2025-11-06
 
 ### Added
 
-- Page to delete contact
-- Loader on saved messages loading
-- Display an invitation to install the pwa on iOS
-- Notification Web push
-    - Subscribe a device
-    - page to remove notifications for each device linked to the account
-
-### Changed
-
--
-
-### Fixed
-
--
-
----
+- Add contact deletion and feedback while saved messages load.
 
 ## [1.3.4] - 2025-10-30
 
 ### Added
 
-- Display an invitation to install the pwa on iOS
-- Notification Web push
-    - Subscribe a device
-    - page to remove notifications for each device linked to the account
-
-### Changed
-
--
-
-### Fixed
-
--
-
----
+- Add Web Push subscription and per-device notification management.
+- Add an iOS PWA installation prompt.
 
 ## [1.3.3] - 2025-10-18
 
 ### Added
 
-- Deletion of messages after a specified period of time
-    - using php's ```DateTime::modify``` string
-    - By default : _-1 week_
+- Add automatic message expiration, configurable with PHP `DateTime::modify` syntax (defaults to one week).
 
 ### Changed
 
-- Migrate from Netjs 14 to NextJS 15
-- Migrating from next lint to eslint
-- Show date & time on messages
-- Shadcn's otp input for the password of private key
-
-### Fixed
-
--
-
----
+- Migrate to Next.js 15 and ESLint; show message timestamps and improve private-key password entry.
 
 ## [1.3.2] - 2025-10-15
 
 ### Added
 
-- Add friends by qr code
+- Allow adding friends by QR code.
 
 ### Changed
 
-- Make existing qr code scanner as componenet
-- Switch button instead of a checkbox to choose whether messages will be saved
-- Message box style
-- New menu
-
-### Fixed
-
--
-
----
+- Improve QR scanning, message saving controls, chat styling, and navigation.
 
 ## [1.3.1] - 2025-10-10
 
 ### Added
 
-- (UI) Spinne loader
-- Disconnection button
+- Add loading feedback and a logout button.
 
 ### Changed
 
-- Check JWT token by GET method
-- Contacts list line height (to 44px)
+- Validate JWTs with a GET request and improve contact-list spacing.
 
 ### Fixed
 
-- Decrypt saved message on all browser 
-
----
+- Fix saved-message decryption across browsers.
 
 ## [1.3.0] - 2025-10-06
 
 ### Added
 
-- PWA offline page
-- ability to save message
+- Add an offline PWA page and the ability to save messages.
 
 ### Changed
 
-- reload contact list
+- Reload the contact list when needed.
 
 ### Fixed
 
-- svg visible in denied access page
-
----
+- Fix SVG visibility on the access-denied page.
 
 ## [1.2.0] - 2025-10-03
 
 ### Added
 
-- IP white list on front end
-
-### Changed
-
-/
-
-### Fixed
-
-/
----
+- Add front-end IP allowlisting.
 
 ## [1.1.9] - 2025-10-03
 
-### Added
-
-/
-
 ### Changed
 
-- Some UI elements
-- QR code reader square shapped
-- Some wording
+- Improve QR scanning, chat layout, and interface wording.
 
 ### Fixed
 
-- View messages at the bottom of the chatbox as on all other chat applications
-
----
+- Keep the latest messages visible at the bottom of the chat.
 
 ## [1.1.8] - 2025-10-02
 
 ### Added
 
-- Ability to transfer the private key from one browser to another using a QR code or manual entry
-
-### Changed
-
-/
-
-### Fixed
-
-/
-
----
+- Allow transferring a private key between browsers by QR code or manual entry.
 
 ## [1.1.7] - 2025-10-01
 
 ### Added
 
-- autofocus on the input
--  try to reconnect to websocket server if disconnected
-- manage auto scroll on when there is many message
-- "unfocus" the input after sending message
-
-### Changed
-
--  delete console log
-
-### Fixed
-
-/
-
----
+- Improve chat usability with WebSocket reconnection, automatic scrolling, and input focus handling.
 
 ## [1.1.6] - 2025-09-30
 
-### Added
-
-- Responsive for phone 
-
 ### Changed
 
-- Light theme by default
-- Enable system theme
-
-### Fixed
-
-/
-
----
+- Improve mobile responsiveness and support the system theme; use light theme by default.
 
 ## [1.1.5] - 2025-09-30
 
 ### Added
 
-- Favicon
-- PWA
-
-### Changed
-
-/
-
-### Fixed
-
-/
-
----
+- Add a favicon and PWA support.
 
 ## [1.1.4] - 2025-09-30
 
 ### Added
 
-- Dark / light theme switch
-- From home page, redirect to the chat if there is a valid JWT Token
-- From chat page, redirect to the home page if there no or invald JWT Token
+- Add a dark/light theme switch and redirect users based on JWT validity.
 
 ### Changed
 
-- UI between the contacts list and the chat
-
-### Fixed
-
-/
-
----
+- Improve the contact-list and chat layout.
 
 ## [1.1.3] - 2025-09-30
 
 ### Added
 
-- Possibility to copy the private and public RSA key
+- Allow copying public and private RSA keys.
 
 ### Changed
 
-- Delete the subject
-
-### Fixed
-
-/
-
----
+- Remove the message subject.
 
 ## [1.1.2] - 2025-09-29
 
 ### Added
 
-- Menu with Secured Whisker links
-- Menu with relationship management
-
-### Changed
-
-/
-
-### Fixed
-
-/
-
----
+- Add navigation and relationship-management menus.
 
 ## [1.1.1] - 2025-09-29
 
 ### Added
 
-- Button home on home login / sign in pages
-
-### Changed
-
-- UI on home / login / sign in pages
-
-### Fixed
-
-/
-
----
+- Add home navigation and improve login and registration pages.
 
 ## [1.1.0] - 2025-09-27
 
 ### Added
 
-- Button to copy user's identifier
+- Encrypt messages with AES and encrypt AES keys with the recipient's RSA public key.
+- Add the ability to copy a user's identifier.
 
 ### Changed
 
-- Message crypted in AES and aes crypt with the recipent RSA public key.
-- Style of message
-
-### Fixed
-
+- Improve message styling.
 
 ## [1.0.0] - 2025-07-14
 
 ### Added
 
-Capability to :
-- Login
-- Register
-- Add someone
-- Chat
-- Translate with chatGPT
-
-### Changed
-
-/
-
-### Fixed
-
-/
+- Provide registration, login, contacts, chat, and ChatGPT translation.
 
 ## [0.0.0] - 2024-11-07 - Beta
 
-The first version was a POC. It's in this repository :
-
-[github.com/YR72dpi/SecuredWhisker-beta](https://github.com/YR72dpi/SecuredWhisker-beta)
-
+The first version was a proof of concept in the [SecuredWhisker-beta repository](https://github.com/YR72dpi/SecuredWhisker-beta).
