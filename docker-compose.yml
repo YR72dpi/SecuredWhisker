@@ -4,10 +4,10 @@ services:
     build:
       context: ./message
       dockerfile: Dockerfile
-      args:
-        SHOW_ONLY_ERROR: ${SHOW_ONLY_ERROR}
     ports:
       - "${SOCKET_PORT}:8080"
+    environment:
+      SHOW_ONLY_ERROR: ${SHOW_ONLY_ERROR}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.message.rule=Host(`${SOCKET_HOST}`)"
@@ -26,10 +26,12 @@ services:
       - ./docker/jwt:/app/config/jwt:rw
       - ./docker/keys:/app/config/keys:rw
     environment:
-      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
-      - TRANSLATE_API_URL=http://text-manager-gpt:3000
-      - SYMFONY_PROJECT_NAME=securedWhisker
-      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:${POSTGRES_PORT}/${POSTGRES_DB}?serverVersion=16&charset=utf8
+      APP_ENV: prod
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
+      LIMIT_MESSAGES_AGE: ${LIMIT_MESSAGES_AGE}
+      TRANSLATE_API_URL: http://text-manager-gpt:3000
+      SYMFONY_PROJECT_NAME: securedWhisker
+      DATABASE_URL: "pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8"
     depends_on:
       database:
         condition: service_healthy
@@ -69,13 +71,14 @@ services:
       context: ./front/
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_GPT_API_KEY: ${GPT_API_KEY}
+        NEXT_PUBLIC_GPT_ENABLED: ${GPT_API_KEY:+true}
         NEXT_PUBLIC_USER_HOST: ${SERVER_HOST}
         NEXT_PUBLIC_MESSAGE_HOST: ${SOCKET_HOST}
         NEXT_PUBLIC_APP_VERSION: ${VERSION}
         NEXT_PUBLIC_IP_WHITELIST: ${IP_WHITELIST}
         NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
-        VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+    environment:
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
     restart: always
     ports:
       - ${NEXTJS_PORT}:3000
@@ -103,9 +106,11 @@ services:
     ports:
       - "${TextManagerGPT_PORT}:3000"
     environment:
-      - NODE_ENV=production
-      - GPT_API_KEY=${GPT_API_KEY}
-      - PORT=${TextManagerGPT_PORT}
+      NODE_ENV: production
+      GPT_API_KEY: ${GPT_API_KEY}
+      GPT_MODEL: ${GPT_MODEL:-gpt-4o-mini}
+      GPT_TEMPERATURE: ${GPT_TEMPERATURE:-0.5}
+      PORT: "3000"
     command: node dist/index.js
     networks:
       - app-network

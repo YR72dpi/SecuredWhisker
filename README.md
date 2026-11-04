@@ -66,49 +66,20 @@ That's all.
 
 ### Configuration
 
-You mainly need to modify :
+Copy [`.env.example`](./.env.example) to `.env` for the production stack, or
+copy [`.env.dev.example`](./.env.dev.example) to `.env.dev` for development.
+Set `SERVER_HOST`, `SOCKET_HOST`, and `NEXTJS_DOMAIN` to the hostnames used by
+your deployment. Set `GPT_API_KEY` for the translation service and configure
+`VAPID_PUBLIC_KEY` with its matching `VAPID_PRIVATE_KEY` for push notifications.
 
-- ``SERVER_HOST`` : that's the user microservice
-- ``SOCKET_HOST`` : the websocket server who transmit the messages
-- ``NEXTJS_DOMAIN`` : The front end
+`POSTGRES_PORT` is the port published on the host; services in Compose always
+connect to PostgreSQL on its internal port `5432`. The development stack uses
+separate database storage and publishes PostgreSQL on port `5433` by default.
 
-```env
-# SecuredWhisker
-VERSION=1.3.5
+Start development with:
 
-# User manager (Symfony, PHP) 
-APP_ENV=dev
-DATABASE_URL="pgsql://root:securedwhisker@localhost:5432/securedwhisker?serverVersion=16&charset=utf8"
-CORS_ALLOW_ORIGIN='^.*$'
-SYMFONY_PORT=5000
-SERVER_HOST=[YOUR_SERVER_DOMAIN_OR_IP]
-LIMIT_MESSAGES_AGE="-1 week"
-###> nelmio/cors-bundle ###
-
-# message service (Fiber, GO)
-SHOW_ONLY_ERROR=false
-SOCKET_PORT=5050
-SOCKET_HOST=[YOUR_SERVER_IP]
-
-# To complete
-
-# Frontend
-NEXTJS_PORT=5010
-NEXTJS_DOMAIN=[YOUR_FRONTEND_DOMAIN_OR_IP]
-IP_WHITELIST="ip,ip,ip"
-VAPID_PUBLIC_KEY=
-VAPID_PRIVATE_KEY=
-
-#TextManagerGPT
-NEXT_PUBLIC_GPT_API_KEY=""
-TextManagerGPT_PORT=5020
-
-# POSTGRES (for docker compose)
-POSTGRES_DB=securedwhisker
-POSTGRES_PASSWORD=securedwhisker
-POSTGRES_USER=root
-POSTGRES_PORT=5432
-POSTGRES_VERSION=
+```bash
+docker compose --env-file .env.dev -f docker-compose.dev.yml up --build
 ```
 
 ## ChangeLog

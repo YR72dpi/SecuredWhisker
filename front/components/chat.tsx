@@ -30,7 +30,7 @@ export function Chat({
     const [selectedLanguage, setSelectedLanguage] = useState<string>("");
     const [haveToSaveMessage, setHaveToSaveMessage] = useState<boolean>(true);
     const [isSavedMessagesPrinted, setIsSavedMessagePrint] = useState<boolean>(false)
-    const showLanguageSelector = !!process.env.NEXT_PUBLIC_GPT_API_KEY;
+    const showLanguageSelector = process.env.NEXT_PUBLIC_GPT_ENABLED === 'true';
 
     const room = ChatLib.getRoomName(senderDataForChat.id, receiverDataForChat.id)
     const reconnectInterval = useRef<NodeJS.Timeout>();
